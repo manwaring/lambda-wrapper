@@ -20,6 +20,9 @@
     "publish-please": "^3.2.0",
     "typescript": "^3.0.1"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/manwaring/lambda-wrapper.git"
