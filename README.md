@@ -1,5 +1,5 @@
 <p align="center">
-  <img src=".github/images/manwaring.jpg">
+  <img src="https://avatars0.githubusercontent.com/u/36457275?s=400&u=16d355f384ed7f8e0655b7ed1d70ff2e411690d8&v=4">
 </p>
 
 [![Build status][circleci-badge]][circleci-badge-url]
