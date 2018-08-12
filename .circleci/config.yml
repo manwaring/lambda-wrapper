@@ -1,0 +1,61 @@
+# CI/CD configuration file for QQ shared packages
+
+# Note: YAML anchors allow an object to be re-used, reducing duplication. The ampersand
+# declares an alias for an object, then later the `<<: *alias` syntax dereferences it.
+#
+# See http://blog.daemonl.com/2016/02/yaml.html and 
+# https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd
+# for more information about how to use anchors.
+# 
+# To validate changes use an online parser, eg. http://yaml-online-parser.appspot.com/
+anchors:
+
+  container-config: &container-config
+    docker:
+      - image: circleci/node
+        environment:
+          TERM: dumb
+
+  load-cache: &load-cache
+    restore_cache:
+      key: dependency-cache-{{ checksum "package.json" }}
+
+## Circle CI configuration, see https://circleci.com/docs/2.0/configuration-reference/
+version: 2
+jobs:
+  install:
+    <<: *container-config
+    steps:
+      - checkout
+      - *load-cache   
+      - run:
+          name: Install dependencies
+          command: npm i
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules      
+
+  publish:
+    <<: *container-config
+    steps:
+      - checkout
+      - *load-cache    
+      - run:
+          name: Set npm credentials
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run:
+          name: Publish on npm
+          command: npm run publish-please
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - install     
+      - publish:
+          requires:
+            - install
+          filters:
+            branches:
+              only: master
