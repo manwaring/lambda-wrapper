@@ -43,7 +43,7 @@ jobs:
       - *load-cache    
       - run:
           name: Set npm credentials
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_PUBLISH_TOKEN" >> ~/.npmrc
       - run:
           name: Publish on npm
           command: npm run publish-please
