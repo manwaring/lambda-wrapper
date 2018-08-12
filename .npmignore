@@ -1,5 +1,6 @@
 .github/
 .circleci/
+src/
 .prettierrc.yml
 .gitignore
 .npmignore
