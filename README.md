@@ -6,7 +6,7 @@
 [![Known Vulnerabilities][vulnerability-badge]][vulnerability-badge-url]
 [![Dependency Status][dependency-badge]][dependency-badge-url]
 [![devDependency Status][dev-dependency-badge]][dev-dependency-badge-url]
-[![NPM version][npm-version-badge]][npm-version-badge-url]
+[![NPM version][latest-version-badge]][latest-version-badge-url]
 [![License][license-badge]][license-badge-url]
 [![Code style][formatter-badge]][formatter-badge-url]
 
@@ -22,7 +22,7 @@
 [formatter-badge-url]: #badge
 [license-badge]: https://img.shields.io/npm/l/@manwaring/lambda-wrapper.svg
 [license-badge-url]: https://www.npmjs.com/package/@manwaring/lambda-wrapper
-[npm-version-badge]: https://badge.fury.io/js/%40manwaring%2Flambda-wrapper.svg
-[npm-version-badge-url]: https://badge.fury.io/js/%40manwaring%2Flambda-wrapper
 [vulnerability-badge]: https://snyk.io/test/github/manwaring/lambda-wrapper/badge.svg?targetFile=package.json
 [vulnerability-badge-url]: https://snyk.io/test/github/manwaring/lambda-wrapper?targetFile=package.json
+[latest-version-badge]: https://img.shields.io/npm/v/%40manwaring%2Flambda-wrapper/latest.svg
+[latest-version-badge-url]: https://npmjs.com/package/@manwaring/lambda-wrapper
