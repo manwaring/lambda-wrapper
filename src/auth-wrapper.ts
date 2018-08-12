@@ -52,9 +52,9 @@ function generatePolicy(jwt: any): any {
 }
 
 export interface AuthorizerSignature {
-  event: CustomAuthorizerEvent;
-  token: string;
-  valid(jwt: any): void;
-  invalid(message: string[]): void;
-  error(error: any): void;
+  event: CustomAuthorizerEvent; // original event
+  token: string; // authorizer token from original event
+  valid(jwt: any): void; // creates AWS policy to authenticate request, and adds auth context if available
+  invalid(message: string[]): void; // returns 401 unauthorized
+  error(error: any): void; // records error information and returns 401 unauthorized
 }

@@ -64,21 +64,21 @@ function getTableInformation(record: Record): { tableName: string; tableArn: str
 }
 
 export interface StreamSignature {
-  event: DynamoDBStreams.GetRecordsOutput;
-  newVersions: any[];
-  oldVersions: any[];
-  versions: Version[];
-  success(message: any): void;
-  error(error: any): void;
+  event: DynamoDBStreams.GetRecordsOutput; // original event
+  newVersions: any[]; // array of all unmarshalled javascript objects of new images
+  oldVersions: any[]; // array of all unmarshalled javascript objects of old images
+  versions: Version[]; // array of full version object (new image, old image, etc - see Version interface)
+  success(message: any): void; // invokes lambda callback with success
+  error(error: any): void; // invokes lambda callback with error
 }
 
 export interface Version {
-  newVersion: any;
-  oldVersion: any;
-  keys: any;
-  tableName: string;
-  tableArn: string;
-  eventName: string;
+  newVersion: any; // unmarshalled javascript object of new image (if exists) or null
+  oldVersion: any; // unmarshalled javascript object of old image (if exists) or null
+  keys: any; // unmarshalled javascript object of keys (includes key values)
+  tableName: string; // name of the table the object came from
+  tableArn: string; // arn of the table the object came from
+  eventName: string; // name of the event (INSERT || MODIFY || REMOVE)
 }
 
 // Used internally to this class for brevity in private method signatures
