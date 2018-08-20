@@ -50,6 +50,7 @@ Example implementation:
 
 ```ts
 import { apiWrapper, ApiSignature } from '@manwaring/lambda-wrapper';
+...
 
 export const handler = apiWrapper(async ({ path, success, error }: ApiSignature) => {
   try {
@@ -58,7 +59,7 @@ export const handler = apiWrapper(async ({ path, success, error }: ApiSignature)
     const results = await doSomething(pathParam1, pathParam2);
     success(results);
   } catch (err) {
-    return error(err);
+    error(err);
   }
 });
 ```
@@ -81,6 +82,7 @@ Example implementation:
 
 ```ts
 import { authWrapper, AuthorizerSignature } from '@manwaring/lambda-wrapper';
+...
 
 export const handler = authWrapper(async ({ token, valid, invalid }: AuthorizerSignature) => {
   try {
@@ -88,9 +90,9 @@ export const handler = authWrapper(async ({ token, valid, invalid }: AuthorizerS
       return invalid('Missing token');
     }
     const jwt = await verifier.verifyAccessToken(token);
-    return valid(jwt);
+    valid(jwt);
   } catch (err) {
-    return invalid(err);
+    invalid(err);
   }
 });
 ```
@@ -111,6 +113,7 @@ Example implementation:
 
 ```ts
 import { wrapper, WrapperSignature } from '@manwaring/lambda-wrapper';
+...
 
 export const handler = wrapper(async ({ event, success, error }: WrapperSignature) => {
   try {
@@ -118,9 +121,8 @@ export const handler = wrapper(async ({ event, success, error }: WrapperSignatur
     const { value1, value2 } = event;
     const results = await doSomething(value1, value2);
     success(results);
-    return success(response);
   } catch (err) {
-    return error(err);
+    error(err);
   }
 });
 ```
