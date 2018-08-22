@@ -317,9 +317,9 @@ For each invocation across all wrapper types you'll get the following:
 
 Metrics:
 
-1. Region: <AWS region your Lambda is running in>
-1. Revision: <Git revision of the deployed Lambda code> (if you set a `REVISION` environment variable for your Lambda function)
-1. Stage: <Name of the stage this Lambda function is deployed with> (if you set a `STAGE` environment variable for your Lambda function)
+1. Region: AWS region your Lambda is running in
+1. Revision: Git revision of the deployed Lambda code (if you set a `REVISION` environment variable for your Lambda function)
+1. Stage: Name of the stage this Lambda function is deployed with (if you set a `STAGE` environment variable for your Lambda function)
 
 Labels:
 
