@@ -21,7 +21,11 @@ This project includes the [IOPipe library](https://iopipe.com) for (IMO) the bes
 
 `npm i --save @manwaring/lambda-wrapper`
 
-Optional IOPipe setup: if you want to take advantage of the IOPipe logging and monitoring functionality (highly recommended!) you'll need to create an account and include a project token. More information can be found in the [IOPipe configuration documentation here](https://github.com/iopipe/iopipe-js-core#configuration).
+Optional IOPipe setup:
+
+1. If you want to take advantage of the IOPipe logging and monitoring functionality (highly recommended!) you'll need to create an account and include a project token. More information can be found in the [IOPipe configuration documentation here](https://github.com/iopipe/iopipe-js-core#configuration).
+1. If you want IOPipe to add a metric for the stage the Lambda function is deployed to will need to set a `STAGE` environment variable
+1. If you want IOPipe to add a metric for the git revision of the deployed Lambda code you will need to set a `REVISION` environment variable (see [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) for a JavaScript library that can help with this, and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for a Serverless Framework plugin)
 
 ## Supported AWS Lambda trigger events
 
