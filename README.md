@@ -13,24 +13,32 @@
 
 # AWS Lambda wrapper library
 
-This package provides custom Lambda function wrappers to help simplify Lambda application code and to provide default implementations for logging invocation and status information.
+This package provides custom Lambda function wrappers to help simplify Lambda application code and to provide default implementations for logging invocation and status information. For information about optional setup information see the [setup section below](#installation-and-setup).
+
+This project includes the [IOPipe library](https://iopipe.com) for (IMO) the best serverless logging and monitoring experience available at the moment. Each wrapper will automatically label the invocations and add appropriate metrics upon receipt of the event payload as well as when helper callback functions are invoked. For more information about what labels, metrics, and logs are configured for each wrapper please see the [IOPipe labels and metrics section below](#iopipe-labels-and-metrics).
+
+## Installation and setup
+
+`npm i --save @manwaring/lambda-wrapper`
+
+Optional IOPipe setup: if you want to take advantage of the IOPipe logging and monitoring functionality (highly recommended!) you'll need to create an account and include a project token. More information can be found in the [IOPipe configuration documentation here](https://github.com/iopipe/iopipe-js-core#configuration).
 
 ## Supported AWS Lambda trigger events
 
 All of the below wrappers provide a deconstructed method signature exposing parsed/unmarshalled request parameters and helper methods.
 
-1. API Gateway event with support for cors headers and 200, 302, 400, and 500 responses
-1. API Gateway authorizer event with support for creating access policies for successfully authorized requests
-1. CloudFormation Custom Resource event with support for CloudFormation successes and failures
-1. SNS event with support for success and failure responses
-1. DynamoDB Stream event with support for success and failure responses
-1. A generic event wrapper with support for success and failure responses.
+1. [API Gateway event wrapper](#api-event-wrapper) with support for cors headers and 200, 302, 400, and 500 responses
+1. [API Gateway authorizer event wrapper](#auth-event-wrapper) with support for creating access policies for successfully authorized requests
+1. [CloudFormation Custom Resource event wrapper](#cloudformation-custom-resource-event-wrapper) with support for CloudFormation successes and failures
+1. [SNS event wrapper](#sns-event-wrapper) with support for success and failure responses
+1. [DynamoDB Stream event wrapper](#dynamodb-stream-event-wrapper) with support for success and failure responses
+1. A [generic event wrapper](#general-event-wrapper) with support for success and failure responses.
 
 # Example usage
 
 ## Api event wrapper
 
-Available properties and methods on api wrapper signature:
+### Available properties and methods on api wrapper signature:
 
 ```ts
 interface ApiSignature {
@@ -46,7 +54,9 @@ interface ApiSignature {
 }
 ```
 
-Example implementation:
+\*Note that each callback helper functions (success, invalid, redirect, error) includes CORS-enabling header information.
+
+### Example implementation:
 
 ```ts
 import { apiWrapper, ApiSignature } from '@manwaring/lambda-wrapper';
@@ -54,7 +64,6 @@ import { apiWrapper, ApiSignature } from '@manwaring/lambda-wrapper';
 
 export const handler = apiWrapper(async ({ path, success, error }: ApiSignature) => {
   try {
-    // application logic using API event information
     const { pathParam1, pathParam2 } = path;
     const results = await doSomething(pathParam1, pathParam2);
     success(results);
@@ -64,9 +73,42 @@ export const handler = apiWrapper(async ({ path, success, error }: ApiSignature)
 });
 ```
 
+### Information captured with each invocation
+
+**The following information is always included:**
+
+1. (IOPipe metric) Body: parsed or null body object included with event
+1. (IOPipe metric) Path: path parameters included with event
+1. (IOPipe metric) Query: query string parameters included with event
+1. (Debug log) Full request (body, path, query)
+
+Depending on which callback helper is invoked additional information will be associated with the invocation:
+
+**Success callback helper:**
+
+1. (IOPipe label) `success`
+1. (Info log) Response payload/body
+
+**Invalid callback helper:**
+
+1. (IOPipe label) `invalid`
+1. (IOPipe metric) Invalid: list of validation messages
+1. (Warn log) List of validation errors
+
+**Redirect callback helper:**
+
+1. (IOPipe label) `redirect`
+1. (Info log) Redirect URL
+
+**Error callback helper:**
+
+1. (IOPipe label) `error`
+1. (IOPipe metric) Error: error object or message
+1. (Error log) Error object or message
+
 ## Auth event wrapper
 
-Available properties and methods on auth wrapper signature:
+### Available properties and methods on auth wrapper signature:
 
 ```ts
 interface AuthorizerSignature {
@@ -78,7 +120,7 @@ interface AuthorizerSignature {
 }
 ```
 
-Example implementation:
+### Example implementation:
 
 ```ts
 import { authWrapper, AuthorizerSignature } from '@manwaring/lambda-wrapper';
@@ -97,39 +139,27 @@ export const handler = authWrapper(async ({ token, valid, invalid }: AuthorizerS
 });
 ```
 
-## General event wrapper
+### Information captured with each invocation
 
-Available properties and methods on general wrapper signature:
+Depending on which callback helper is invoked additional information will be associated with the invocation:
 
-```ts
-interface WrapperSignature {
-  event: any; // original event
-  success(payload: any): void; // invokes lambda callback with success response
-  error(error: any): void; // invokes lambda callback with error response
-}
-```
+**Valid callback helper:**
 
-Example implementation:
+1. (IOPipe label) `valid`
 
-```ts
-import { wrapper, WrapperSignature } from '@manwaring/lambda-wrapper';
-...
+**Invalid callback helper:**
 
-export const handler = wrapper(async ({ event, success, error }: WrapperSignature) => {
-  try {
-    // application logic using any kind of event information
-    const { value1, value2 } = event;
-    const results = await doSomething(value1, value2);
-    success(results);
-  } catch (err) {
-    error(err);
-  }
-});
-```
+1. (IOPipe label) `invalid`
+1. (IOPipe metric) Invalid: the message indicating cause of invalidation (expired token, unauthorized, etc.)
+
+**Error callback helper:**
+
+1. (IOPipe label) `error`
+1. (IOPipe metric) Error: error object or message
 
 ## CloudFormation custom resource event wrapper
 
-Available properties and methods on CloudFormation wrapper signature:
+### Available properties and methods on CloudFormation wrapper signature:
 
 ```ts
 interface CloudFormationSignature {
@@ -139,13 +169,27 @@ interface CloudFormationSignature {
 }
 ```
 
-Example implementation:
+### Example implementation:
 
 // TODO CloudFormation wrapper implementation example
 
+### Information captured with each invocation
+
+Depending on which callback helper is invoked additional information will be associated with the invocation:
+
+**Success callback helper:**
+
+1. (IOPipe label) `success`
+1. (Info log) Success message
+
+**Failure callback helper:**
+
+1. (IOPipe label) `failure`
+1. (Error log) Error message or object
+
 ## SNS event wrapper
 
-Available properties and methods on SNS wrapper signature:
+### Available properties and methods on SNS wrapper signature:
 
 ```ts
 interface SnsSignature {
@@ -156,13 +200,28 @@ interface SnsSignature {
 }
 ```
 
-Example implementation:
+### Example implementation:
 
 // TODO SNS event wrapper implementation example
 
+### Information captured with each invocation
+
+Depending on which callback helper is invoked additional information will be associated with the invocation:
+
+**Success callback helper:**
+
+1. (IOPipe label) `success`
+1. (Info log) Success message
+
+**Error callback helper:**
+
+1. (IOPipe label) `error`
+1. (IOPipe metric) Error: Error message or object
+1. (Error log) Error message or object
+
 ## DynamoDB stream event wrapper
 
-Available properties and methods on DynamoDB wrapper signature:
+### Available properties and methods on DynamoDB wrapper signature:
 
 ```ts
 interface StreamSignature {
@@ -184,9 +243,87 @@ interface Version {
 }
 ```
 
-Example implementation:
+### Example implementation:
 
 // TODO DynamoDB stream wrapper implementation example
+
+### Information captured with each invocation
+
+Depending on which callback helper is invoked additional information will be associated with the invocation:
+
+**Success callback helper:**
+
+1. (IOPipe label) `success`
+1. (Info log) Success message
+
+**Error callback helper:**
+
+1. (IOPipe label) `error`
+1. (IOPipe metric) Error: Error message or object
+1. (Error log) Error message or object
+
+## General event wrapper
+
+### Available properties and methods on general wrapper signature:
+
+```ts
+interface WrapperSignature {
+  event: any; // original event
+  success(payload: any): void; // invokes lambda callback with success response
+  error(error: any): void; // invokes lambda callback with error response
+}
+```
+
+### Example implementation:
+
+```ts
+import { wrapper, WrapperSignature } from '@manwaring/lambda-wrapper';
+...
+
+export const handler = wrapper(async ({ event, success, error }: WrapperSignature) => {
+  try {
+    // application logic using any kind of event information
+    const { value1, value2 } = event;
+    const results = await doSomething(value1, value2);
+    success(results);
+  } catch (err) {
+    error(err);
+  }
+});
+```
+
+### Information captured with each invocation
+
+Depending on which callback helper is invoked additional information will be associated with the invocation:
+
+**Success callback helper:**
+
+1. (IOPipe label) `success`
+1. (Info log) Success message
+
+**Error callback helper:**
+
+1. (IOPipe label) `error`
+1. (IOPipe metric) Error: Error message or object
+1. (Error log) Error message or object
+
+# IOPipe labels and metrics
+
+If you've [configured your project to use IOPipe](https://github.com/iopipe/iopipe-js-core#configuration) by at a minimum including the access token you'll get labels and metrics assigned to each invocation.
+
+## Common labels and metrics
+
+For each invocation across all wrapper types you'll get the following:
+
+Metrics:
+
+1. Region: <AWS region your Lambda is running in>
+1. Revision: <Git revision of the deployed Lambda code> (if you set a `REVISION` environment variable for your Lambda function)
+1. Stage: <Name of the stage this Lambda function is deployed with> (if you set a `STAGE` environment variable for your Lambda function)
+
+Labels:
+
+1. The result of each invocation, determined by the helper callback function that was invoked (`success`, `invalid`, `errors`, etc. - see the per-wrapper details above for more information)
 
 [build-badge]: https://circleci.com/gh/manwaring/lambda-wrapper.svg?style=shield&circle-token=29c46c698a84144d4ea9d21552f1927c87afd68e
 [build-badge-url]: https://circleci.com/gh/manwaring/lambda-wrapper
