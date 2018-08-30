@@ -13,6 +13,20 @@
 
 # AWS Lambda wrapper library
 
+1. [Package overview](#package-overview)
+1. [Installation and setup](#installation-and-setup)
+1. [Supported AWS trigger events](#supported-aws-lambda-trigger-events)
+1. [Example usage](#example-usage)
+   - [API Gateway event wrapper](#api-event-wrapper)
+   - [API Gateway authorizer event wrapper](#auth-event-wrapper)
+   - [CloudFormation Custom Resource event wrapper](#cloudformation-custom-resource-event-wrapper)
+   - [SNS event wrapper](#sns-event-wrapper)
+   - [DynamoDB Stream event wrapper](#dynamodb-stream-event-wrapper)
+   - [Generic event wrapper](#general-event-wrapper)
+1. [IOPipe labels and metrics](#iopipe-labels-and-metrics)
+
+## Package overview
+
 This package provides custom Lambda function wrappers to help simplify Lambda application code and to provide default implementations for logging invocation and status information. For information about optional setup information see the [setup section below](#installation-and-setup).
 
 This project includes the [IOPipe library](https://iopipe.com) for (IMO) the best serverless logging and monitoring experience available at the moment. Each wrapper will automatically label the invocations and add appropriate metrics upon receipt of the event payload as well as when helper callback functions are invoked. For more information about what labels, metrics, and logs are configured for each wrapper please see the [IOPipe labels and metrics section below](#iopipe-labels-and-metrics).
