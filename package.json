@@ -38,6 +38,7 @@
     "aws",
     "lambda",
     "wrapper",
-    "iopipe"
+    "iopipe",
+    "serverless"
   ]
 }
