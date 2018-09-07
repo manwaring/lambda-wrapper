@@ -35,6 +35,15 @@ jobs:
           paths:
             - node_modules
 
+  test:
+    <<: *container-config
+    steps:
+      - checkout
+      - *load-cache
+      - run:
+          name: Test
+          command: npm test
+
   publish:
     <<: *container-config
     steps:
@@ -52,6 +61,9 @@ workflows:
   build_and_test:
     jobs:
       - install
+      - test:
+          requires:
+            - install
       - publish:
           context: manwaring-npm
           requires:
