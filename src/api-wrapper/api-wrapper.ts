@@ -1,6 +1,6 @@
 import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
 import { label, metric } from '@iopipe/iopipe';
-import { tagCommonMetrics } from './common';
+import { tagCommonMetrics } from '../common';
 
 const headers = {
   'Access-Control-Allow-Origin': '*',

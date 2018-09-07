@@ -1,6 +1,6 @@
 import { CustomAuthorizerEvent } from 'aws-lambda';
 import { label, metric } from '@iopipe/iopipe';
-import { tagCommonMetrics } from './common';
+import { tagCommonMetrics } from '../common';
 
 export function authWrapper<T extends Function>(fn: T): T {
   return <any>function(event: CustomAuthorizerEvent, context: any, callback: any) {

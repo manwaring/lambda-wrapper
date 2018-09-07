@@ -3,9 +3,12 @@
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
   "version": "0.1.3",
   "scripts": {
-    "prepublishOnly": "tsc",
-    "prepublish": "publish-please guard && rimraf dist/**",
-    "publish-please": "publish-please"
+    "prepublishOnly": "rimraf dist/ && npm run build && publish-please guard",
+    "publish-please": "publish-please",
+    "build": "tsc -p ./tsconfig.build.json",
+    "test": "node_modules/cucumber/bin/cucumber-js src/**/*.feature",
+    "pretest": "tsc -p ./tsconfig.json",
+    "posttest": "rimraf src/*.js src/**/*.js src/*.d.ts src/**/*.d.ts"
   },
   "dependencies": {
     "@iopipe/iopipe": "^1.8.0",
@@ -16,7 +19,11 @@
     "@types/node": "^10.5.8",
     "aws-lambda": "^0.1.2",
     "aws-sdk": "^2.291.0",
+    "chai": "^4.1.2",
+    "cucumber": "^4.2.1",
+    "cucumber-tsflow": "^2.2.0",
     "publish-please": "^3.2.0",
+    "rimraf": "^2.6.2",
     "typescript": "^3.0.1"
   },
   "publishConfig": {

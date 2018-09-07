@@ -1,6 +1,6 @@
 import { Context, Callback } from 'aws-lambda';
 import { label, metric } from '@iopipe/iopipe';
-import { tagCommonMetrics } from './common';
+import { tagCommonMetrics } from '../common';
 
 export function wrapper<T extends Function>(fn: T): T {
   return <any>function(event, context: Context, callback: Callback) {

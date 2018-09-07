@@ -1,6 +1,6 @@
 import { DynamoDB, DynamoDBStreams } from 'aws-sdk';
 import { label, metric } from '@iopipe/iopipe';
-import { tagCommonMetrics } from './common';
+import { tagCommonMetrics } from '../common';
 
 export function streamWrapper<T extends Function>(fn: T): T {
   return <any>function(event: DynamoDBStreams.GetRecordsOutput, context, callback) {

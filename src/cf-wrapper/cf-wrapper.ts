@@ -1,7 +1,7 @@
 import { CloudFormationCustomResourceEvent, Context, Callback } from 'aws-lambda';
 import { label, metric } from '@iopipe/iopipe';
 import { send, SUCCESS, FAILED } from 'cfn-response';
-import { tagCommonMetrics } from './common';
+import { tagCommonMetrics } from '../common';
 
 export function cloudFormationWrapper<T extends Function>(fn: T): T {
   return <any>function(event: CloudFormationCustomResourceEvent, context: Context, callback: Callback) {
