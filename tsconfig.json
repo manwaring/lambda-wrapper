@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "declaration": true
+    "declaration": true,
+    "inlineSourceMap": true
   },
   "exclude": ["node_modules", "dist"]
 }

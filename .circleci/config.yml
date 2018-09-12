@@ -67,7 +67,6 @@ workflows:
     jobs:
       - install
       - test:
-          # context: manwaring-codecov
           requires:
             - install
       - publish:
