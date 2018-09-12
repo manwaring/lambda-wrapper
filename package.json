@@ -3,12 +3,15 @@
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
   "version": "0.1.4",
   "scripts": {
-    "prepublishOnly": "rimraf dist/ && npm run build && publish-please guard",
     "publish-please": "publish-please",
+    "prepublishOnly": "rimraf dist/ && npm run build && publish-please guard",
     "build": "tsc -p ./tsconfig.build.json",
-    "test": "node_modules/cucumber/bin/cucumber-js src/**/*.feature",
+    "test": "nyc nyc node_modules/cucumber/bin/cucumber-js src/**/*.feature",
     "pretest": "tsc -p ./tsconfig.json",
-    "posttest": "rimraf src/*.js src/**/*.js src/*.d.ts src/**/*.d.ts"
+    "posttest": "npm run reportcoverage && npm run clean",
+    "reportcoverage": "nyc report --reporter=json --reporter=lcov",
+    "clean": "rimraf src/*.js src/**/*.js src/*.d.ts src/**/*.d.ts",
+    "codecov": "codecov -f coverage/*.json"
   },
   "dependencies": {
     "@iopipe/iopipe": "^1.8.0",

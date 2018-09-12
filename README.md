@@ -4,6 +4,7 @@
 </p>
 
 [![Build status][build-badge]][build-badge-url]
+[![Test coverage][coverage-badge]][coverage-badge-url]
 [![Known Vulnerabilities][vulnerability-badge]][vulnerability-badge-url]
 [![Dependency Status][dependency-badge]][dependency-badge-url]
 [![devDependency Status][dev-dependency-badge]][dev-dependency-badge-url]
@@ -345,6 +346,8 @@ Labels:
 
 [build-badge]: https://circleci.com/gh/manwaring/lambda-wrapper.svg?style=shield&circle-token=29c46c698a84144d4ea9d21552f1927c87afd68e
 [build-badge-url]: https://circleci.com/gh/manwaring/lambda-wrapper
+[coverage-badge]: https://codecov.io/gh/manwaring/lambda-wrapper/branch/master/graph/badge.svg
+[coverage-badge-url]: https://codecov.io/gh/manwaring/lambda-wrapper
 [dependency-badge]: https://david-dm.org/manwaring/lambda-wrapper.svg
 [dependency-badge-url]: https://david-dm.org/manwaring/lambda-wrapper
 [dev-dependency-badge]: https://david-dm.org/manwaring/lambda-wrapper/dev-status.svg
