@@ -7,9 +7,9 @@ export function wrapper<T extends Function>(fn: T): T {
     tagCommonMetrics();
     console.debug('Received event', event);
 
-    function success(message: any): void {
+    function success(message?: any): void {
       label('success');
-      console.info('Successfully processed request', message);
+      console.info('Successfully processed request', message ? message : '');
       return callback(null, message);
     }
 

@@ -7,9 +7,9 @@ export function cloudFormationWrapper<T extends Function>(fn: T): T {
   return <any>function(event: CloudFormationCustomResourceEvent, context: Context, callback: Callback) {
     tagCommonMetrics();
 
-    function success(message: any): void {
+    function success(message?: any): void {
       label('success');
-      console.info('Successfully processed CloudFormation stack event', message);
+      console.info('Successfully processed CloudFormation stack event', message ? message : '');
       return send(event, context, SUCCESS);
     }
 

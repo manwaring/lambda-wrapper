@@ -9,9 +9,9 @@ export function snsWrapper<T extends Function>(fn: T): T {
     metric('message', message);
     console.debug('Received SNS event', message);
 
-    function success(message: any): void {
+    function success(message?: any): void {
       label('success');
-      console.info('Successfully processed request', message);
+      console.info('Successfully processed request', message ? message : '');
       return callback(null, message);
     }
 

@@ -8,9 +8,9 @@ export function streamWrapper<T extends Function>(fn: T): T {
     const { newVersions, oldVersions, versions } = getStreamInformation(event);
     console.debug('Received stream request', newVersions, oldVersions, versions);
 
-    function success(message: any): void {
+    function success(message?: any): void {
       label('success');
-      console.info('Successfully processed request, returning response payload', message);
+      console.info('Successfully processed request, returning response payload', message ? message : '');
       return callback(null, message);
     }
 
