@@ -27,6 +27,6 @@ export function wrapper<T extends Function>(fn: T): T {
 
 export interface WrapperSignature {
   event: any; // original event
-  success(payload: any): void; // invokes lambda callback with success response
+  success(message?: any): void; // invokes lambda callback with success response
   error(error: any): void; // invokes lambda callback with error response
 }

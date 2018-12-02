@@ -30,6 +30,6 @@ export function snsWrapper<T extends Function>(fn: T): T {
 export interface SnsSignature {
   event: SNSEvent; // original event
   message: any; // JSON-parsed message from event
-  success(payload: any): void; // invokes lambda callback with success
+  success(message?: any): void; // invokes lambda callback with success
   error(error: any): void; // invokes lambda callback with error
 }

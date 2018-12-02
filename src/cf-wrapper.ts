@@ -26,6 +26,6 @@ export function cloudFormationWrapper<T extends Function>(fn: T): T {
 
 export interface CloudFormationSignature {
   event: CloudFormationCustomResourceEvent; // original event
-  success(payload: any): void; // sends CloudFormation success event
+  success(message?: any): void; // sends CloudFormation success event
   failure(message: any): void; // sends CloudFormation failure event
 }

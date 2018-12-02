@@ -68,7 +68,7 @@ export interface StreamSignature {
   newVersions: any[]; // array of all unmarshalled javascript objects of new images
   oldVersions: any[]; // array of all unmarshalled javascript objects of old images
   versions: Version[]; // array of full version object (new image, old image, etc - see Version interface)
-  success(message: any): void; // invokes lambda callback with success
+  success(message?: any): void; // invokes lambda callback with success
   error(error: any): void; // invokes lambda callback with error
 }
 
