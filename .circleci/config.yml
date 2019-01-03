@@ -11,7 +11,7 @@
 anchors:
   container-config: &container-config
     docker:
-      - image: circleci/node
+      - image: circleci/node:10.15
         environment:
           TERM: dumb
 
