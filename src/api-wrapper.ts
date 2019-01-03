@@ -10,7 +10,7 @@ const headers = {
 export function apiWrapper<T extends Function>(fn: T): T {
   return <any>function(event: APIGatewayEvent, context: Context, callback: Callback) {
     tagCommonMetrics();
-    const { body, path, query, request, auth, headers } = getRequestFields(event);
+    const { body, path, query, request, auth, headers, testRequest } = getRequestFields(event);
     metric('body', body);
     metric('path', path);
     metric('query', query);
@@ -46,7 +46,19 @@ export function apiWrapper<T extends Function>(fn: T): T {
       return callback(error);
     }
 
-    const signature: ApiSignature = { event, body, path, query, headers, auth, success, invalid, redirect, error };
+    const signature: ApiSignature = {
+      event,
+      body,
+      path,
+      query,
+      headers,
+      testRequest,
+      auth,
+      success,
+      invalid,
+      redirect,
+      error
+    };
     return fn(signature);
   };
 }
@@ -57,8 +69,9 @@ function getRequestFields(event: APIGatewayEvent): any {
   const query = event.queryStringParameters ? event.queryStringParameters : null;
   const auth = event.requestContext && event.requestContext.authorizer ? event.requestContext.authorizer : null;
   const headers = event.headers ? event.headers : null;
-  const request = { body, path, query, auth, headers };
-  return { body, path, query, request, auth, headers };
+  const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || 'Test-Request';
+  const testRequest = headers ? JSON.parse(headers[TEST_REQUEST_HEADER]) : null;
+  return { body, path, query, auth, headers, testRequest };
 }
 
 export interface ApiSignature {
@@ -67,6 +80,7 @@ export interface ApiSignature {
   path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise null)
   query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise null)
   headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise null)
+  testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
   auth: any; // auth context from custom authorizer if exists (otherwise null)
   success(payload: any): void; // returns 200 status with payload
   invalid(errors: string[]): void; // returns 400 status with errors in payload

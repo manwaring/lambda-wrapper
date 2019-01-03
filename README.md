@@ -59,6 +59,7 @@ interface ApiSignature {
   path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise null)
   query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise null)
   headers: { [name: string]: string }; // headers param payload as key-value pairs if exists (otherwise null)
+  testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
   auth: any; // auth context from custom authorizer if exists (otherwise null)
   success(payload: any): void; // returns 200 status with payload
   invalid(errors: string[]): void; // returns 400 status with errors in payload
