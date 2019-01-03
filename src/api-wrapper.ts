@@ -71,7 +71,8 @@ function getRequestFields(event: APIGatewayEvent): any {
   const headers = event.headers ? event.headers : null;
   const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || 'Test-Request';
   const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : null;
-  return { body, path, query, auth, headers, testRequest };
+  const request = { body, path, query, auth, headers, testRequest };
+  return { body, path, query, auth, request, headers, testRequest };
 }
 
 export interface ApiSignature {
