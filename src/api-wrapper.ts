@@ -10,10 +10,11 @@ const headers = {
 export function apiWrapper<T extends Function>(fn: T): T {
   return <any>function(event: APIGatewayEvent, context: Context, callback: Callback) {
     tagCommonMetrics();
-    const { body, path, query, request, auth } = getRequestFields(event);
+    const { body, path, query, request, auth, headers } = getRequestFields(event);
     metric('body', body);
     metric('path', path);
     metric('query', query);
+    metric('headers', headers);
     console.debug('Received API request', request);
 
     function success(payload: any): void {
@@ -45,7 +46,7 @@ export function apiWrapper<T extends Function>(fn: T): T {
       return callback(error);
     }
 
-    const signature: ApiSignature = { event, body, path, query, auth, success, invalid, redirect, error };
+    const signature: ApiSignature = { event, body, path, query, headers, auth, success, invalid, redirect, error };
     return fn(signature);
   };
 }
@@ -55,8 +56,9 @@ function getRequestFields(event: APIGatewayEvent): any {
   const path = event.pathParameters ? event.pathParameters : null;
   const query = event.queryStringParameters ? event.queryStringParameters : null;
   const auth = event.requestContext && event.requestContext.authorizer ? event.requestContext.authorizer : null;
-  const request = { body, path, query, auth };
-  return { body, path, query, request, auth };
+  const headers = event.headers ? event.headers : null;
+  const request = { body, path, query, auth, headers };
+  return { body, path, query, request, auth, headers };
 }
 
 export interface ApiSignature {
@@ -64,6 +66,7 @@ export interface ApiSignature {
   body: any; // JSON parsed body payload if exists (otherwise null)
   path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise null)
   query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise null)
+  headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise null)
   auth: any; // auth context from custom authorizer if exists (otherwise null)
   success(payload: any): void; // returns 200 status with payload
   invalid(errors: string[]): void; // returns 400 status with errors in payload

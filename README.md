@@ -3,13 +3,7 @@
   <img height="150" src="https://user-images.githubusercontent.com/2955468/44874383-0168f780-ac69-11e8-8e51-774678cbd966.png">
 </p>
 
-[![Build status][build-badge]][build-badge-url]
-[![Known Vulnerabilities][vulnerability-badge]][vulnerability-badge-url]
-[![Dependency Status][dependency-badge]][dependency-badge-url]
-[![devDependency Status][dev-dependency-badge]][dev-dependency-badge-url]
-[![NPM version][latest-version-badge]][latest-version-badge-url]
-[![License][license-badge]][license-badge-url]
-[![Code style][formatter-badge]][formatter-badge-url]
+[![Build status][build-badge]][build-badge-url][![Known Vulnerabilities][vulnerability-badge]][vulnerability-badge-url][![Dependency Status][dependency-badge]][dependency-badge-url][![devDependency Status][dev-dependency-badge]][dev-dependency-badge-url][![NPM version][latest-version-badge]][latest-version-badge-url][![License][license-badge]][license-badge-url][![Code style][formatter-badge]][formatter-badge-url]
 
 # AWS Lambda wrapper library
 
@@ -64,6 +58,7 @@ interface ApiSignature {
   body: any; // JSON parsed body payload if exists (otherwise null)
   path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise null)
   query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise null)
+  headers: { [name: string]: string }; // headers param payload as key-value pairs if exists (otherwise null)
   auth: any; // auth context from custom authorizer if exists (otherwise null)
   success(payload: any): void; // returns 200 status with payload
   invalid(errors: string[]): void; // returns 400 status with errors in payload
