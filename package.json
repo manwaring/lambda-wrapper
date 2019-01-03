@@ -16,7 +16,8 @@
     "@types/node": "^10.5.8",
     "aws-lambda": "^0.1.2",
     "aws-sdk": "^2.291.0",
-    "publish-please": "^3.2.0",
+    "publish-please": "^5.4.3",
+    "rimraf": "^2.6.3",
     "typescript": "^3.0.1"
   },
   "publishConfig": {
