@@ -2,7 +2,7 @@ import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
 import { label, metric } from '@iopipe/iopipe';
 import { tagCommonMetrics } from './common';
 
-const headers = {
+const HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Credentials': true
 };
@@ -21,7 +21,7 @@ export function apiWrapper<T extends Function>(fn: T): T {
       label('success');
       console.info('Successfully processed request, returning response payload', payload);
       const body = JSON.stringify(payload);
-      return callback(null, { statusCode: 200, headers, body });
+      return callback(null, { statusCode: 200, headers: HEADERS, body });
     }
 
     function invalid(errors: string[] = []): void {
@@ -29,14 +29,14 @@ export function apiWrapper<T extends Function>(fn: T): T {
       metric('invalid', errors);
       console.warn('Received invalid payload, returning errors payload', errors);
       const body = JSON.stringify({ errors, request });
-      return callback(null, { statusCode: 400, headers, body });
+      return callback(null, { statusCode: 400, headers: HEADERS, body });
     }
 
     function redirect(url: string): void {
       label('redirect');
       console.info('Returning redirect URL', url);
       headers['Location'] = url;
-      return callback(null, { statusCode: 302, headers });
+      return callback(null, { statusCode: 302, headers: HEADERS });
     }
 
     function error(error: any = ''): void {
