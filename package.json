@@ -1,7 +1,7 @@
 {
   "name": "@manwaring/lambda-wrapper",
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "scripts": {
     "prepublishOnly": "tsc",
     "prepublish": "publish-please guard && rimraf dist/**",

@@ -17,14 +17,14 @@ export function apiWrapper<T extends Function>(fn: T): T {
     metric('headers', headers);
     console.debug('Received API request', request);
 
-    function success(payload: any): void {
+    function success(payload: any = {}): void {
       label('success');
       console.info('Successfully processed request, returning response payload', payload);
       const body = JSON.stringify(payload);
       return callback(null, { statusCode: 200, headers, body });
     }
 
-    function invalid(errors: string[]): void {
+    function invalid(errors: string[] = []): void {
       label('invalid');
       metric('invalid', errors);
       console.warn('Received invalid payload, returning errors payload', errors);
@@ -39,7 +39,7 @@ export function apiWrapper<T extends Function>(fn: T): T {
       return callback(null, { statusCode: 302, headers });
     }
 
-    function error(error: any): void {
+    function error(error: any = ''): void {
       label('error');
       metric('error', error);
       console.error('Error processing request, returning error payload', error);
