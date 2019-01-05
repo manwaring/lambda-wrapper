@@ -70,7 +70,7 @@ function getRequestFields(event: APIGatewayEvent): any {
   const auth = event.requestContext && event.requestContext.authorizer ? event.requestContext.authorizer : null;
   const headers = event.headers ? event.headers : null;
   const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || 'Test-Request';
-  const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : null;
+  const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : false;
   const request = { body, path, query, auth, headers, testRequest };
   return { body, path, query, auth, request, headers, testRequest };
 }
