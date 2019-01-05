@@ -3,9 +3,9 @@
   <img height="150" src="https://user-images.githubusercontent.com/2955468/44874383-0168f780-ac69-11e8-8e51-774678cbd966.png">
 </p>
 
-[![Build status][build-badge]][build-badge-url][![Known Vulnerabilities][vulnerability-badge]][vulnerability-badge-url][![Dependency Status][dependency-badge]][dependency-badge-url][![devDependency Status][dev-dependency-badge]][dev-dependency-badge-url][![Code style][formatter-badge]][formatter-badge-url]
+[![NPM version][latest-version-badge]][latest-version-badge-url][![Total downloads][total-downloads-badge]][total-downloads-badge-url][![License][license-badge]][license-badge-url]
 
-[![License][license-badge]][license-badge-url][![NPM version][latest-version-badge]][latest-version-badge-url][![Total downloads][total-downloads-badge]][total-downloads-badge-url]
+[![Build status][build-badge]][build-badge-url][![Known Vulnerabilities][vulnerability-badge]][vulnerability-badge-url][![Dependency Status][dependency-badge]][dependency-badge-url][![devDependency Status][dev-dependency-badge]][dev-dependency-badge-url][![Code style][formatter-badge]][formatter-badge-url]
 
 # AWS Lambda wrapper library
 
