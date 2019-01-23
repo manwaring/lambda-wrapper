@@ -1,3 +1,4 @@
+import { parse } from 'querystring';
 import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
 import { label, metric } from '@iopipe/iopipe';
 import { tagCommonMetrics } from './common';
@@ -64,26 +65,33 @@ export function apiWrapper<T extends Function>(fn: T): T {
 }
 
 function getRequestFields(event: APIGatewayEvent): any {
-  const body = getBody(event.body);
   const path = event.pathParameters ? event.pathParameters : null;
   const query = event.queryStringParameters ? event.queryStringParameters : null;
   const auth = event.requestContext && event.requestContext.authorizer ? event.requestContext.authorizer : null;
   const headers = event.headers ? event.headers : null;
+  const body = parseBody(event.body, headers);
   const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || 'Test-Request';
   const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : false;
   const request = { body, path, query, auth, headers, testRequest };
   return { body, path, query, auth, request, headers, testRequest };
 }
 
-function getBody(body: any): any {
+function parseBody(body: any, headers: { [name: string]: string }): any {
+  let parsedBody = null;
   if (body) {
     try {
-      body = JSON.parse(body);
+      const contentType = headers['Content-Type'];
+      if (contentType && contentType.toUpperCase() === 'APPLICATION/X-WWW-FORM-URLENCODED') {
+        parsedBody = parse(body);
+      } else if (contentType && contentType.toUpperCase() === 'APPLICATION/JSON') {
+        parsedBody = JSON.parse(body);
+      }
     } catch (err) {
-      body = body;
+      console.error('Error parsing body', err, body);
+      parsedBody = body;
     }
   }
-  return body ? body : null;
+  return parsedBody;
 }
 
 export interface ApiSignature {
