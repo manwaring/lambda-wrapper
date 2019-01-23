@@ -64,7 +64,7 @@ export function apiWrapper<T extends Function>(fn: T): T {
 }
 
 function getRequestFields(event: APIGatewayEvent): any {
-  const body = event.body ? JSON.parse(event.body) : null;
+  const body = getBody(event.body);
   const path = event.pathParameters ? event.pathParameters : null;
   const query = event.queryStringParameters ? event.queryStringParameters : null;
   const auth = event.requestContext && event.requestContext.authorizer ? event.requestContext.authorizer : null;
@@ -73,6 +73,17 @@ function getRequestFields(event: APIGatewayEvent): any {
   const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : false;
   const request = { body, path, query, auth, headers, testRequest };
   return { body, path, query, auth, request, headers, testRequest };
+}
+
+function getBody(body: any): any {
+  if (body) {
+    try {
+      body = JSON.parse(body);
+    } catch (err) {
+      body = body;
+    }
+  }
+  return body ? body : null;
 }
 
 export interface ApiSignature {
