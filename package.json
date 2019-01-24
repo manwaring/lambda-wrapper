@@ -39,7 +39,7 @@
     "aws",
     "lambda",
     "wrapper",
-    "iopipe",
+    "epsagon",
     "serverless"
   ]
 }
