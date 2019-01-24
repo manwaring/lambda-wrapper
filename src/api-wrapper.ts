@@ -85,6 +85,9 @@ function parseBody(body: any, headers: { [name: string]: string }): any {
         parsedBody = parse(body);
       } else if (contentType && contentType.toUpperCase() === 'APPLICATION/JSON') {
         parsedBody = JSON.parse(body);
+      } else {
+        console.error('Content-Type header not found, unable to parse body');
+        parsedBody = body;
       }
     } catch (err) {
       console.error('Error parsing body', err, body);
