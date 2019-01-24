@@ -12,10 +12,6 @@ export function apiWrapper<T extends Function>(fn: T): T {
   return <any>function(event: APIGatewayEvent, context: Context, callback: Callback) {
     tagCommonMetrics();
     const { body, path, query, request, auth, headers, testRequest } = getRequestFields(event);
-    // metric('body', body);
-    // metric('path', path);
-    // metric('query', query);
-    // metric('headers', headers);
     console.debug('Received API request', request);
 
     function success(payload: any = {}): void {
@@ -27,7 +23,6 @@ export function apiWrapper<T extends Function>(fn: T): T {
 
     function invalid(errors: string[] = []): void {
       label('invalid');
-      // metric('invalid', errors);
       console.warn('Received invalid payload, returning errors payload', errors);
       const body = JSON.stringify({ errors, request });
       return callback(null, { statusCode: 400, headers: HEADERS, body });
@@ -36,13 +31,12 @@ export function apiWrapper<T extends Function>(fn: T): T {
     function redirect(url: string): void {
       label('redirect');
       console.info('Returning redirect URL', url);
-      headers['Location'] = url;
+      HEADERS['Location'] = url;
       return callback(null, { statusCode: 302, headers: HEADERS });
     }
 
     function error(error: any = ''): void {
       label('error');
-      // metric('error', error);
       console.error('Error processing request, returning error payload', error);
       return callback(error);
     }

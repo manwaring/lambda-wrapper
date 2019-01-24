@@ -1,5 +1,4 @@
 import { CloudFormationCustomResourceEvent, Context, Callback } from 'aws-lambda';
-// import { label, metric } from '@iopipe/iopipe';
 import { label } from 'epsagon';
 import { send, SUCCESS, FAILED } from 'cfn-response';
 import { tagCommonMetrics } from './common';

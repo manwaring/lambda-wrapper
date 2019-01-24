@@ -1,6 +1,5 @@
 import { CustomAuthorizerEvent } from 'aws-lambda';
 import { label } from 'epsagon';
-// import { label, metric } from '@iopipe/iopipe';
 import { tagCommonMetrics } from './common';
 
 export function authWrapper<T extends Function>(fn: T): T {
@@ -19,14 +18,12 @@ export function authWrapper<T extends Function>(fn: T): T {
     function invalid(message: any): void {
       console.warn('Authorizer token was invalid', message);
       label('invalid');
-      // metric('invalid', message);
       return callback('Unauthorized');
     }
 
     function error(error: any): void {
       console.error('Error authorizing API call', error, event);
       label('error');
-      // metric('error', error);
       return callback(error);
     }
 

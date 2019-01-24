@@ -1,5 +1,4 @@
 import { DynamoDB, DynamoDBStreams } from 'aws-sdk';
-// import { label, metric } from '@iopipe/iopipe';
 import { label } from 'epsagon';
 import { tagCommonMetrics } from './common';
 
@@ -17,7 +16,6 @@ export function streamWrapper<T extends Function>(fn: T): T {
 
     function error(error: any): void {
       label('error');
-      // metric('error', error);
       console.error('Error processing request, returning error payload', error);
       return callback(error);
     }

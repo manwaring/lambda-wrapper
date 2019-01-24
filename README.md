@@ -19,23 +19,23 @@
    - [SNS event wrapper](#sns-event-wrapper)
    - [DynamoDB Stream event wrapper](#dynamodb-stream-event-wrapper)
    - [Generic event wrapper](#general-event-wrapper)
-1. [IOPipe labels and metrics](#iopipe-labels-and-metrics)
+1. [Epsagon labels](#epsagon-labels)
 
 ## Package overview
 
 This package provides custom Lambda function wrappers to help simplify Lambda application code and to provide default implementations for logging invocation and status information. For information about optional setup information see the [setup section below](#installation-and-setup).
 
-This project includes the [IOPipe library](https://iopipe.com) for (IMO) the best serverless logging and monitoring experience available at the moment. Each wrapper will automatically label the invocations and add appropriate metrics upon receipt of the event payload as well as when helper callback functions are invoked. For more information about what labels, metrics, and logs are configured for each wrapper please see the [IOPipe labels and metrics section below](#iopipe-labels-and-metrics).
+This project includes the [Epsagon library](https://epsagon.com) for (IMO) the best serverless logging and monitoring experience available at the moment. Each wrapper will automatically label the invocations and add appropriate metrics upon receipt of the event payload as well as when helper callback functions are invoked. For more information about what labels, metrics, and logs are configured for each wrapper please see the [Epsagon labels section below](#epsagon-labels).
 
 ## Installation and setup
 
 `npm i --save @manwaring/lambda-wrapper`
 
-Optional IOPipe setup:
+Optional Epsagon setup:
 
-1. If you want to take advantage of the IOPipe logging and monitoring functionality (highly recommended!) you'll need to create an account and include a project token. More information can be found in the [IOPipe configuration documentation here](https://github.com/iopipe/iopipe-js-core#configuration).
-1. If you want IOPipe to add a metric for the stage the Lambda function is deployed to will need to set a `STAGE` environment variable
-1. If you want IOPipe to add a metric for the git revision of the deployed Lambda code you will need to set a `REVISION` environment variable (see [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) for a JavaScript library that can help with this, and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for a Serverless Framework plugin)
+1. If you want to take advantage of the Epsagon logging and monitoring functionality (highly recommended!) you'll need to create an account and include a project token. More information can be found in the [Epsagon configuration documentation here](https://github.com/epsagon/epsagon-node).
+1. If you want Epsagon to add a label for the stage the Lambda function is deployed to will need to set a `STAGE` environment variable
+1. If you want Epsagon to add a label for the git revision of the deployed Lambda code you will need to set a `REVISION` environment variable (see [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) for a JavaScript library that can help with this, and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for a Serverless Framework plugin)
 
 ## Supported AWS Lambda trigger events
 
@@ -91,35 +91,26 @@ export const handler = apiWrapper(async ({ path, success, error }: ApiSignature)
 
 ### Information captured with each invocation
 
-**The following information is always included:**
-
-1. (IOPipe metric) Body: parsed or null body object included with event
-1. (IOPipe metric) Path: path parameters included with event
-1. (IOPipe metric) Query: query string parameters included with event
-1. (Debug log) Full request (body, path, query)
-
 Depending on which callback helper is invoked additional information will be associated with the invocation:
 
 **Success callback helper:**
 
-1. (IOPipe label) `success`
+1. (Epsagon label) `success`
 1. (Info log) Response payload/body
 
 **Invalid callback helper:**
 
-1. (IOPipe label) `invalid`
-1. (IOPipe metric) Invalid: list of validation messages
+1. (Epsagon label) `invalid`
 1. (Warn log) List of validation errors
 
 **Redirect callback helper:**
 
-1. (IOPipe label) `redirect`
+1. (Epsagon label) `redirect`
 1. (Info log) Redirect URL
 
 **Error callback helper:**
 
-1. (IOPipe label) `error`
-1. (IOPipe metric) Error: error object or message
+1. (Epsagon label) `error`
 1. (Error log) Error object or message
 
 ## Auth event wrapper
@@ -161,17 +152,15 @@ Depending on which callback helper is invoked additional information will be ass
 
 **Valid callback helper:**
 
-1. (IOPipe label) `valid`
+1. (Epsagon label) `valid`
 
 **Invalid callback helper:**
 
-1. (IOPipe label) `invalid`
-1. (IOPipe metric) Invalid: the message indicating cause of invalidation (expired token, unauthorized, etc.)
+1. (Epsagon label) `invalid`
 
 **Error callback helper:**
 
-1. (IOPipe label) `error`
-1. (IOPipe metric) Error: error object or message
+1. (Epsagon label) `error`
 
 ## CloudFormation custom resource event wrapper
 
@@ -195,12 +184,12 @@ Depending on which callback helper is invoked additional information will be ass
 
 **Success callback helper:**
 
-1. (IOPipe label) `success`
+1. (Epsagon label) `success`
 1. (Info log) Success message
 
 **Failure callback helper:**
 
-1. (IOPipe label) `failure`
+1. (Epsagon label) `failure`
 1. (Error log) Error message or object
 
 ## SNS event wrapper
@@ -226,13 +215,12 @@ Depending on which callback helper is invoked additional information will be ass
 
 **Success callback helper:**
 
-1. (IOPipe label) `success`
+1. (Epsagon label) `success`
 1. (Info log) Success message
 
 **Error callback helper:**
 
-1. (IOPipe label) `error`
-1. (IOPipe metric) Error: Error message or object
+1. (Epsagon label) `error`
 1. (Error log) Error message or object
 
 ## DynamoDB stream event wrapper
@@ -269,13 +257,12 @@ Depending on which callback helper is invoked additional information will be ass
 
 **Success callback helper:**
 
-1. (IOPipe label) `success`
+1. (Epsagon label) `success`
 1. (Info log) Success message
 
 **Error callback helper:**
 
-1. (IOPipe label) `error`
-1. (IOPipe metric) Error: Error message or object
+1. (Epsagon label) `error`
 1. (Error log) Error message or object
 
 ## General event wrapper
@@ -314,31 +301,27 @@ Depending on which callback helper is invoked additional information will be ass
 
 **Success callback helper:**
 
-1. (IOPipe label) `success`
+1. (Epsagon label) `success`
 1. (Info log) Success message
 
 **Error callback helper:**
 
-1. (IOPipe label) `error`
-1. (IOPipe metric) Error: Error message or object
+1. (Epsagon label) `error`
 1. (Error log) Error message or object
 
-# IOPipe labels and metrics
+# Epsagon labels
 
-If you've [configured your project to use IOPipe](https://github.com/iopipe/iopipe-js-core#configuration) by at a minimum including the access token you'll get labels and metrics assigned to each invocation.
+If you've [configured your project to use Epsagon](https://github.com/epsagon/epsagon-node) by at a minimum including the access token you'll get labels assigned to each invocation.
 
 ## Common labels and metrics
 
 For each invocation across all wrapper types you'll get the following:
 
-Metrics:
+Labels:
 
 1. Region: AWS region your Lambda is running in
 1. Revision: Git revision of the deployed Lambda code (if you set a `REVISION` environment variable for your Lambda function)
 1. Stage: Name of the stage this Lambda function is deployed with (if you set a `STAGE` environment variable for your Lambda function)
-
-Labels:
-
 1. The result of each invocation, determined by the helper callback function that was invoked (`success`, `invalid`, `errors`, etc. - see the per-wrapper details above for more information)
 
 [build-badge]: https://circleci.com/gh/manwaring/lambda-wrapper.svg?style=shield&circle-token=29c46c698a84144d4ea9d21552f1927c87afd68e

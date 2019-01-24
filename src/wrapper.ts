@@ -1,5 +1,4 @@
 import { Context, Callback } from 'aws-lambda';
-// import { label, metric } from '@iopipe/iopipe';
 import { label } from 'epsagon';
 import { tagCommonMetrics } from './common';
 
@@ -16,7 +15,6 @@ export function wrapper<T extends Function>(fn: T): T {
 
     function error(error: any): void {
       label('error');
-      // metric('error', error);
       console.error('Error processing request', error);
       return callback(error);
     }
