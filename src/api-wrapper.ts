@@ -1,6 +1,6 @@
 import { parse } from 'querystring';
 import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
-import { label, metric } from '@iopipe/iopipe';
+import { label } from 'epsagon';
 import { tagCommonMetrics } from './common';
 
 const HEADERS = {
@@ -12,10 +12,10 @@ export function apiWrapper<T extends Function>(fn: T): T {
   return <any>function(event: APIGatewayEvent, context: Context, callback: Callback) {
     tagCommonMetrics();
     const { body, path, query, request, auth, headers, testRequest } = getRequestFields(event);
-    metric('body', body);
-    metric('path', path);
-    metric('query', query);
-    metric('headers', headers);
+    // metric('body', body);
+    // metric('path', path);
+    // metric('query', query);
+    // metric('headers', headers);
     console.debug('Received API request', request);
 
     function success(payload: any = {}): void {
@@ -27,7 +27,7 @@ export function apiWrapper<T extends Function>(fn: T): T {
 
     function invalid(errors: string[] = []): void {
       label('invalid');
-      metric('invalid', errors);
+      // metric('invalid', errors);
       console.warn('Received invalid payload, returning errors payload', errors);
       const body = JSON.stringify({ errors, request });
       return callback(null, { statusCode: 400, headers: HEADERS, body });
@@ -42,7 +42,7 @@ export function apiWrapper<T extends Function>(fn: T): T {
 
     function error(error: any = ''): void {
       label('error');
-      metric('error', error);
+      // metric('error', error);
       console.error('Error processing request, returning error payload', error);
       return callback(error);
     }
