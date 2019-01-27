@@ -74,7 +74,7 @@ function parseBody(body: any, headers: { [name: string]: string }): any {
   let parsedBody = null;
   if (body) {
     try {
-      const contentType = headers['Content-Type'];
+      const contentType = headers['Content-Type'] || headers['CONTENT-TYPE'] || headers['content-type'];
       if (contentType && contentType.toUpperCase() === 'APPLICATION/X-WWW-FORM-URLENCODED') {
         parsedBody = parse(body);
       } else if (contentType && contentType.toUpperCase() === 'APPLICATION/JSON') {
