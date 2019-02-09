@@ -25,17 +25,25 @@
 
 This package provides custom Lambda function wrappers to help simplify Lambda application code and to provide default implementations for logging invocation and status information. For information about optional setup information see the [setup section below](#installation-and-setup).
 
-This project includes the [Epsagon library](https://epsagon.com) for (IMO) the best serverless logging and monitoring experience available at the moment. Each wrapper will automatically label the invocations and add appropriate metrics upon receipt of the event payload as well as when helper callback functions are invoked. For more information about what labels, metrics, and logs are configured for each wrapper please see the [Epsagon labels section below](#epsagon-labels).
+This project supports integrations with both [Epsagon](https://epsagon.com) and [IOPipe](https://iopipe.com) for (IMO) the best serverless logging and monitoring experiences available at the moment. Each wrapper will automatically label the invocations and add appropriate metrics upon receipt of the event payload as well as when helper callback functions are invoked. For more information about what labels, metrics, and logs are configured for each wrapper please see the [Epsagon and IOPipe section below](#epsagon-iopipe).
 
 ## Installation and setup
 
 `npm i --save @manwaring/lambda-wrapper`
 
+If you want to take advantage of either Epsagon or IOPipe logging and monitoring functionality (highly recommmended!) you'll need to create an account with them and setup your project appropriately. If this library detects either of the other two as being present in your application it will automatically apply standard tagging (Epsagon labels and IOPipe labels and metrics) to each invocation for easier logging, monitoring, and troubleshooting.
+
 Optional Epsagon setup:
 
-1. If you want to take advantage of the Epsagon logging and monitoring functionality (highly recommended!) you'll need to create an account and include a project token. More information can be found in the [Epsagon configuration documentation here](https://github.com/epsagon/epsagon-node).
+1. More information on setting up Epsagon in your application can be found in the [Epsagon configuration documentation here](https://github.com/epsagon/epsagon-node).
 1. If you want Epsagon to add a label for the stage the Lambda function is deployed to will need to set a `STAGE` environment variable
 1. If you want Epsagon to add a label for the git revision of the deployed Lambda code you will need to set a `REVISION` environment variable (see [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) for a JavaScript library that can help with this, and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for a Serverless Framework plugin)
+
+Optional IOPipe setup:
+
+1. More information on setting up IOPipe in your application can be found in the [IOPipe configuration documentation here](https://github.com/iopipe/iopipe-js-core#configuration).
+1. If you want IOPipe to add a metric for the stage the Lambda function is deployed to will need to set a `STAGE` environment variable
+1. If you want IOPipe to add a metric for the git revision of the deployed Lambda code you will need to set a `REVISION` environment variable (see [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) for a JavaScript library that can help with this, and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for a Serverless Framework plugin)
 
 ## Supported AWS Lambda trigger events
 
@@ -63,10 +71,10 @@ interface ApiSignature {
   headers: { [name: string]: string }; // headers param payload as key-value pairs if exists (otherwise null)
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
   auth: any; // auth context from custom authorizer if exists (otherwise null)
-  success(payload: any): void; // returns 200 status with payload
-  invalid(errors: string[]): void; // returns 400 status with errors in payload
+  success(payload?: any): void; // returns 200 status with payload
+  invalid(errors?: string[]): void; // returns 400 status with errors in payload
   redirect(url: string): void; // returns 302 redirect with new url
-  error(error: any): void; // returns 500 status with error and original request payload
+  error(error?: any): void; // returns 500 status with error and original request payload
 }
 ```
 
@@ -91,26 +99,39 @@ export const handler = apiWrapper(async ({ path, success, error }: ApiSignature)
 
 ### Information captured with each invocation
 
+**The following information is always included:**
+
+1. (IOPipe metric) Body: parsed or null body object included with event
+1. (IOPipe metric) Path: path parameters included with event
+1. (IOPipe metric) Query: query string parameters included with event
+1. (Debug log) Full request (body, path, query)
+
 Depending on which callback helper is invoked additional information will be associated with the invocation:
 
 **Success callback helper:**
 
 1. (Epsagon label) `success`
+1. (IOPipe label) `success`
 1. (Info log) Response payload/body
 
 **Invalid callback helper:**
 
 1. (Epsagon label) `invalid`
+1. (IOPipe label) `invalid`
+1. (IOPipe metric) Invalid: list of validation messages
 1. (Warn log) List of validation errors
 
 **Redirect callback helper:**
 
 1. (Epsagon label) `redirect`
+1. (IOPipe label) `redirect`
 1. (Info log) Redirect URL
 
 **Error callback helper:**
 
 1. (Epsagon label) `error`
+1. (IOPipe label) `error`
+1. (IOPipe metric) Error: error object or message
 1. (Error log) Error object or message
 
 ## Auth event wrapper
@@ -122,8 +143,8 @@ interface AuthorizerSignature {
   event: CustomAuthorizerEvent; // original event
   token: string; // authorizer token from original event
   valid(jwt: any): void; // creates AWS policy to authenticate request, and adds auth context if available
-  invalid(message: string[]): void; // returns 401 unauthorized
-  error(error: any): void; // records error information and returns 401 unauthorized
+  invalid(message?: string[]): void; // returns 401 unauthorized
+  error(error?: any): void; // records error information and returns 401 unauthorized
 }
 ```
 
@@ -153,14 +174,19 @@ Depending on which callback helper is invoked additional information will be ass
 **Valid callback helper:**
 
 1. (Epsagon label) `valid`
+1. (IOPipe label) `valid`
 
 **Invalid callback helper:**
 
 1. (Epsagon label) `invalid`
+1. (IOPipe label) `invalid`
+1. (IOPipe metric) Invalid: the message indicating cause of invalidation (expired token, unauthorized, etc.)
 
 **Error callback helper:**
 
 1. (Epsagon label) `error`
+1. (IOPipe label) `error`
+1. (IOPipe metric) Error: error object or message
 
 ## CloudFormation custom resource event wrapper
 
@@ -169,8 +195,8 @@ Depending on which callback helper is invoked additional information will be ass
 ```ts
 interface CloudFormationSignature {
   event: CloudFormationCustomResourceEvent; // original event
-  success(payload: any): void; // sends CloudFormation success event
-  failure(message: any): void; // sends CloudFormation failure event
+  success(payload?: any): void; // sends CloudFormation success event
+  failure(message?: any): void; // sends CloudFormation failure event
 }
 ```
 
@@ -185,11 +211,13 @@ Depending on which callback helper is invoked additional information will be ass
 **Success callback helper:**
 
 1. (Epsagon label) `success`
+1. (IOPipe label) `success`
 1. (Info log) Success message
 
 **Failure callback helper:**
 
 1. (Epsagon label) `failure`
+1. (IOPipe label) `failure`
 1. (Error log) Error message or object
 
 ## SNS event wrapper
@@ -200,8 +228,8 @@ Depending on which callback helper is invoked additional information will be ass
 interface SnsSignature {
   event: SNSEvent; // original event
   message: any; // JSON-parsed message from event
-  success(payload: any): void; // invokes lambda callback with success
-  error(error: any): void; // invokes lambda callback with error
+  success(payload?: any): void; // invokes lambda callback with success
+  error(error?: any): void; // invokes lambda callback with error
 }
 ```
 
@@ -216,11 +244,14 @@ Depending on which callback helper is invoked additional information will be ass
 **Success callback helper:**
 
 1. (Epsagon label) `success`
+1. (IOPipe label) `success`
 1. (Info log) Success message
 
 **Error callback helper:**
 
 1. (Epsagon label) `error`
+1. (IOPipe label) `error`
+1. (IOPipe metric) Error: Error message or object
 1. (Error log) Error message or object
 
 ## DynamoDB stream event wrapper
@@ -233,8 +264,8 @@ interface StreamSignature {
   newVersions: any[]; // array of all unmarshalled javascript objects of new images
   oldVersions: any[]; // array of all unmarshalled javascript objects of old images
   versions: Version[]; // array of full version object (new image, old image, etc - see Version interface)
-  success(message: any): void; // invokes lambda callback with success
-  error(error: any): void; // invokes lambda callback with error
+  success(message?: any): void; // invokes lambda callback with success
+  error(error?: any): void; // invokes lambda callback with error
 }
 
 interface Version {
@@ -258,11 +289,14 @@ Depending on which callback helper is invoked additional information will be ass
 **Success callback helper:**
 
 1. (Epsagon label) `success`
+1. (IOPipe label) `success`
 1. (Info log) Success message
 
 **Error callback helper:**
 
 1. (Epsagon label) `error`
+1. (IOPipe label) `error`
+1. (IOPipe metric) Error: Error message or object
 1. (Error log) Error message or object
 
 ## General event wrapper
@@ -272,8 +306,8 @@ Depending on which callback helper is invoked additional information will be ass
 ```ts
 interface WrapperSignature {
   event: any; // original event
-  success(payload: any): void; // invokes lambda callback with success response
-  error(error: any): void; // invokes lambda callback with error response
+  success(payload?: any): void; // invokes lambda callback with success response
+  error(error?: any): void; // invokes lambda callback with error response
 }
 ```
 
@@ -302,16 +336,15 @@ Depending on which callback helper is invoked additional information will be ass
 **Success callback helper:**
 
 1. (Epsagon label) `success`
+1. (IOPipe label) `success`
 1. (Info log) Success message
 
 **Error callback helper:**
 
 1. (Epsagon label) `error`
+1. (IOPipe label) `error`
+1. (IOPipe metric) Error: Error message or object
 1. (Error log) Error message or object
-
-# Epsagon labels
-
-If you've [configured your project to use Epsagon](https://github.com/epsagon/epsagon-node) by at a minimum including the access token you'll get labels assigned to each invocation.
 
 ## Common labels and metrics
 
