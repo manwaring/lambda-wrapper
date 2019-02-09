@@ -1,6 +1,5 @@
 import { DynamoDB, DynamoDBStreams } from 'aws-sdk';
-import { label } from 'epsagon';
-import { tagCommonMetrics } from './common';
+import { tagCommonMetrics, tagSuccess, tagError } from './common';
 
 export function streamWrapper<T extends Function>(fn: T): T {
   return <any>function(event: DynamoDBStreams.GetRecordsOutput, context, callback) {
@@ -8,14 +7,14 @@ export function streamWrapper<T extends Function>(fn: T): T {
     const { newVersions, oldVersions, versions } = getStreamInformation(event);
     console.debug('Received stream request', newVersions, oldVersions, versions);
 
-    function success(message?: any): void {
-      label('success');
+    function success(message: any = ''): void {
+      tagSuccess();
       console.info('Successfully processed request, returning response payload', message ? message : '');
       return callback(null, message);
     }
 
-    function error(error: any): void {
-      label('error');
+    function error(error: any = ''): void {
+      tagError();
       console.error('Error processing request, returning error payload', error);
       return callback(error);
     }
@@ -68,7 +67,7 @@ export interface StreamSignature {
   oldVersions: any[]; // array of all unmarshalled javascript objects of old images
   versions: Version[]; // array of full version object (new image, old image, etc - see Version interface)
   success(message?: any): void; // invokes lambda callback with success
-  error(error: any): void; // invokes lambda callback with error
+  error(error?: any): void; // invokes lambda callback with error
 }
 
 export interface Version {

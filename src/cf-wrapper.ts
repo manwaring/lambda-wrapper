@@ -1,20 +1,19 @@
 import { CloudFormationCustomResourceEvent, Context, Callback } from 'aws-lambda';
-import { label } from 'epsagon';
 import { send, SUCCESS, FAILED } from 'cfn-response';
-import { tagCommonMetrics } from './common';
+import { tagCommonMetrics, tagSuccess, tagFailure } from './common';
 
 export function cloudFormationWrapper<T extends Function>(fn: T): T {
   return <any>function(event: CloudFormationCustomResourceEvent, context: Context, callback: Callback) {
     tagCommonMetrics();
 
     function success(message?: any): void {
-      label('success');
+      tagSuccess();
       console.info('Successfully processed CloudFormation stack event', message ? message : '');
       return send(event, context, SUCCESS);
     }
 
     function failure(message: any): void {
-      label('failure');
+      tagFailure();
       console.error('Error handling CloudFormation stack event', message);
       return send(event, context, FAILED);
     }

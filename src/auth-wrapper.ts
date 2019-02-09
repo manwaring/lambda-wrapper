@@ -1,6 +1,5 @@
 import { CustomAuthorizerEvent } from 'aws-lambda';
-import { label } from 'epsagon';
-import { tagCommonMetrics } from './common';
+import { tagCommonMetrics, tagValid, tagInvalid, tagError } from './common';
 
 export function authWrapper<T extends Function>(fn: T): T {
   return <any>function(event: CustomAuthorizerEvent, context: any, callback: any) {
@@ -10,20 +9,20 @@ export function authWrapper<T extends Function>(fn: T): T {
 
     function valid(jwt: any): void {
       console.info('Successfully processed authorizer request');
-      label('valid');
+      tagValid();
       const policy = generatePolicy(jwt);
       return callback(null, policy);
     }
 
-    function invalid(message: any): void {
+    function invalid(message: any = ''): void {
       console.warn('Authorizer token was invalid', message);
-      label('invalid');
+      tagInvalid(message);
       return callback('Unauthorized');
     }
 
-    function error(error: any): void {
+    function error(error: any = ''): void {
       console.error('Error authorizing API call', error, event);
-      label('error');
+      tagError(error);
       return callback(error);
     }
 
@@ -53,6 +52,6 @@ export interface AuthorizerSignature {
   event: CustomAuthorizerEvent; // original event
   token: string; // authorizer token from original event
   valid(jwt: any): void; // creates AWS policy to authenticate request, and adds auth context if available
-  invalid(message: string[]): void; // returns 401 unauthorized
-  error(error: any): void; // records error information and returns 401 unauthorized
+  invalid(message?: string[]): void; // returns 401 unauthorized
+  error(error?: any): void; // records error information and returns 401 unauthorized
 }

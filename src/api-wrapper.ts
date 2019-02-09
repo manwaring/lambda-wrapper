@@ -1,7 +1,6 @@
 import { parse } from 'querystring';
 import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
-import { label } from 'epsagon';
-import { tagCommonMetrics } from './common';
+import { tagCommonMetrics, tagSuccess, tagInvalid, tagRedirect, tagError } from './common';
 
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -15,28 +14,28 @@ export function apiWrapper<T extends Function>(fn: T): T {
     console.debug('Received API request', request);
 
     function success(payload: any = {}): void {
-      label('success');
+      tagSuccess();
       console.info('Successfully processed request, returning response payload', payload);
       const body = JSON.stringify(payload);
       return callback(null, { statusCode: 200, headers: HEADERS, body });
     }
 
     function invalid(errors: string[] = []): void {
-      label('invalid');
+      tagInvalid(errors);
       console.warn('Received invalid payload, returning errors payload', errors);
       const body = JSON.stringify({ errors, request });
       return callback(null, { statusCode: 400, headers: HEADERS, body });
     }
 
     function redirect(url: string): void {
-      label('redirect');
+      tagRedirect();
       console.info('Returning redirect URL', url);
       HEADERS['Location'] = url;
       return callback(null, { statusCode: 302, headers: HEADERS });
     }
 
     function error(error: any = ''): void {
-      label('error');
+      tagError(error);
       console.error('Error processing request, returning error payload', error);
       return callback(error);
     }
@@ -99,8 +98,8 @@ export interface ApiSignature {
   headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise null)
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
   auth: any; // auth context from custom authorizer if exists (otherwise null)
-  success(payload: any): void; // returns 200 status with payload
-  invalid(errors: string[]): void; // returns 400 status with errors in payload
+  success(payload?: any): void; // returns 200 status with payload
+  invalid(errors?: string[]): void; // returns 400 status with errors in payload
   redirect(url: string): void; // returns 302 redirect with new url
-  error(error: any): void; // returns 500 status with error and original request payload
+  error(error?: any): void; // returns 500 status with error and original request payload
 }
