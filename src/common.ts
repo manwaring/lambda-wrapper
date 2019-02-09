@@ -4,7 +4,7 @@ try {
   epsagon = true;
   epsagon_label = lib.label;
 } catch (err) {
-  console.log('Epsagon not installed in project, not tagging Epsagon labels');
+  console.debug('Epsagon not installed in project, not tagging with Epsagon labels');
 }
 try {
   const lib = require('@iopipe/iopipe');
@@ -12,7 +12,7 @@ try {
   iopipe_metric = lib.metric;
   iopipe_label = lib.label;
 } catch (err) {
-  console.log('IOPipe not installed in project, not tagging with IOPipe metrics');
+  console.debug('IOPipe not installed in project, not tagging with IOPipe metrics');
 }
 
 export function tagCommonMetrics(): void {
@@ -111,10 +111,7 @@ function tagEpsagon(key: string, value: any = false) {
 
 function tagIOPipe(key: string, value: any = false) {
   if (iopipe) {
-    iopipe_label(key);
-    if (value) {
-      iopipe_metric(key, value);
-    }
+    value ? iopipe_metric(key, value) : iopipe_label(key);
   }
 }
 
