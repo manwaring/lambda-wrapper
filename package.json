@@ -1,16 +1,14 @@
 {
   "name": "@manwaring/lambda-wrapper",
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "scripts": {
     "prepublishOnly": "tsc",
     "prepublish": "publish-please guard && rimraf dist/**",
     "publish-please": "publish-please"
   },
   "dependencies": {
-    "@iopipe/iopipe": "^1.12.3",
-    "cfn-response": "^1.0.1",
-    "epsagon": "^1.7.13"
+    "cfn-response": "^1.0.1"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.11",
