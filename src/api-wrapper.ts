@@ -13,11 +13,14 @@ export function apiWrapper<T extends Function>(fn: T): T {
     const { body, path, query, request, auth, headers, testRequest } = getRequestFields(event);
     console.debug('Received API request', request);
 
-    function success(payload: any = {}): void {
+    function success(payload: any = null): void {
       tagSuccess();
       console.info('Successfully processed request, returning response payload', payload);
-      const body = JSON.stringify(payload);
-      return callback(null, { statusCode: 200, headers: HEADERS, body });
+      const response = { statusCode: 200, headers: HEADERS };
+      if (payload) {
+        response['body'] = JSON.stringify(payload);
+      }
+      return callback(null, response);
     }
 
     function invalid(errors: string[] = []): void {
