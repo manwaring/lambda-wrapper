@@ -1,7 +1,7 @@
 {
   "name": "@manwaring/lambda-wrapper",
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "scripts": {
     "prepublishOnly": "tsc",
     "prepublish": "publish-please guard && rimraf dist/**",
@@ -11,13 +11,13 @@
     "cfn-response": "^1.0.1"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.11",
-    "@types/node": "^10.5.8",
+    "@types/aws-lambda": "^8.10.28",
+    "@types/node": "^12.6.2",
     "aws-lambda": "^0.1.2",
-    "aws-sdk": "^2.291.0",
-    "publish-please": "^5.4.3",
+    "aws-sdk": "^2.493.0",
+    "publish-please": "^5.5.0",
     "rimraf": "^2.6.3",
-    "typescript": "^3.0.1"
+    "typescript": "^3.5.3"
   },
   "publishConfig": {
     "access": "public"
