@@ -367,8 +367,8 @@ Labels:
 [formatter-badge-url]: #badge
 [license-badge]: https://img.shields.io/npm/l/@manwaring/lambda-wrapper.svg
 [license-badge-url]: https://www.npmjs.com/package/@manwaring/lambda-wrapper
-[vulnerability-badge]: https://snyk.io/test/github/manwaring/lambda-wrapper/badge.svg?targetFile=package.json
-[vulnerability-badge-url]: https://snyk.io/test/github/manwaring/lambda-wrapper?targetFile=package.json
+[vulnerability-badge]: https://api.dependabot.com/badges/status?host=github&repo=manwaring/lambda-wrapper
+[vulnerability-badge-url]: https://dependabot.com/
 [latest-version-badge]: https://img.shields.io/npm/v/%40manwaring%2Flambda-wrapper/latest.svg
 [latest-version-badge-url]: https://npmjs.com/package/@manwaring/lambda-wrapper
 [total-downloads-badge]: https://img.shields.io/npm/dt/@manwaring/lambda-wrapper.svg
