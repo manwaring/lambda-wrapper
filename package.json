@@ -6,16 +6,26 @@
     "publish-please-dry-run": "publish-please --dry-run",
     "publish-please": "publish-please",
     "prepublishOnly": "publish-please guard && npm run build",
-    "build": "rimraf dist && tsc -p ./tsconfig.build.json"
+    "build": "rimraf dist && tsc -p ./tsconfig.build.json",
+    "test": "jest --coverage",
+    "codecov": "codecov -f coverage/*.json"
   },
   "dependencies": {
     "cfn-response": "^1.0.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/preset-typescript": "^7.3.3",
     "@types/aws-lambda": "^8.10.31",
+    "@types/jest": "^24.0.18",
     "@types/node": "^12.7.3",
     "aws-lambda": "^0.1.2",
     "aws-sdk": "^2.521.0",
+    "babel-jest": "^24.9.0",
+    "codecov": "^3.5.0",
+    "jest": "^24.9.0",
     "publish-please": "^5.5.1",
     "rimraf": "^3.0.0",
     "typescript": "^3.6.2"

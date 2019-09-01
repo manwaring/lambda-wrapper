@@ -1,6 +1,5 @@
 # compiled code
 dist
-*.js
 
 # Logs
 logs

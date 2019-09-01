@@ -33,6 +33,20 @@ jobs:
           paths:
             - node_modules
 
+  test:
+    <<: *container-config
+    steps:
+      - checkout
+      - *load-cache
+      - run:
+          name: Test
+          command: npm test
+      - store_artifacts:
+          path: coverage
+      - run:
+          name: Send coverage to Codecov
+          command: npm run codecov
+
   publish:
     <<: *container-config
     steps:
@@ -54,12 +68,12 @@ workflows:
           filters:
             tags:
               only: /.*/
-      # - test:
-      #     requires:
-      #       - install
-      #     filters:
-      #       tags:
-      #         only: /.*/
+      - test:
+          requires:
+            - install
+          filters:
+            tags:
+              only: /.*/
       # TODO add a dry-run step to non-tagged changes
       # - publish-dry-run:
       #     requires:

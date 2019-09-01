@@ -1,0 +1,14 @@
+all: true
+cache: false
+
+exclude:
+  - '**/*.js'
+  - '**/*/mock-data'
+  - '**/*test.ts'
+  - '**/*index.ts'
+  - dist
+  - coverage
+  - examples
+
+extension:
+  - .ts

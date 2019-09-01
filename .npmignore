@@ -1,8 +1,14 @@
 .circleci/
+.dependabot/
+.nyc_output/
+coverage/
+dist/mock-data/
+dist/*.test*
+examples/
 src/
 .prettierrc.yml
 .gitignore
 .npmignore
 .publishrc
-tsconfig.json
-tsconfig.build.json
+cucumber.js
+tsconfig.*json

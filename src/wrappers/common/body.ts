@@ -5,7 +5,7 @@ export class Body {
   constructor(private body: any, private headers: { [name: string]: string }) {}
 
   getParsedBody(): any {
-    let parsedBody = null;
+    let parsedBody;
     if (this.body) {
       try {
         const contentType = this.getContentType();
