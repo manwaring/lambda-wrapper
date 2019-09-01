@@ -3,7 +3,7 @@
   <img height="150" src="https://user-images.githubusercontent.com/2955468/44874383-0168f780-ac69-11e8-8e51-774678cbd966.png">
 </p>
 
-[![version]][version-url] [![downloads]][downloads-url] [![size]][size-url] [![license]][license-url]
+[![version]][version-url] [![downloads]][downloads-url] [![coverage]][coverage-url] [![size]][size-url] [![license]][license-url]
 
 [![build]][build-url] [![dependabot]][dependabot-url] [![dependency]][dependency-url] [![dev-dependency]][dev-dependency-url]
 
