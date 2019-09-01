@@ -3,9 +3,9 @@
   <img height="150" src="https://user-images.githubusercontent.com/2955468/44874383-0168f780-ac69-11e8-8e51-774678cbd966.png">
 </p>
 
-[![NPM version][latest-version-badge]][latest-version-badge-url][![Total downloads][total-downloads-badge]][total-downloads-badge-url][![License][license-badge]][license-badge-url]
+[![version]][version-url] [![downloads]][downloads-url] [![size]][size-url] [![license]][license-url]
 
-[![Build status][build-badge]][build-badge-url][![Known Vulnerabilities][vulnerability-badge]][vulnerability-badge-url][![Dependency Status][dependency-badge]][dependency-badge-url][![devDependency Status][dev-dependency-badge]][dev-dependency-badge-url][![Code style][formatter-badge]][formatter-badge-url]
+[![build]][build-url] [![dependabot]][dependabot-url] [![dependency]][dependency-url] [![dev-dependency]][dev-dependency-url]
 
 # AWS Lambda wrapper library
 
@@ -357,19 +357,28 @@ Labels:
 1. Stage: Name of the stage this Lambda function is deployed with (if you set a `STAGE` environment variable for your Lambda function)
 1. The result of each invocation, determined by the helper callback function that was invoked (`success`, `invalid`, `errors`, etc. - see the per-wrapper details above for more information)
 
-[build-badge]: https://circleci.com/gh/manwaring/lambda-wrapper.svg?style=shield&circle-token=29c46c698a84144d4ea9d21552f1927c87afd68e
-[build-badge-url]: https://circleci.com/gh/manwaring/lambda-wrapper
-[dependency-badge]: https://david-dm.org/manwaring/lambda-wrapper.svg
-[dependency-badge-url]: https://david-dm.org/manwaring/lambda-wrapper
-[dev-dependency-badge]: https://david-dm.org/manwaring/lambda-wrapper/dev-status.svg
-[dev-dependency-badge-url]: https://david-dm.org/manwaring/lambda-wrapper?type=dev
-[formatter-badge]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square
-[formatter-badge-url]: #badge
-[license-badge]: https://img.shields.io/npm/l/@manwaring/lambda-wrapper.svg
-[license-badge-url]: https://www.npmjs.com/package/@manwaring/lambda-wrapper
-[vulnerability-badge]: https://api.dependabot.com/badges/status?host=github&repo=manwaring/lambda-wrapper
-[vulnerability-badge-url]: https://dependabot.com/
-[latest-version-badge]: https://img.shields.io/npm/v/%40manwaring%2Flambda-wrapper/latest.svg
-[latest-version-badge-url]: https://npmjs.com/package/@manwaring/lambda-wrapper
-[total-downloads-badge]: https://img.shields.io/npm/dt/@manwaring/lambda-wrapper.svg
-[total-downloads-badge-url]: https://www.npmjs.com/package/@manwaring/lambda-wrapper
+<!-- Badge icons -->
+
+[version]: https://flat.badgen.net/npm/v/@manwaring/lambda-wrapper?icon=npm&label=npm@latest
+[downloads]: https://flat.badgen.net/npm/dt/@manwaring/lambda-wrapper?icon=npm
+[coverage]: https://flat.badgen.net/codecov/c/github/manwaring/lambda-wrapper/?icon=codecov
+[size]: https://flat.badgen.net/packagephobia/install/@manwaring/lambda-wrapper
+[license]: https://flat.badgen.net/npm/license/@manwaring/lambda-wrapper/
+[language]: https://flat.badgen.net/badge/typescript/typescript/?icon&label
+[style]: https://flat.badgen.net/badge/code%20style/prettier?color=purple&icon=terminal&label
+[build]: https://flat.badgen.net/circleci/github/manwaring/lambda-wrapper/master?icon=circleci
+[dependabot]: https://flat.badgen.net/dependabot/manwaring/lambda-wrapper/?icon=dependabot&label=dependabot
+[dependency]: https://flat.badgen.net/david/dep/manwaring/lambda-wrapper
+[dev-dependency]: https://flat.badgen.net/david/dev/manwaring/lambda-wrapper/?label=dev+dependencies
+
+<!-- Badge URLs -->
+
+[version-url]: https://npmjs.com/package/@manwaring/lambda-wrapper
+[downloads-url]: https://www.npmjs.com/package/@manwaring/lambda-wrapper
+[coverage-url]: https://codecov.io/gh/manwaring/lambda-wrapper
+[size-url]: https://packagephobia.now.sh/result?p=@manwaring/lambda-wrapper
+[license-url]: https://www.npmjs.com/package/@manwaring/lambda-wrapper
+[build-url]: https://circleci.com/gh/manwaring/lambda-wrapper
+[dependabot-url]: https://flat.badgen.net/dependabot/manwaring/lambda-wrapper
+[dependency-url]: https://david-dm.org/manwaring/lambda-wrapper
+[dev-dependency-url]: https://david-dm.org/manwaring/lambda-wrapper?type=dev
