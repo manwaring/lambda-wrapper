@@ -1,20 +1,19 @@
 import { Context, Callback } from 'aws-lambda';
-import { tagCommonMetrics, tagSuccess, tagError } from './common';
+import { Metrics } from './common';
+
+const metrics = new Metrics('Generic');
 
 export function wrapper<T extends Function>(fn: T): T {
   return <any>function(event, context: Context, callback: Callback) {
-    tagCommonMetrics();
-    console.debug('Received event', event);
+    metrics.common(event);
 
     function success(message: any = ''): void {
-      tagSuccess();
-      console.info('Successfully processed request', message ? message : '');
+      metrics.success(message);
       return callback(null, message);
     }
 
     function error(error: any = ''): void {
-      tagError();
-      console.error('Error processing request', error);
+      metrics.error(error);
       return callback(error);
     }
 

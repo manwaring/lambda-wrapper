@@ -1,21 +1,20 @@
 import { SNSEvent, Context, Callback } from 'aws-lambda';
-import { tagCommonMetrics, tagSuccess, tagError } from './common';
+import { Metrics } from './common';
+
+const metrics = new Metrics('SNS');
 
 export function snsWrapper<T extends Function>(fn: T): T {
   return <any>function(event: SNSEvent, context: Context, callback: Callback) {
-    tagCommonMetrics();
     const message = JSON.parse(event.Records[0].Sns.Message);
-    console.debug('Received SNS event', message);
+    metrics.common(message);
 
     function success(message: any = ''): void {
-      tagSuccess(message);
-      console.info('Successfully processed request', message ? message : '');
+      metrics.success(message);
       return callback(null, message);
     }
 
     function error(error: any = ''): void {
-      tagError(error);
-      console.error('Error processing request', error);
+      metrics.error(error);
       return callback(error);
     }
 

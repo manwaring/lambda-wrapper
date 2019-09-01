@@ -1,6 +1,7 @@
-import { parse } from 'querystring';
 import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
-import { tagCommonMetrics, tagSuccess, tagInvalid, tagRedirect, tagError } from './common';
+import { Metrics, Body } from './common';
+
+const metrics = new Metrics('API Gateway');
 
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -9,37 +10,33 @@ const HEADERS = {
 
 export function apiWrapper<T extends Function>(fn: T): T {
   return <any>function(event: APIGatewayEvent, context: Context, callback: Callback) {
-    tagCommonMetrics();
     const { body, path, query, request, auth, headers, testRequest } = getRequestFields(event);
-    console.debug('Received API request', request);
+    metrics.common(request);
 
     function success(payload: any = null): void {
-      tagSuccess();
-      console.info('Successfully processed request, returning response payload', payload);
       const response = { statusCode: 200, headers: HEADERS };
       if (payload) {
         response['body'] = JSON.stringify(payload);
       }
+      metrics.success(payload);
       return callback(null, response);
     }
 
     function invalid(errors: string[] = []): void {
-      tagInvalid(errors);
-      console.warn('Received invalid payload, returning errors payload', errors);
-      const body = JSON.stringify({ errors, request });
-      return callback(null, { statusCode: 400, headers: HEADERS, body });
+      const response = { statusCode: 400, headers: HEADERS, body: JSON.stringify({ errors, request }) };
+      metrics.invalid(response);
+      return callback(null, response);
     }
 
     function redirect(url: string): void {
-      tagRedirect();
-      console.info('Returning redirect URL', url);
       HEADERS['Location'] = url;
-      return callback(null, { statusCode: 302, headers: HEADERS });
+      const response = { statusCode: 302, headers: HEADERS };
+      metrics.redirect(response);
+      return callback(null, response);
     }
 
     function error(error: any = ''): void {
-      tagError(error);
-      console.error('Error processing request, returning error payload', error);
+      metrics.error(error);
       return callback(error);
     }
 
@@ -65,32 +62,11 @@ function getRequestFields(event: APIGatewayEvent): any {
   const query = event.queryStringParameters ? event.queryStringParameters : null;
   const auth = event.requestContext && event.requestContext.authorizer ? event.requestContext.authorizer : null;
   const headers = event.headers ? event.headers : null;
-  const body = parseBody(event.body, headers);
+  const body = new Body(event.body, headers).getParsedBody();
   const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || 'Test-Request';
   const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : false;
   const request = { body, path, query, auth, headers, testRequest };
   return { body, path, query, auth, request, headers, testRequest };
-}
-
-function parseBody(body: any, headers: { [name: string]: string }): any {
-  let parsedBody = null;
-  if (body) {
-    try {
-      const contentType = headers['Content-Type'] || headers['CONTENT-TYPE'] || headers['content-type'];
-      if (contentType && contentType.toUpperCase() === 'APPLICATION/X-WWW-FORM-URLENCODED') {
-        parsedBody = parse(body);
-      } else if (contentType && contentType.toUpperCase() === 'APPLICATION/JSON') {
-        parsedBody = JSON.parse(body);
-      } else {
-        console.error('Content-Type header not found, unable to parse body');
-        parsedBody = body;
-      }
-    } catch (err) {
-      console.error('Error parsing body', err, body);
-      parsedBody = body;
-    }
-  }
-  return parsedBody;
 }
 
 export interface ApiSignature {

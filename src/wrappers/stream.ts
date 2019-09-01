@@ -1,21 +1,20 @@
 import { DynamoDB, DynamoDBStreams } from 'aws-sdk';
-import { tagCommonMetrics, tagSuccess, tagError } from './common';
+import { Metrics } from './common';
+
+const metrics = new Metrics('Stream');
 
 export function streamWrapper<T extends Function>(fn: T): T {
   return <any>function(event: DynamoDBStreams.GetRecordsOutput, context, callback) {
-    tagCommonMetrics();
     const { newVersions, oldVersions, versions } = getStreamInformation(event);
-    console.debug('Received stream request', newVersions, oldVersions, versions);
+    metrics.common({ newVersions, oldVersions, versions });
 
     function success(message: any = ''): void {
-      tagSuccess();
-      console.info('Successfully processed request, returning response payload', message ? message : '');
+      metrics.success(message);
       return callback(null, message);
     }
 
     function error(error: any = ''): void {
-      tagError();
-      console.error('Error processing request, returning error payload', error);
+      metrics.error(error);
       return callback(error);
     }
 

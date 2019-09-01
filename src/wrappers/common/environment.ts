@@ -1,0 +1,22 @@
+export function isRunningInAwsLambdaEnvironment(): boolean {
+  const {
+    _HANDLER,
+    AWS_REGION,
+    AWS_EXECUTION_ENV,
+    AWS_LAMBDA_FUNCTION_NAME,
+    AWS_LAMBDA_FUNCTION_MEMORY_SIZE,
+    AWS_LAMBDA_FUNCTION_VERSION,
+    LAMBDA_TASK_ROOT,
+    LAMBDA_RUNTIME_DIR
+  } = process.env;
+  return (
+    !!_HANDLER &&
+    !!AWS_REGION &&
+    !!AWS_EXECUTION_ENV &&
+    !!AWS_LAMBDA_FUNCTION_NAME &&
+    !!AWS_LAMBDA_FUNCTION_MEMORY_SIZE &&
+    !!AWS_LAMBDA_FUNCTION_VERSION &&
+    !!LAMBDA_TASK_ROOT &&
+    !!LAMBDA_RUNTIME_DIR
+  );
+}

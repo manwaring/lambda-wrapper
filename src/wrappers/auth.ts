@@ -1,28 +1,26 @@
 import { CustomAuthorizerEvent } from 'aws-lambda';
-import { tagCommonMetrics, tagValid, tagInvalid, tagError } from './common';
+import { Metrics } from './common';
+
+const metrics = new Metrics('API Gateway Auth');
 
 export function authWrapper<T extends Function>(fn: T): T {
   return <any>function(event: CustomAuthorizerEvent, context: any, callback: any) {
-    tagCommonMetrics();
+    metrics.common(event);
     const token = event.authorizationToken;
-    console.debug('Received API authorizer request', event);
 
     function valid(jwt: any): void {
-      console.info('Successfully processed authorizer request');
-      tagValid();
       const policy = generatePolicy(jwt);
+      metrics.valid(policy);
       return callback(null, policy);
     }
 
     function invalid(message: any = ''): void {
-      console.warn('Authorizer token was invalid', message);
-      tagInvalid(message);
+      metrics.invalid(message);
       return callback('Unauthorized');
     }
 
     function error(error: any = ''): void {
-      console.error('Error authorizing API call', error, event);
-      tagError(error);
+      metrics.error(error);
       return callback(error);
     }
 
