@@ -4,8 +4,8 @@
     "uncommittedChanges": true,
     "untrackedFiles": true,
     "sensitiveData": true,
-    "branch": "master",
-    "gitTag": false
+    "branch": "/(HEAD detached at v*)/",
+    "gitTag": true
   },
   "confirm": false,
   "publishCommand": "npm publish",

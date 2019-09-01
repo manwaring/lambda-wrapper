@@ -1,5 +1,3 @@
-# CI/CD configuration file for QQ shared packages
-
 # Note: YAML anchors allow an object to be re-used, reducing duplication. The ampersand
 # declares an alias for an object, then later the `<<: *alias` syntax dereferences it.
 #
@@ -11,7 +9,7 @@
 anchors:
   container-config: &container-config
     docker:
-      - image: circleci/node:10.15
+      - image: circleci/node
         environment:
           TERM: dumb
 
@@ -49,13 +47,41 @@ jobs:
 
 workflows:
   version: 2
-  build_and_test:
+
+  test-and-publish:
     jobs:
-      - install
+      - install:
+          filters:
+            tags:
+              only: /.*/
+      # - test:
+      #     requires:
+      #       - install
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      # TODO add a dry-run step to non-tagged changes
+      # - publish-dry-run:
+      #     requires:
+      #       - test
+      #     filters:
+      #       tags:
+      #         only: /.*/
       - publish:
           context: manwaring-npm
           requires:
             - install
           filters:
             branches:
-              only: master
+              ignore: /.*/
+            tags:
+              only: /v.*/
+      # - test-default-example:
+      #     context: manwaring-aws
+      #     requires:
+      #       - publish
+      #     filters:
+      #       branches:
+      #         ignore: /.*/
+      #       tags:
+      #         only: /v.*/

@@ -4,5 +4,5 @@ src/
 .gitignore
 .npmignore
 .publishrc
-.prettierrc.yml
 tsconfig.json
+tsconfig.build.json
