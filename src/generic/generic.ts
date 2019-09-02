@@ -1,5 +1,5 @@
 import { Context, Callback } from 'aws-lambda';
-import { Metrics } from './common';
+import { Metrics } from '../common';
 
 const metrics = new Metrics('Generic');
 

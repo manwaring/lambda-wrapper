@@ -1,5 +1,5 @@
 import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
-import { Metrics, Body } from './common';
+import { Metrics, Body } from '../common';
 
 const metrics = new Metrics('API Gateway');
 
