@@ -108,7 +108,6 @@ describe('Stream parsing', () => {
       tableArn: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
       eventName: 'PUT'
     };
-
     expect(versions).toHaveLength(2);
     expect(versions).toContainEqual(firstVersion);
     expect(versions).toContainEqual(secondVersion);

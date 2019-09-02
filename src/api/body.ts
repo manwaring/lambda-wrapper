@@ -1,5 +1,5 @@
 import { parse } from 'querystring';
-import { logger } from './log';
+import { logger } from '../common/log';
 
 export class Body {
   constructor(private body: any, private headers: { [name: string]: string }) {}

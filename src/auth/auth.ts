@@ -11,17 +11,17 @@ export function authWrapper<T extends Function>(fn: T): T {
     function valid(jwt: any): void {
       const policy = generatePolicy(jwt);
       metrics.valid(policy);
-      return callback(null, policy);
+      return policy;
     }
 
     function invalid(message: any = ''): void {
       metrics.invalid(message);
-      return callback('Unauthorized');
+      throw new Error('Unauthorized');
     }
 
     function error(error: any = ''): void {
       metrics.error(error);
-      return callback(error);
+      throw new Error(error);
     }
 
     const signature: AuthorizerSignature = { event, token, valid, invalid, error };
