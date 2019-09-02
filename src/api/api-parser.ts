@@ -1,5 +1,25 @@
+import { APIGatewayEvent } from 'aws-lambda';
 import { parse } from 'querystring';
-import { logger } from '../common/log';
+import { Metrics, logger } from '../common';
+
+const metrics = new Metrics('API Gateway');
+
+export class Request {
+  constructor(private event: APIGatewayEvent) {}
+
+  getProperties(): any {
+    const event = this.event;
+    const path = event.pathParameters ? event.pathParameters : null;
+    const query = event.queryStringParameters ? event.queryStringParameters : null;
+    const auth = event.requestContext && event.requestContext.authorizer ? event.requestContext.authorizer : null;
+    const headers = event.headers ? event.headers : null;
+    const body = new Body(event.body, headers).getParsedBody();
+    const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || 'Test-Request';
+    const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : false;
+    metrics.common({ body, path, query, auth, headers, testRequest });
+    return { body, path, query, auth, headers, testRequest };
+  }
+}
 
 export class Body {
   constructor(private body: any, private headers: { [name: string]: string }) {}

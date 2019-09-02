@@ -3,46 +3,39 @@ import { apiWrapper, ApiSignature } from './api-wrapper';
 
 describe('API wrapper', () => {
   // @ts-ignore
-  const event = createEvent('aws:apiGateway', {});
-
-  it('Handles success callback', () => {
-    function mockHandler({ success }: ApiSignature) {
-      return success('success');
-    }
-    expect(apiWrapper(mockHandler)(event)).toEqual({
-      body: JSON.stringify('success'),
-      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
-      statusCode: 200
-    });
+  const requestEvent = createEvent('aws:apiGateway', {
+    body: JSON.stringify({ hello: 'world' }),
+    pathParameters: { proxy: 'not today' },
+    queryStringParameters: { name: 'a test' },
+    headers: { 'content-type': 'application/json', 'Test-Request': 'true' }
   });
 
-  it('Handles error callback', () => {
-    function mockHandler({ error }: ApiSignature) {
-      return error('error');
+  it('Has expected properties and response functions', () => {
+    function mockHandler({
+      event,
+      body,
+      path,
+      query,
+      headers,
+      testRequest,
+      auth,
+      success,
+      invalid,
+      redirect,
+      error
+    }: ApiSignature) {
+      expect(event).toEqual(requestEvent);
+      expect(body).toEqual({ hello: 'world' });
+      expect(path).toEqual({ proxy: 'not today' });
+      expect(query).toEqual({ name: 'a test' });
+      expect(headers['content-type']).toEqual('application/json');
+      expect(testRequest).toEqual(true);
+      expect(auth).toBeFalsy();
+      expect(success).toBeInstanceOf(Function);
+      expect(invalid).toBeInstanceOf(Function);
+      expect(redirect).toBeInstanceOf(Function);
+      expect(error).toBeInstanceOf(Function);
     }
-    expect(() => {
-      apiWrapper(mockHandler)(event);
-    }).toThrow('error');
-  });
-
-  it('Handles invalid callback', () => {
-    function mockHandler({ invalid }: ApiSignature) {
-      return invalid(['invalid']);
-    }
-    expect(apiWrapper(mockHandler)(event)).toEqual({
-      body: JSON.stringify({ errors: ['invalid'], event }),
-      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
-      statusCode: 400
-    });
-  });
-
-  it('Handles redirect callback', () => {
-    function mockHandler({ redirect }: ApiSignature) {
-      return redirect('url');
-    }
-    expect(apiWrapper(mockHandler)(event)).toEqual({
-      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true, Location: 'url' },
-      statusCode: 302
-    });
+    apiWrapper(mockHandler)(requestEvent);
   });
 });

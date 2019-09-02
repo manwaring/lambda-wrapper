@@ -1,45 +1,10 @@
-import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
-import { Metrics } from '../common';
-import { Body } from './body';
-
-const metrics = new Metrics('API Gateway');
-
-const HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Credentials': true
-};
+import { APIGatewayEvent } from 'aws-lambda';
+import { Request } from './api-parser';
+import { success, invalid, redirect, error } from './api-responses';
 
 export function apiWrapper<T extends Function>(fn: T): T {
   return <any>function(event: APIGatewayEvent) {
-    const { body, path, query, request, auth, headers, testRequest } = getRequestFields(event);
-    metrics.common(request);
-
-    function success(payload: any = null) {
-      const response = { statusCode: 200, headers: HEADERS };
-      if (payload) {
-        response['body'] = JSON.stringify(payload);
-      }
-      metrics.success(payload);
-      return response;
-    }
-
-    function invalid(errors: string[] = []) {
-      const response = { statusCode: 400, headers: HEADERS, body: JSON.stringify({ errors, event }) };
-      metrics.invalid(response);
-      return response;
-    }
-
-    function redirect(url: string) {
-      HEADERS['Location'] = url;
-      const response = { statusCode: 302, headers: HEADERS };
-      metrics.redirect(response);
-      return response;
-    }
-
-    function error(error: any = '') {
-      metrics.error(error);
-      throw new Error(error);
-    }
+    const { body, path, query, auth, headers, testRequest } = new Request(event).getProperties();
 
     const signature: ApiSignature = {
       event,
@@ -56,18 +21,6 @@ export function apiWrapper<T extends Function>(fn: T): T {
     };
     return fn(signature);
   };
-}
-
-function getRequestFields(event: APIGatewayEvent): any {
-  const path = event.pathParameters ? event.pathParameters : null;
-  const query = event.queryStringParameters ? event.queryStringParameters : null;
-  const auth = event.requestContext && event.requestContext.authorizer ? event.requestContext.authorizer : null;
-  const headers = event.headers ? event.headers : null;
-  const body = new Body(event.body, headers).getParsedBody();
-  const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || 'Test-Request';
-  const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : false;
-  const request = { body, path, query, auth, headers, testRequest };
-  return { body, path, query, auth, request, headers, testRequest };
 }
 
 export interface ApiSignature {
