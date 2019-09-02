@@ -1,5 +1,6 @@
 import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
-import { Metrics, Body } from './common';
+import { Metrics } from '../common';
+import { Body } from './body';
 
 const metrics = new Metrics('API Gateway');
 
@@ -9,35 +10,35 @@ const HEADERS = {
 };
 
 export function apiWrapper<T extends Function>(fn: T): T {
-  return <any>function(event: APIGatewayEvent, context: Context, callback: Callback) {
+  return <any>function(event: APIGatewayEvent) {
     const { body, path, query, request, auth, headers, testRequest } = getRequestFields(event);
     metrics.common(request);
 
-    function success(payload: any = null): void {
+    function success(payload: any = null) {
       const response = { statusCode: 200, headers: HEADERS };
       if (payload) {
         response['body'] = JSON.stringify(payload);
       }
       metrics.success(payload);
-      return callback(null, response);
+      return response;
     }
 
-    function invalid(errors: string[] = []): void {
-      const response = { statusCode: 400, headers: HEADERS, body: JSON.stringify({ errors, request }) };
+    function invalid(errors: string[] = []) {
+      const response = { statusCode: 400, headers: HEADERS, body: JSON.stringify({ errors, event }) };
       metrics.invalid(response);
-      return callback(null, response);
+      return response;
     }
 
-    function redirect(url: string): void {
+    function redirect(url: string) {
       HEADERS['Location'] = url;
       const response = { statusCode: 302, headers: HEADERS };
       metrics.redirect(response);
-      return callback(null, response);
+      return response;
     }
 
-    function error(error: any = ''): void {
+    function error(error: any = '') {
       metrics.error(error);
-      return callback(error);
+      throw new Error(error);
     }
 
     const signature: ApiSignature = {

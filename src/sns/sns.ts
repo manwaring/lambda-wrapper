@@ -1,21 +1,21 @@
-import { SNSEvent, Context, Callback } from 'aws-lambda';
-import { Metrics } from './common';
+import { SNSEvent } from 'aws-lambda';
+import { Metrics } from '../common';
 
 const metrics = new Metrics('SNS');
 
 export function snsWrapper<T extends Function>(fn: T): T {
-  return <any>function(event: SNSEvent, context: Context, callback: Callback) {
+  return <any>function(event: SNSEvent) {
     const message = JSON.parse(event.Records[0].Sns.Message);
     metrics.common(message);
 
     function success(message: any = ''): void {
       metrics.success(message);
-      return callback(null, message);
+      return message;
     }
 
     function error(error: any = ''): void {
       metrics.error(error);
-      return callback(error);
+      throw new Error(error);
     }
 
     const signature: SnsSignature = { event, message, success, error };

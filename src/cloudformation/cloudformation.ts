@@ -1,6 +1,6 @@
 import { CloudFormationCustomResourceEvent, Context, Callback } from 'aws-lambda';
 import { send, SUCCESS, FAILED } from 'cfn-response';
-import { Metrics } from './common';
+import { Metrics } from '../common';
 
 const metrics = new Metrics('CloudFormation');
 

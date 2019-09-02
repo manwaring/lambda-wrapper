@@ -1,14 +1,14 @@
+__mocks__
 .circleci/
 .dependabot/
-.nyc_output/
 coverage/
-dist/mock-data/
 dist/*.test*
 examples/
 src/
+.babelrc.js
 .prettierrc.yml
 .gitignore
 .npmignore
 .publishrc
-cucumber.js
+jest.config.js
 tsconfig.*json

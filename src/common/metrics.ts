@@ -4,7 +4,7 @@ import { isRunningInAwsLambdaEnvironment } from './environment';
 export class Metrics {
   private tagger;
   constructor(private type: string) {
-    this.tagger = new Tagger(type);
+    this.tagger = new Tagger();
   }
 
   common(payload): void {
@@ -57,7 +57,7 @@ class Tagger {
   metric: Function;
   label: Function;
 
-  constructor(private type: string) {
+  constructor() {
     try {
       const epsagon = require('epsagon');
       this.isEpsagonInstalled = true;
