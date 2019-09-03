@@ -84,7 +84,7 @@ workflows:
       - publish:
           context: manwaring-npm
           requires:
-            - install
+            - test
           filters:
             branches:
               ignore: /.*/

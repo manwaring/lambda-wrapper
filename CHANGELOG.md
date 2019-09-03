@@ -6,9 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), 
 
 ## [1.0.0]&nbsp;&nbsp;(2019-09-01)
 
+### Added
+
+- Examples with tests to run after publishing a new version
+
 ### Changed
 
-- Modified how common code is handled (responses, logging, tagging)
+- Extensive refactor to support unit tests
+- Update documentation to be more clear and concise
 
 ## 0.3.9&nbsp;&nbsp;(2019-09-01)
 
