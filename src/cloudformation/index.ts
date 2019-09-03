@@ -1,1 +1,1 @@
-export * from './cloudformation';
+export * from './wrapper';
