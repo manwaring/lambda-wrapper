@@ -1,7 +1,7 @@
 import createEvent from '@serverless/event-mocks';
-import { Stream } from './stream';
+import { DynamoDBStreamParser } from './parser';
 
-describe('Stream parsing', () => {
+describe('DynamoDB stream parsing', () => {
   const firstRecord = {
     eventId: '1',
     eventVersion: '1.0',
@@ -53,12 +53,30 @@ describe('Stream parsing', () => {
           N: '456'
         }
       },
+      StreamViewType: 'NEW_AND_OLD_IMAGES',
+      SequenceNumber: '111',
+      SizeBytes: 26
+    },
+    awsRegion: 'us-east-1',
+    eventName: 'INSERT',
+    eventSourceARN: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
+    eventSource: 'aws-dynamodb'
+  };
+  const thirdRecord = {
+    eventId: '1',
+    eventVersion: '1.0',
+    dynamodb: {
+      Keys: {
+        Id: {
+          N: '789'
+        }
+      },
       OldImage: {
         Message: {
-          S: 'hola'
+          S: 'buongiorno'
         },
         Id: {
-          N: '456'
+          N: '789'
         }
       },
       StreamViewType: 'NEW_AND_OLD_IMAGES',
@@ -66,50 +84,52 @@ describe('Stream parsing', () => {
       SizeBytes: 26
     },
     awsRegion: 'us-east-1',
-    eventName: 'PUT',
+    eventName: 'DELETE',
     eventSourceARN: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
     eventSource: 'aws-dynamodb'
   };
   // @ts-ignore
-  const event = createEvent('aws:dynamo', { Records: [firstRecord, secondRecord] });
-  const stream = new Stream(event);
+  const event = createEvent('aws:dynamo', { Records: [firstRecord, secondRecord, thirdRecord] });
+  const stream = new DynamoDBStreamParser(event);
   const { newVersions, oldVersions, versions } = stream.getVersions();
 
   it('Gets new versions correctly', () => {
-    const firstVersion = { Message: 'goodbye', Id: 123 };
-    const secondVersion = { Message: 'hasta la vista', Id: 456 };
     expect(newVersions).toHaveLength(2);
-    expect(newVersions).toContainEqual(firstVersion);
-    expect(newVersions).toContainEqual(secondVersion);
+    expect(newVersions).toContainEqual({ Message: 'goodbye', Id: 123 });
+    expect(newVersions).toContainEqual({ Message: 'hasta la vista', Id: 456 });
   });
 
   it('Gets old versions correctly', () => {
-    const firstVersion = { Message: 'hello', Id: 123 };
-    const secondVersion = { Message: 'hola', Id: 456 };
     expect(oldVersions).toHaveLength(2);
-    expect(oldVersions).toContainEqual(firstVersion);
-    expect(oldVersions).toContainEqual(secondVersion);
+    expect(oldVersions).toContainEqual({ Message: 'hello', Id: 123 });
+    expect(oldVersions).toContainEqual({ Message: 'buongiorno', Id: 789 });
   });
 
   it('Gets versions correctly', () => {
-    const firstVersion = {
+    expect(versions).toHaveLength(3);
+    expect(versions).toContainEqual({
       newVersion: { Message: 'goodbye', Id: 123 },
       oldVersion: { Message: 'hello', Id: 123 },
       keys: { Id: 123 },
       tableName: 'table',
       tableArn: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
       eventName: 'PUT'
-    };
-    const secondVersion = {
+    });
+    expect(versions).toContainEqual({
       newVersion: { Message: 'hasta la vista', Id: 456 },
-      oldVersion: { Message: 'hola', Id: 456 },
+      oldVersion: null,
       keys: { Id: 456 },
       tableName: 'table',
       tableArn: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
-      eventName: 'PUT'
-    };
-    expect(versions).toHaveLength(2);
-    expect(versions).toContainEqual(firstVersion);
-    expect(versions).toContainEqual(secondVersion);
+      eventName: 'INSERT'
+    });
+    expect(versions).toContainEqual({
+      newVersion: null,
+      oldVersion: { Message: 'buongiorno', Id: 789 },
+      keys: { Id: 789 },
+      tableName: 'table',
+      tableArn: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
+      eventName: 'DELETE'
+    });
   });
 });

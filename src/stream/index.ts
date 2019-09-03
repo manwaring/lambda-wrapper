@@ -1,1 +1,1 @@
-export * from './stream-wrapper';
+export * from './wrapper';

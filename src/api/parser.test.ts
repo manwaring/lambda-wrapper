@@ -1,6 +1,6 @@
 import { stringify } from 'querystring';
 import createEvent from '@serverless/event-mocks';
-import { Request, Body } from './api-parser';
+import { Request, Body } from './parser';
 
 describe('Body parsing', () => {
   it('Parses json body', () => {

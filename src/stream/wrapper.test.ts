@@ -1,5 +1,5 @@
 import createEvent from '@serverless/event-mocks';
-import { streamWrapper } from './stream-wrapper';
+import { streamWrapper } from './wrapper';
 
 describe('Stream wrapper', () => {
   // @ts-ignore

@@ -1,5 +1,5 @@
 import createEvent from '@serverless/event-mocks';
-import { apiWrapper, ApiSignature } from './api-wrapper';
+import { apiWrapper, ApiSignature } from './wrapper';
 
 describe('API wrapper', () => {
   // @ts-ignore

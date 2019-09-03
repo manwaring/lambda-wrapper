@@ -1,23 +1,14 @@
 import { DynamoDBStreams } from 'aws-sdk';
-import { Stream, Version } from './stream';
+import { DynamoDBStreamParser, Version } from './parser';
 import { Metrics } from '../common';
+import { success, error } from './responses';
 
-const metrics = new Metrics('Stream');
+const metrics = new Metrics('DynamoDB Stream');
 
 export function streamWrapper<T extends Function>(fn: T): T {
   return <any>function(event: DynamoDBStreams.GetRecordsOutput) {
-    const { newVersions, oldVersions, versions } = new Stream(event).getVersions();
+    const { newVersions, oldVersions, versions } = new DynamoDBStreamParser(event).getVersions();
     metrics.common({ newVersions, oldVersions, versions });
-
-    function success(message: any = ''): void {
-      metrics.success(message);
-      return message;
-    }
-
-    function error(error: any = ''): void {
-      metrics.error(error);
-      throw new Error(error);
-    }
 
     const signature: StreamSignature = { event, newVersions, oldVersions, versions, success, error };
     return fn(signature);

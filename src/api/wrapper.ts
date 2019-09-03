@@ -1,6 +1,6 @@
 import { APIGatewayEvent } from 'aws-lambda';
-import { Request } from './api-parser';
-import { success, invalid, redirect, error } from './api-responses';
+import { Request } from './parser';
+import { success, invalid, redirect, error } from './responses';
 
 export function apiWrapper<T extends Function>(fn: T): T {
   return <any>function(event: APIGatewayEvent) {

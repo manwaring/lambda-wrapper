@@ -1,22 +1,14 @@
 import { SNSEvent } from 'aws-lambda';
 import { Metrics } from '../common';
+import { success, error } from './responses';
+import { SnsParser } from './parser';
 
 const metrics = new Metrics('SNS');
 
 export function snsWrapper<T extends Function>(fn: T): T {
   return <any>function(event: SNSEvent) {
-    const message = JSON.parse(event.Records[0].Sns.Message);
+    const message = new SnsParser(event).getMessage();
     metrics.common(message);
-
-    function success(message: any = ''): void {
-      metrics.success(message);
-      return message;
-    }
-
-    function error(error: any = ''): void {
-      metrics.error(error);
-      throw new Error(error);
-    }
 
     const signature: SnsSignature = { event, message, success, error };
     return fn(signature);

@@ -1,1 +1,1 @@
-export * from './sns';
+export * from './wrapper';

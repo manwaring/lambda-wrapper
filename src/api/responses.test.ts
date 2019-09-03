@@ -1,5 +1,5 @@
 import createEvent from '@serverless/event-mocks';
-import { success, error, invalid, redirect } from './api-responses';
+import { success, error, invalid, redirect } from './responses';
 
 describe('API responses', () => {
   // @ts-ignore
@@ -13,6 +13,13 @@ describe('API responses', () => {
     });
   });
 
+  it('Handles success response without payload', () => {
+    expect(success()).toEqual({
+      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
+      statusCode: 200
+    });
+  });
+
   it('Handles error response', () => {
     expect(() => error('error')).toThrow('error');
   });
@@ -20,6 +27,13 @@ describe('API responses', () => {
   it('Handles invalid response', () => {
     expect(invalid(['invalid'])).toEqual({
       body: JSON.stringify({ errors: ['invalid'] }),
+      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
+      statusCode: 400
+    });
+  });
+
+  it('Handles invalid response without validation errors', () => {
+    expect(invalid()).toEqual({
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
       statusCode: 400
     });

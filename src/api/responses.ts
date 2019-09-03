@@ -7,7 +7,7 @@ const HEADERS = {
   'Access-Control-Allow-Credentials': true
 };
 
-export function success(payload: any = null) {
+export function success(payload?: any) {
   const response = { statusCode: 200, headers: HEADERS };
   if (payload) {
     response['body'] = JSON.stringify(payload);
@@ -16,8 +16,11 @@ export function success(payload: any = null) {
   return response;
 }
 
-export function invalid(errors: string[] = []) {
-  const response = { statusCode: 400, headers: HEADERS, body: JSON.stringify({ errors }) };
+export function invalid(errors?: string[]) {
+  const response = { statusCode: 400, headers: HEADERS };
+  if (errors) {
+    response['body'] = JSON.stringify({ errors });
+  }
   metrics.invalid(response);
   return response;
 }
@@ -29,7 +32,7 @@ export function redirect(url: string) {
   return response;
 }
 
-export function error(error: any = '') {
+export function error(error?: any) {
   metrics.error(error);
   throw new Error(error);
 }

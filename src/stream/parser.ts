@@ -1,6 +1,6 @@
 import { DynamoDB, DynamoDBStreams } from 'aws-sdk';
 
-export class Stream {
+export class DynamoDBStreamParser {
   constructor(private event: Event) {}
 
   getVersions(): { newVersions: any[]; oldVersions: any[]; versions: Version[] } {
