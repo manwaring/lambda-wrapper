@@ -3,9 +3,9 @@ import { Metrics } from '../common';
 import { success, error } from './responses';
 import { SnsParser } from './parser';
 
-const metrics = new Metrics('SNS');
+const metrics = new Metrics('Sns');
 
-export function snsWrapper<T extends Function>(fn: T): T {
+export function sns<T extends Function>(fn: T): T {
   return <any>function(event: SNSEvent) {
     const message = new SnsParser(event).getMessage();
     metrics.common(message);

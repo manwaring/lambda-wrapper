@@ -60,3 +60,47 @@ describe('Metrics tagging', () => {
     expect(console.log).toHaveBeenCalledWith('failure', response);
   });
 });
+
+describe('Metrics tagging with missing libs', () => {
+  const ORIGINAL_ENVS = process.env;
+  const commonProps = { REVISION: 'ahf6e', STAGE: 'prod', AWS_REGION: 'us-east-1', LAMBDA_WRAPPER_LOG: 'true' };
+  const payload = { hello: 'world' };
+  const response = { goodbye: 'world' };
+  const type = 'Test';
+
+  afterEach(() => {
+    jest.resetModules();
+    process.env = ORIGINAL_ENVS;
+  });
+
+  it('Handles missing Epsagon', () => {
+    jest.doMock('epsagon', () => {
+      return {
+        __esModule: true,
+        default: (function() {
+          throw new Error();
+        })()
+      };
+    });
+    const { Metrics } = require('./metrics');
+    const metrics = new Metrics(type);
+    metrics.failure(response);
+    expect(console.debug).toHaveBeenCalledWith(`Failure processing ${type} event, responding with`, response);
+    expect(console.log).toHaveBeenCalledWith('failure', response);
+  });
+
+  it('Handles missing IOPipe', () => {
+    jest.doMock('@iopipe/iopipe', () => {
+      return {
+        __esModule: true,
+        default: (function() {
+          throw new Error();
+        })()
+      };
+    });
+    const metrics = new Metrics(type);
+    metrics.failure(response);
+    expect(console.debug).toHaveBeenCalledWith(`Failure processing ${type} event, responding with`, response);
+    expect(console.log).toHaveBeenCalledWith('failure', response);
+  });
+});

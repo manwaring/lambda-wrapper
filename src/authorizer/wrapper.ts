@@ -4,7 +4,7 @@ import { valid, invalid, error } from './responses';
 
 const metrics = new Metrics('Lambda Authorizer');
 
-export function authWrapper<T extends Function>(fn: T): T {
+export function authorizer<T extends Function>(fn: T): T {
   return <any>function(event: CustomAuthorizerEvent) {
     metrics.common(event);
     const token = event.authorizationToken;

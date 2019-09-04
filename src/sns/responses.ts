@@ -1,6 +1,6 @@
 import { Metrics } from '../common';
 
-const metrics = new Metrics('SNS');
+const metrics = new Metrics('Sns');
 
 export function success(message: any): void {
   metrics.success(message);

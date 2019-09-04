@@ -4,7 +4,7 @@ import { successWrapper, failureWrapper } from './responses';
 
 const metrics = new Metrics('CloudFormation');
 
-export function cloudFormationWrapper<T extends Function>(fn: T): T {
+export function cloudFormation<T extends Function>(fn: T): T {
   return <any>function(event: CloudFormationCustomResourceEvent, context: Context) {
     metrics.common(event);
 

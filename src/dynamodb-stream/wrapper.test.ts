@@ -1,7 +1,7 @@
 import createEvent from '@serverless/event-mocks';
-import { streamWrapper } from './wrapper';
+import { dynamodbStream } from './wrapper';
 
-describe('Stream wrapper', () => {
+describe('DynamoDB Stream wrapper', () => {
   // @ts-ignore
   const event = createEvent('aws:dynamo', {});
 
@@ -9,7 +9,7 @@ describe('Stream wrapper', () => {
     function mockHandler({ success }) {
       return success('success');
     }
-    expect(streamWrapper(mockHandler)(event)).toEqual('success');
+    expect(dynamodbStream(mockHandler)(event)).toEqual('success');
   });
 
   it('Handles error callback', () => {
@@ -17,7 +17,7 @@ describe('Stream wrapper', () => {
       return error('error');
     }
     expect(() => {
-      streamWrapper(mockHandler)(event);
+      dynamodbStream(mockHandler)(event);
     }).toThrow('error');
   });
 });

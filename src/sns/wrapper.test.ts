@@ -1,5 +1,5 @@
 import createEvent from '@serverless/event-mocks';
-import { snsWrapper, SnsSignature } from './wrapper';
+import { sns, SnsSignature } from './wrapper';
 
 describe('Stream wrapper', () => {
   const Sns = {
@@ -15,6 +15,6 @@ describe('Stream wrapper', () => {
       expect(success).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
     }
-    snsWrapper(mockHandler)(requestEvent);
+    sns(mockHandler)(requestEvent);
   });
 });

@@ -4,3 +4,6 @@ const epsagon = jest.genMockFromModule('epsagon');
 epsagon.label = function(key: string) {};
 
 module.exports = epsagon;
+// module.exports = (function() {
+//   throw new Error();
+// })();

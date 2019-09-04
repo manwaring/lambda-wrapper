@@ -5,17 +5,17 @@ import { success, error } from './responses';
 
 const metrics = new Metrics('DynamoDB Stream');
 
-export function streamWrapper<T extends Function>(fn: T): T {
+export function dynamodbStream<T extends Function>(fn: T): T {
   return <any>function(event: DynamoDBStreams.GetRecordsOutput) {
     const { newVersions, oldVersions, versions } = new DynamoDBStreamParser(event).getVersions();
     metrics.common({ newVersions, oldVersions, versions });
 
-    const signature: StreamSignature = { event, newVersions, oldVersions, versions, success, error };
+    const signature: DynamoDBStreamSignature = { event, newVersions, oldVersions, versions, success, error };
     return fn(signature);
   };
 }
 
-export interface StreamSignature {
+export interface DynamoDBStreamSignature {
   event: DynamoDBStreams.GetRecordsOutput; // original event
   newVersions: any[]; // array of all unmarshalled javascript objects of new images
   oldVersions: any[]; // array of all unmarshalled javascript objects of old images

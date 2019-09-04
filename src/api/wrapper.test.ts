@@ -1,5 +1,5 @@
 import createEvent from '@serverless/event-mocks';
-import { apiWrapper, ApiSignature } from './wrapper';
+import { api, ApiSignature } from './wrapper';
 
 describe('API wrapper', () => {
   // @ts-ignore
@@ -36,6 +36,6 @@ describe('API wrapper', () => {
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
     }
-    apiWrapper(mockHandler)(requestEvent);
+    api(mockHandler)(requestEvent);
   });
 });

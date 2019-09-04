@@ -43,6 +43,26 @@ describe('Lambda Authorizer responses', () => {
     });
   });
 
+  it('Handles valid response without jwt subs or claims', () => {
+    const jwt = {
+      name: 'John Doe',
+      admin: true
+    };
+    expect(valid(jwt)).toEqual({
+      principalId: '',
+      policyDocument: {
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Action: 'execute-api:Invoke',
+            Effect: 'Allow',
+            Resource: 'arn:aws:execute-api:**'
+          }
+        ]
+      }
+    });
+  });
+
   it('Handles invalid response', () => {
     expect(() => invalid()).toThrow('Unauthorized');
   });

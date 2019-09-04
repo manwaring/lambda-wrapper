@@ -1,4 +1,4 @@
-import { authWrapper, AuthorizerSignature } from './wrapper';
+import { authorizer, AuthorizerSignature } from './wrapper';
 
 describe('Stream wrapper', () => {
   const requestEvent = {
@@ -16,6 +16,6 @@ describe('Stream wrapper', () => {
       expect(error).toBeInstanceOf(Function);
     }
     // @ts-ignore
-    authWrapper(mockHandler)(requestEvent);
+    authorizer(mockHandler)(requestEvent);
   });
 });

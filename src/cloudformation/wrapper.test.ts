@@ -1,4 +1,4 @@
-import { cloudFormationWrapper, CloudFormationSignature } from './wrapper';
+import { cloudFormation, CloudFormationSignature } from './wrapper';
 import { CloudFormationCustomResourceEvent } from 'aws-lambda';
 
 describe('Stream wrapper', () => {
@@ -22,6 +22,6 @@ describe('Stream wrapper', () => {
       expect(failure).toBeInstanceOf(Function);
     }
     // @ts-ignore
-    cloudFormationWrapper(mockHandler)(requestEvent);
+    cloudFormation(mockHandler)(requestEvent);
   });
 });

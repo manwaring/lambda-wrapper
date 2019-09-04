@@ -2,7 +2,7 @@ import { APIGatewayEvent } from 'aws-lambda';
 import { Request } from './parser';
 import { success, invalid, redirect, error } from './responses';
 
-export function apiWrapper<T extends Function>(fn: T): T {
+export function api<T extends Function>(fn: T): T {
   return <any>function(event: APIGatewayEvent) {
     const { body, path, query, auth, headers, testRequest } = new Request(event).getProperties();
 
