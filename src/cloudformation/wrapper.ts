@@ -10,7 +10,7 @@ export function cloudFormation<T extends Function>(fn: T): T {
 
     const signature: CloudFormationSignature = {
       event,
-      // We need to call these response wrappers so that we can pass in context (necessary for CloudFormation responses) so that
+      // We need to call these response wrappers so that we can pass in context (necessary for CloudFormation responses) to keep it abstracted from users
       success: successWrapper(event, context),
       failure: failureWrapper(event, context)
     };

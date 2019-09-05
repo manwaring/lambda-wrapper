@@ -1,9 +1,13 @@
-import { APIGatewayEvent } from 'aws-lambda';
+import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
 import { Request } from './parser';
-import { success, invalid, redirect, error } from './responses';
+import { Metrics } from '../common';
+import { Responses } from './responses';
+
+const metrics = new Metrics('API Gateway');
 
 export function api<T extends Function>(fn: T): T {
-  return <any>function(event: APIGatewayEvent) {
+  return <any>function(event: APIGatewayEvent, context: Context, callback: Callback) {
+    const responses = new Responses(metrics, callback);
     const { body, path, query, auth, headers, testRequest } = new Request(event).getProperties();
 
     const signature: ApiSignature = {
@@ -14,10 +18,10 @@ export function api<T extends Function>(fn: T): T {
       headers,
       testRequest,
       auth,
-      success,
-      invalid,
-      redirect,
-      error
+      success: responses.success,
+      invalid: responses.invalid,
+      redirect: responses.redirect,
+      error: responses.error
     };
     return fn(signature);
   };

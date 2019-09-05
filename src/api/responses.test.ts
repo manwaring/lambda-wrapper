@@ -1,12 +1,16 @@
-import createEvent from '@serverless/event-mocks';
-import { success, error, invalid, redirect } from './responses';
+import { Responses } from './responses';
+import { Metrics } from '../common';
 
 describe('API responses', () => {
-  // @ts-ignore
-  const event = createEvent('aws:apiGateway', {});
+  const metrics = new Metrics('API Gateway');
+  const callback = jest.fn((err, result) => (err ? new Error(err) : result));
+  const responses = new Responses(metrics, callback);
+
+  beforeEach(() => jest.resetAllMocks());
 
   it('Handles success response', () => {
-    expect(success('success')).toEqual({
+    responses.success('success');
+    expect(callback).toHaveBeenCalledWith(null, {
       body: JSON.stringify('success'),
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
       statusCode: 200
@@ -14,18 +18,21 @@ describe('API responses', () => {
   });
 
   it('Handles success response without payload', () => {
-    expect(success()).toEqual({
+    responses.success();
+    expect(callback).toHaveBeenCalledWith(null, {
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
       statusCode: 200
     });
   });
 
   it('Handles error response', () => {
-    expect(() => error('error')).toThrow('error');
+    responses.error('error');
+    expect(callback).toHaveBeenCalledWith(new Error('error'));
   });
 
   it('Handles invalid response', () => {
-    expect(invalid(['invalid'])).toEqual({
+    responses.invalid(['invalid']);
+    expect(callback).toHaveBeenCalledWith(null, {
       body: JSON.stringify({ errors: ['invalid'] }),
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
       statusCode: 400
@@ -33,14 +40,16 @@ describe('API responses', () => {
   });
 
   it('Handles invalid response without validation errors', () => {
-    expect(invalid()).toEqual({
+    responses.invalid();
+    expect(callback).toHaveBeenCalledWith(null, {
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
       statusCode: 400
     });
   });
 
   it('Handles redirect response', () => {
-    expect(redirect('url')).toEqual({
+    responses.redirect('url');
+    expect(callback).toHaveBeenCalledWith(null, {
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true, Location: 'url' },
       statusCode: 302
     });
