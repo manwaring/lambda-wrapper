@@ -7,3 +7,6 @@ jspm_packages
 
 # Webpack directories
 .webpack
+
+# Don't want to cache library versions because always want latest lambda-wrapper
+package-lock.json
