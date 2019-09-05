@@ -58,21 +58,21 @@ class Tagger {
   label: Function;
 
   constructor() {
-    try {
-      const epsagon = require('epsagon');
-      this.isEpsagonInstalled = true;
-      this.label = epsagon.label;
-    } catch (err) {
-      logger.debug('Epsagon not installed in project, not tagging with Epsagon labels');
-    }
-    try {
-      const iopipe = require('@iopipe/iopipe');
-      this.isIOPipeInstalled = true;
-      this.metric = iopipe.metric;
-      this.label = iopipe.label;
-    } catch (err) {
-      logger.debug('IOPipe not installed in project, not tagging with IOPipe metrics');
-    }
+    // try {
+    //   const epsagon = require('epsagon');
+    //   this.isEpsagonInstalled = true;
+    //   this.label = epsagon.label;
+    // } catch (err) {
+    //   logger.debug('Epsagon not installed in project, not tagging with Epsagon labels');
+    // }
+    // try {
+    //   const iopipe = require('@iopipe/iopipe');
+    //   this.isIOPipeInstalled = true;
+    //   this.metric = iopipe.metric;
+    //   this.label = iopipe.label;
+    // } catch (err) {
+    //   logger.debug('IOPipe not installed in project, not tagging with IOPipe metrics');
+    // }
   }
 
   tag(key: string, value: any = false): void {
