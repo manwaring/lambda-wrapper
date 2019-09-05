@@ -9,6 +9,8 @@ describe('API wrapper', () => {
     queryStringParameters: { name: 'a test' },
     headers: { 'content-type': 'application/json', 'Test-Request': 'true' }
   });
+  const context = {};
+  const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response functions', () => {
     function mockHandler({
@@ -35,7 +37,9 @@ describe('API wrapper', () => {
       expect(invalid).toBeInstanceOf(Function);
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
+      success('success');
     }
-    api(mockHandler)(requestEvent);
+    // @ts-ignore
+    api(mockHandler)(requestEvent, context, callback);
   });
 });
