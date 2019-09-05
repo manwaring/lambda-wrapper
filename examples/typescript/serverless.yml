@@ -1,0 +1,68 @@
+service:
+  name: typescript-example
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  stage: example
+  runtime: nodejs10.x
+
+functions:
+  api:
+    handler: handlers/api.handler
+    events:
+      - http:
+          authorizer:
+            name: authorizere
+          method: get
+          path: hello
+
+  authorizer:
+    handler: handlers/authorizer.handler
+
+  cloudformation:
+    handler: handlers/cloudformation.handler
+
+  dynamodb:
+    handler: handlers/dynamodb.handler
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: Table.StreamArn
+
+  # generic:
+
+  sns:
+    handler: handlers/sns.handler
+    events:
+      - sns: sns
+
+resources:
+  Resources:
+    Table:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: S
+        BillingMode: PAY_PER_REQUEST
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+
+    Bucket:
+      Type: AWS::S3::Bucket
+
+    EmptyBucketCustomResource:
+      Type: Custom::EmptyBucket
+      DependsOn: Bucket
+      Properties:
+        ServiceToken:
+          Fn::GetAtt: CloudformationLambdaFunction.Arn
+        BucketName:
+          Ref: Bucket
