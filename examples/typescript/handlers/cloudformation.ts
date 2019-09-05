@@ -1,5 +1,6 @@
 import { S3 } from 'aws-sdk';
 import { cloudFormation, CloudFormationSignature } from '@manwaring/lambda-wrapper';
+import 'source-map-support/register';
 
 const s3 = new S3({ apiVersion: '2006-03-01', region: 'us-east-1' });
 

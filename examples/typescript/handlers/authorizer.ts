@@ -1,4 +1,5 @@
 import { authorizer, AuthorizerSignature } from '@manwaring/lambda-wrapper';
+import 'source-map-support/register';
 
 export const handler = authorizer(async ({ token, valid, invalid, error }: AuthorizerSignature) => {
   try {
