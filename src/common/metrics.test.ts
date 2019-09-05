@@ -21,7 +21,6 @@ describe('Metrics tagging', () => {
     expect(console.log).toHaveBeenCalledWith('revision', commonProps.REVISION);
     expect(console.log).toHaveBeenCalledWith('stage', commonProps.STAGE);
     expect(console.log).toHaveBeenCalledWith('region', commonProps.AWS_REGION);
-    expect(console.log).toHaveBeenCalledWith('payload', payload);
   });
 
   it('Tags success', () => {

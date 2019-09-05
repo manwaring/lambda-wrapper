@@ -10,44 +10,48 @@ export class Metrics {
   common(payload): void {
     const { REVISION, STAGE, AWS_REGION } = process.env;
     logger.debug(`Received ${this.type} event payload`, payload);
-    this.tag('region', AWS_REGION);
-    this.tag('revision', REVISION);
-    this.tag('stage', STAGE);
-    this.tag('payload', payload);
+    this.tagAndLog('region', AWS_REGION);
+    this.tagAndLog('revision', REVISION);
+    this.tagAndLog('stage', STAGE);
+    this.tagOnly('payload', payload);
   }
 
   success(response?: any): void {
     logger.debug(`Successfully processed ${this.type} event, responding with`, response);
-    this.tag('success', response);
+    this.tagAndLog('success', response);
   }
 
   valid(response?: any): void {
     logger.debug(`Valid ${this.type} event, responding with`, response);
-    this.tag('valid', response);
+    this.tagAndLog('valid', response);
   }
 
   invalid(response?: any): void {
     logger.debug(`Invalid ${this.type} event, responding with`, response);
-    this.tag('invalid', response);
+    this.tagAndLog('invalid', response);
   }
 
   redirect(response?: any): void {
     logger.debug(`Redirecting ${this.type} event, responding with`, response);
-    this.tag('redirect', response);
+    this.tagAndLog('redirect', response);
   }
 
   error(response?: any): void {
     logger.debug(`Error processing ${this.type} event, responding with`, response);
-    this.tag('error', response);
+    this.tagAndLog('error', response);
   }
 
   failure(response?: any): void {
     logger.debug(`Failure processing ${this.type} event, responding with`, response);
-    this.tag('failure', response);
+    this.tagAndLog('failure', response);
   }
 
-  private tag(key: string, value: any = false): void {
-    this.tagger.tag(key, value);
+  private tagAndLog(key: string, value: any = false): void {
+    this.tagger.tagAndLog(key, value);
+  }
+
+  private tagOnly(key: string, value: any = false): void {
+    this.tagger.tagOnly(key, value);
   }
 }
 
@@ -58,30 +62,34 @@ class Tagger {
   label: Function;
 
   constructor() {
-    // try {
-    //   const epsagon = require('epsagon');
-    //   this.isEpsagonInstalled = true;
-    //   this.label = epsagon.label;
-    // } catch (err) {
-    //   logger.debug('Epsagon not installed in project, not tagging with Epsagon labels');
-    // }
-    // try {
-    //   const iopipe = require('@iopipe/iopipe');
-    //   this.isIOPipeInstalled = true;
-    //   this.metric = iopipe.metric;
-    //   this.label = iopipe.label;
-    // } catch (err) {
-    //   logger.debug('IOPipe not installed in project, not tagging with IOPipe metrics');
-    // }
+    try {
+      const epsagon = require('epsagon');
+      this.isEpsagonInstalled = true;
+      this.label = epsagon.label;
+    } catch (err) {
+      logger.debug('Epsagon not installed in project, not tagging with Epsagon labels');
+    }
+    try {
+      const iopipe = require('@iopipe/iopipe');
+      this.isIOPipeInstalled = true;
+      this.metric = iopipe.metric;
+      this.label = iopipe.label;
+    } catch (err) {
+      logger.debug('IOPipe not installed in project, not tagging with IOPipe metrics');
+    }
   }
 
-  tag(key: string, value: any = false): void {
+  tagOnly(key: string, value: any = false): void {
     if (this.isEpsagonInstalled && isRunningInAwsLambdaEnvironment) {
       this.label(key);
     }
     if (this.isIOPipeInstalled && isRunningInAwsLambdaEnvironment) {
       this.isValidMetric(value) ? this.metric(key, value) : this.label(key);
     }
+  }
+
+  tagAndLog(key: string, value: any = false): void {
+    this.tagOnly(key, value);
     logger.log(key, value);
   }
 
