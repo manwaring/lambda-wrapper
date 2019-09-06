@@ -4,13 +4,15 @@
   "description": "Serverless webpack example using Typescript",
   "main": "handler.js",
   "scripts": {
-    "deploy": "sls deploy"
+    "get-latest-lambda-wrapper": "cd ../../ && npm run setup-package && cd examples/ts && npm i -D ../../dist",
+    "deploy": "sls deploy",
+    "test": "sls invoke -f hello"
   },
   "dependencies": {
-    "@manwaring/lambda-wrapper": "*",
     "source-map-support": "^0.5.10"
   },
   "devDependencies": {
+    "@manwaring/lambda-wrapper": "*",
     "@types/aws-lambda": "^8.10.17",
     "@types/node": "^10.12.18",
     "serverless": "^1.51.0",
