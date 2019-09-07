@@ -5,7 +5,9 @@ describe('API responses', () => {
   const metrics = new Metrics('API Gateway');
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
-  beforeEach(() => jest.resetAllMocks());
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
 
   it('Handles success response', () => {
     const success = successWrapper(metrics, callback);

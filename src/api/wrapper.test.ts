@@ -9,7 +9,20 @@ describe('API wrapper', () => {
     queryStringParameters: { name: 'a test' },
     headers: { 'content-type': 'application/json', 'Test-Request': 'true' }
   });
-  const context = {};
+  const context = {
+    callbackWaitsForEmptyEventLoop: false,
+    functionName: 'function-name',
+    functionVersion: '$LATEST',
+    invokedFunctionArn: 'arn:',
+    memoryLimitInMB: 128,
+    awsRequestId: 'request',
+    logGroupName: 'group',
+    logStreamName: 'stream',
+    getRemainingTimeInMillis: () => 2,
+    done: () => {},
+    fail: () => {},
+    succeed: () => {}
+  };
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response functions', () => {
@@ -39,7 +52,6 @@ describe('API wrapper', () => {
       expect(error).toBeInstanceOf(Function);
       success('success');
     }
-    // @ts-ignore
     api(mockHandler)(requestEvent, context, callback);
   });
 });

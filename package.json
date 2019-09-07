@@ -1,13 +1,14 @@
 {
   "name": "@manwaring/lambda-wrapper",
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "scripts": {
     "publish-please-dry-run": "publish-please --dry-run",
     "publish-please": "publish-please",
     "prepublishOnly": "publish-please guard && npm run build",
     "build": "rimraf dist && tsc -p ./tsconfig.build.json",
     "test": "jest --coverage",
+    "watch-tests": "jest --watch",
     "codecov": "codecov -f coverage/*.json"
   },
   "dependencies": {

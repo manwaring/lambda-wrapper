@@ -5,12 +5,13 @@ import { successWrapper, invalidWrapper, errorWrapper, redirectWrapper } from '.
 
 const metrics = new Metrics('API Gateway');
 
-export function api<T extends Function>(fn: T): T {
-  return <any>function(event: APIGatewayEvent, context: Context, callback: Callback) {
-    // const responses = new Responses(metrics, callback).getResponses();
+export function api(
+  custom: (props: ApiSignature) => any
+): (event: APIGatewayEvent, context: Context, callback: Callback) => any {
+  return function handler(event: APIGatewayEvent, context: Context, callback: Callback) {
     const { body, path, query, auth, headers, testRequest } = new Request(event).getProperties();
 
-    const signature: ApiSignature = {
+    const signature = {
       event,
       body,
       path,
@@ -23,7 +24,7 @@ export function api<T extends Function>(fn: T): T {
       error: errorWrapper(metrics, callback),
       redirect: redirectWrapper(metrics, callback)
     };
-    return fn(signature);
+    return custom(signature);
   };
 }
 
