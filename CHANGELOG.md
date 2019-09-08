@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [1.0.9]&nbsp;&nbsp;(2019-09-07)
+
+### Changed
+
+- Eliminate duplicative logging from response functions
+
 ## [1.0.8]&nbsp;&nbsp;(2019-09-07)
 
 ### Changed
@@ -44,6 +50,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), 
 - Update older libraries
 - Now publish from Git tags instead of master pushes
 
+[1.0.9]: https://github.com/manwaring/lambda-wrapper/compare/v1.0.8...v1.0.9
 [1.0.8]: https://github.com/manwaring/lambda-wrapper/compare/v1.0.7...v1.0.8
 [1.0.7]: https://github.com/manwaring/lambda-wrapper/compare/v1.0.1...v1.0.7
 [1.0.1]: https://github.com/manwaring/lambda-wrapper/compare/v1.0.0...v1.0.1

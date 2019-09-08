@@ -15,31 +15,31 @@ export class Metrics {
 
   success(response?: any): void {
     logger.debug(`Successfully processed ${this.type} event, responding with`, response);
-    tagger.tagAndLog('success', response);
+    tagger.tagOnly('success', response);
   }
 
   valid(response?: any): void {
     logger.debug(`Valid ${this.type} event, responding with`, response);
-    tagger.tagAndLog('valid', response);
+    tagger.tagOnly('valid', response);
   }
 
   invalid(response?: any): void {
     logger.debug(`Invalid ${this.type} event, responding with`, response);
-    tagger.tagAndLog('invalid', response);
+    tagger.tagOnly('invalid', response);
   }
 
   redirect(response?: any): void {
     logger.debug(`Redirecting ${this.type} event, responding with`, response);
-    tagger.tagAndLog('redirect', response);
+    tagger.tagOnly('redirect', response);
   }
 
   error(response?: any): void {
     logger.debug(`Error processing ${this.type} event, responding with`, response);
-    tagger.tagAndLog('error', response);
+    tagger.tagOnly('error', response);
   }
 
   failure(response?: any): void {
     logger.debug(`Failure processing ${this.type} event, responding with`, response);
-    tagger.tagAndLog('failure', response);
+    tagger.tagOnly('failure', response);
   }
 }
