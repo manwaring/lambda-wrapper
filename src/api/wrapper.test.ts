@@ -26,7 +26,7 @@ describe('API wrapper', () => {
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response functions', () => {
-    function mockHandler({
+    function custom({
       event,
       body,
       path,
@@ -52,6 +52,6 @@ describe('API wrapper', () => {
       expect(error).toBeInstanceOf(Function);
       success('success');
     }
-    api(mockHandler)(requestEvent, context, callback);
+    api(custom)(requestEvent, context, callback);
   });
 });

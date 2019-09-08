@@ -31,7 +31,7 @@ export function invalidWrapper(metrics: Metrics, callback: Callback) {
 export function errorWrapper(metrics: Metrics, callback: Callback) {
   return function error(error?: any) {
     metrics.error(error);
-    callback(new Error(error));
+    callback(error);
   };
 }
 

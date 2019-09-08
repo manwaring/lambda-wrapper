@@ -11,7 +11,7 @@ export function api(
   return function handler(event: APIGatewayEvent, context: Context, callback: Callback) {
     const { body, path, query, auth, headers, testRequest } = new Request(event).getProperties();
 
-    const signature = {
+    return custom({
       event,
       body,
       path,
@@ -23,8 +23,7 @@ export function api(
       invalid: invalidWrapper(metrics, callback),
       error: errorWrapper(metrics, callback),
       redirect: redirectWrapper(metrics, callback)
-    };
-    return custom(signature);
+    });
   };
 }
 

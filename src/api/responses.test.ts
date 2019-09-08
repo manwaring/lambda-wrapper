@@ -31,7 +31,7 @@ describe('API responses', () => {
   it('Handles error response', () => {
     const error = errorWrapper(metrics, callback);
     error('error');
-    expect(callback).toHaveBeenCalledWith(new Error('error'));
+    expect(callback).toHaveBeenCalledWith('error');
   });
 
   it('Handles invalid response', () => {

@@ -1,13 +1,15 @@
+import { Context, Callback } from 'aws-lambda';
 import { Metrics } from '../common';
-import { success, error } from './responses';
+import { successWrapper, errorWrapper } from './responses';
 
 const metrics = new Metrics('Generic');
 
-export function wrapper<T extends Function>(fn: T): T {
-  return <any>function(event) {
+export function wrapper(
+  custom: (props: WrapperSignature) => any
+): (event: any, context: Context, callback: Callback) => any {
+  return function handler(event: any, context: Context, callback: Callback) {
     metrics.common(event);
-    const signature: WrapperSignature = { event, success, error };
-    return fn(signature);
+    return custom({ event, success: successWrapper(metrics, callback), error: errorWrapper(metrics, callback) });
   };
 }
 

@@ -14,14 +14,29 @@ describe('Stream wrapper', () => {
       ServiceToken: 'serviceToken'
     }
   };
+  const context = {
+    callbackWaitsForEmptyEventLoop: false,
+    functionName: 'function-name',
+    functionVersion: '$LATEST',
+    invokedFunctionArn: 'arn:',
+    memoryLimitInMB: 128,
+    awsRequestId: 'request',
+    logGroupName: 'group',
+    logStreamName: 'stream',
+    getRemainingTimeInMillis: () => 2,
+    done: () => {},
+    fail: () => {},
+    succeed: () => {}
+  };
+  const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response funtions', () => {
-    function mockHandler({ event, success, failure }: CloudFormationSignature) {
+    function custom({ event, success, failure }: CloudFormationSignature) {
       expect(event).toEqual(requestEvent);
       expect(success).toBeInstanceOf(Function);
       expect(failure).toBeInstanceOf(Function);
     }
-    // @ts-ignore
-    cloudFormation(mockHandler)(requestEvent);
+
+    cloudFormation(custom)(requestEvent, context, callback);
   });
 });

@@ -1,21 +1,26 @@
+import { Callback } from 'aws-lambda';
 import { Metrics } from '../common';
 
-const metrics = new Metrics('Lambda Authorizer');
-
-export function valid(jwt: any) {
-  const policy = generatePolicy(jwt);
-  metrics.valid(policy);
-  return policy;
+export function validWrapper(metrics: Metrics, callback: Callback) {
+  return function valid(jwt: any) {
+    const policy = generatePolicy(jwt);
+    metrics.valid(policy);
+    callback(null, policy);
+  };
 }
 
-export function invalid(message?: any): void {
-  metrics.invalid(message);
-  throw new Error('Unauthorized');
+export function invalidWrapper(metrics: Metrics, callback: Callback) {
+  return function invalid(message?: any): void {
+    metrics.invalid(message);
+    callback('Unauthorized');
+  };
 }
 
-export function error(error?: any) {
-  metrics.error(error);
-  throw new Error(error);
+export function errorWrapper(metrics: Metrics, callback: Callback) {
+  return function error(error?: any) {
+    metrics.error(error);
+    callback(error);
+  };
 }
 
 function generatePolicy(jwt: any): any {

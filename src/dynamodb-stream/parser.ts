@@ -1,7 +1,8 @@
+import { DynamoDBStreamEvent, DynamoDBRecord } from 'aws-lambda';
 import { DynamoDB, DynamoDBStreams } from 'aws-sdk';
 
 export class DynamoDBStreamParser {
-  constructor(private event: Event) {}
+  constructor(private event: DynamoDBStreamEvent) {}
 
   getVersions(): { newVersions: any[]; oldVersions: any[]; versions: Version[] } {
     let newVersions = [];
@@ -22,7 +23,7 @@ export class DynamoDBStreamParser {
     return { newVersions, oldVersions, versions };
   }
 
-  private parseVersions(record: Record) {
+  private parseVersions(record: DynamoDBRecord) {
     const { eventName } = record;
     const { NewImage, OldImage, Keys } = record.dynamodb;
     const newVersion = NewImage ? DynamoDB.Converter.unmarshall(NewImage) : null;
@@ -33,7 +34,7 @@ export class DynamoDBStreamParser {
     return { newVersion, oldVersion, version };
   }
 
-  private getTableInformation(record: Record): { tableName: string; tableArn: string } {
+  private getTableInformation(record: DynamoDBRecord): { tableName: string; tableArn: string } {
     let streamArn = record['eventSourceARN'];
     const tableArn = streamArn.split('/stream/')[0];
     const tableName = tableArn.split(':table/')[1];
@@ -49,7 +50,3 @@ export interface Version {
   tableArn: string; // arn of the table the object came from
   eventName: string; // name of the event (INSERT || MODIFY || REMOVE)
 }
-
-// Used internally to this class for brevity in private method signatures
-interface Event extends DynamoDBStreams.GetRecordsOutput {}
-interface Record extends DynamoDBStreams.Record {}

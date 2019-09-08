@@ -1,13 +1,24 @@
-import { valid, invalid, error } from './responses';
+import { validWrapper, invalidWrapper, errorWrapper } from './responses';
+import { Metrics } from '../common';
 
 describe('Lambda Authorizer responses', () => {
+  const metrics = new Metrics('Lambda Authorizer');
+  const callback = jest.fn((err, result) => (err ? new Error(err) : result));
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('Handles valid response with jwt sub', () => {
+    const valid = validWrapper(metrics, callback);
     const jwt = {
       sub: '1234567890',
       name: 'John Doe',
       admin: true
     };
-    expect(valid(jwt)).toEqual({
+
+    valid(jwt);
+    expect(callback).toHaveBeenCalledWith(null, {
       principalId: '1234567890',
       policyDocument: {
         Version: '2012-10-17',
@@ -23,12 +34,15 @@ describe('Lambda Authorizer responses', () => {
   });
 
   it('Handles valid response with jwt claims', () => {
+    const valid = validWrapper(metrics, callback);
     const jwt = {
       claims: 'abcdefghij',
       name: 'John Doe',
       admin: true
     };
-    expect(valid(jwt)).toEqual({
+
+    valid(jwt);
+    expect(callback).toHaveBeenCalledWith(null, {
       principalId: 'abcdefghij',
       policyDocument: {
         Version: '2012-10-17',
@@ -44,11 +58,14 @@ describe('Lambda Authorizer responses', () => {
   });
 
   it('Handles valid response without jwt subs or claims', () => {
+    const valid = validWrapper(metrics, callback);
     const jwt = {
       name: 'John Doe',
       admin: true
     };
-    expect(valid(jwt)).toEqual({
+
+    valid(jwt);
+    expect(callback).toHaveBeenCalledWith(null, {
       principalId: '',
       policyDocument: {
         Version: '2012-10-17',
@@ -64,10 +81,14 @@ describe('Lambda Authorizer responses', () => {
   });
 
   it('Handles invalid response', () => {
-    expect(() => invalid()).toThrow('Unauthorized');
+    const invalid = invalidWrapper(metrics, callback);
+    invalid();
+    expect(callback).toHaveBeenCalledWith('Unauthorized');
   });
 
   it('Handles error response', () => {
-    expect(() => error('error')).toThrow('error');
+    const error = errorWrapper(metrics, callback);
+    error('error');
+    expect(callback).toHaveBeenCalledWith('error');
   });
 });

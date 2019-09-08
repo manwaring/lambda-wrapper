@@ -1,20 +1,20 @@
-import { CloudFormationCustomResourceEvent, Context } from 'aws-lambda';
+import { CloudFormationCustomResourceEvent, Context, Callback } from 'aws-lambda';
 import { Metrics } from '../common';
 import { successWrapper, failureWrapper } from './responses';
 
 const metrics = new Metrics('CloudFormation');
 
-export function cloudFormation<T extends Function>(fn: T): T {
-  return <any>function(event: CloudFormationCustomResourceEvent, context: Context) {
+export function cloudFormation(
+  custom: (props: CloudFormationSignature) => any
+): (event: CloudFormationCustomResourceEvent, context: Context, callback: Callback) => any {
+  return function handler(event: CloudFormationCustomResourceEvent, context: Context, callback: Callback) {
     metrics.common(event);
 
-    const signature: CloudFormationSignature = {
+    return custom({
       event,
-      // We need to call these response wrappers so that we can pass in context (necessary for CloudFormation responses) to keep it abstracted from users
       success: successWrapper(event, context),
       failure: failureWrapper(event, context)
-    };
-    return fn(signature);
+    });
   };
 }
 

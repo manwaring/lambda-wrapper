@@ -1,16 +1,23 @@
-import { CustomAuthorizerEvent } from 'aws-lambda';
+import { CustomAuthorizerEvent, Context, Callback } from 'aws-lambda';
 import { Metrics } from '../common';
-import { valid, invalid, error } from './responses';
+import { validWrapper, invalidWrapper, errorWrapper } from './responses';
 
 const metrics = new Metrics('Lambda Authorizer');
 
-export function authorizer<T extends Function>(fn: T): T {
-  return <any>function(event: CustomAuthorizerEvent) {
+export function authorizer(
+  custom: (props: AuthorizerSignature) => any
+): (event: CustomAuthorizerEvent, context: Context, callback: Callback) => any {
+  return function handler(event: CustomAuthorizerEvent, context: Context, callback: Callback) {
     metrics.common(event);
     const token = event.authorizationToken;
 
-    const signature: AuthorizerSignature = { event, token, valid, invalid, error };
-    return fn(signature);
+    return custom({
+      event,
+      token,
+      valid: validWrapper(metrics, callback),
+      invalid: invalidWrapper(metrics, callback),
+      error: errorWrapper(metrics, callback)
+    });
   };
 }
 

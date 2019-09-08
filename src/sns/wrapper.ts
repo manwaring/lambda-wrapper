@@ -1,17 +1,22 @@
-import { SNSEvent } from 'aws-lambda';
+import { SNSEvent, Context, Callback } from 'aws-lambda';
 import { Metrics } from '../common';
-import { success, error } from './responses';
+import { successWrapper, errorWrapper } from './responses';
 import { SnsParser } from './parser';
 
 const metrics = new Metrics('Sns');
 
-export function sns<T extends Function>(fn: T): T {
-  return <any>function(event: SNSEvent) {
+export function sns(
+  custom: (props: SnsSignature) => any
+): (event: SNSEvent, context: Context, callback: Callback) => any {
+  return function handler(event: SNSEvent, context: Context, callback: Callback) {
     const message = new SnsParser(event).getMessage();
     metrics.common(message);
-
-    const signature: SnsSignature = { event, message, success, error };
-    return fn(signature);
+    return custom({
+      event,
+      message,
+      success: successWrapper(metrics, callback),
+      error: errorWrapper(metrics, callback)
+    });
   };
 }
 
