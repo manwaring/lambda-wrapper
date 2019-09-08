@@ -4,7 +4,6 @@ import { isRunningInAwsLambdaEnvironment } from './environment';
 class Tagger {
   private epsagon: TaggingLibrary = { installed: false };
   private iopipe: TaggingLibrary = { installed: false };
-  isRunningInAwsLambdaEnvironment: boolean;
 
   constructor() {
     try {
@@ -22,14 +21,14 @@ class Tagger {
     } catch (err) {
       logger.debug('IOPipe not installed in project, not tagging with IOPipe metrics');
     }
-    this.isRunningInAwsLambdaEnvironment = isRunningInAwsLambdaEnvironment();
   }
 
   tagOnly(key: string, value?: any): void {
-    if (this.epsagon.installed && this.isRunningInAwsLambdaEnvironment) {
+    const isInAWSLambda = isRunningInAwsLambdaEnvironment();
+    if (this.epsagon.installed && isInAWSLambda) {
       this.epsagon.label(key);
     }
-    if (this.iopipe.installed && this.isRunningInAwsLambdaEnvironment) {
+    if (this.iopipe.installed && isInAWSLambda) {
       this.isValidMetric(value) ? this.iopipe.metric(key, value) : this.iopipe.label(key);
     }
   }

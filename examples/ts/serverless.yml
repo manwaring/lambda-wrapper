@@ -1,44 +1,52 @@
 service:
-  name: typescript-example
+  name: lambda-wrapper-ts
 
 plugins:
   - serverless-webpack
+  - serverless-plugin-git-variables
 
 provider:
   name: aws
   stage: example
+  region: us-east-1
   runtime: nodejs10.x
+  environment:
+    LAMBDA_WRAPPER_LOG: true
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    REVISION: ${git:sha1}
 
 functions:
   api:
-    handler: handlers/api.handler
+    handler: app/api.handler
     events:
       - http:
           authorizer:
-            name: authorizere
+            name: authorizer
           method: get
           path: hello
 
   authorizer:
-    handler: handlers/authorizer.handler
+    handler: app/authorizer.handler
 
   cloudformation:
-    handler: handlers/cloudformation.handler
+    handler: app/cloudformation.handler
 
   dynamodb:
-    handler: handlers/dynamodb.handler
+    handler: app/dynamodb.handler
     events:
       - stream:
           type: dynamodb
           arn:
             Fn::GetAtt: Table.StreamArn
 
-  # generic:
+  generic:
+    handler: app/generic.handler
 
   sns:
-    handler: handlers/sns.handler
+    handler: app/sns.handler
     events:
-      - sns: sns
+      - sns: sns-${self:service.name}-${self:provider.stage}
 
 resources:
   Resources:
@@ -50,7 +58,7 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: id
-            KeyType: S
+            KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES

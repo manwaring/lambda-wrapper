@@ -1,7 +1,7 @@
 {
   "name": "@manwaring/lambda-wrapper",
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "scripts": {
     "publish-please-dry-run": "publish-please --dry-run",
     "publish-please": "publish-please",
@@ -15,17 +15,18 @@
     "cfn-response": "^1.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.5",
+    "@babel/core": "^7.6.0",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "@babel/preset-typescript": "^7.3.3",
+    "@babel/preset-env": "^7.6.0",
+    "@babel/preset-typescript": "^7.6.0",
     "@iopipe/iopipe": "^1.15.1",
     "@serverless/event-mocks": "^1.1.1",
     "@types/aws-lambda": "^8.10.31",
+    "@types/cfn-response": "^1.0.0",
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.4",
     "aws-lambda": "^0.1.2",
-    "aws-sdk": "^2.523.0",
+    "aws-sdk": "^2.524.0",
     "babel-jest": "^24.9.0",
     "codecov": "^3.5.0",
     "epsagon": "^1.33.2",

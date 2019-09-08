@@ -9,87 +9,68 @@
 
 # AWS Lambda wrapper library
 
-1. [Package overview](#package-overview)
+1. [Overview](#overview)
 1. [Installation and setup](#installation-and-setup)
-1. [Supported AWS trigger events](#supported-aws-lambda-trigger-events)
-1. [Example usage](#example-usage)
-   - [API Gateway event wrapper](#api-event-wrapper)
-   - [API Gateway authorizer event wrapper](#auth-event-wrapper)
-   - [CloudFormation Custom Resource event wrapper](#cloudformation-custom-resource-event-wrapper)
-   - [SNS event wrapper](#sns-event-wrapper)
-   - [DynamoDB Stream event wrapper](#dynamodb-stream-event-wrapper)
-   - [Generic event wrapper](#general-event-wrapper)
-1. [Epsagon labels](#epsagon-labels)
+   - [Optional configuration](#optional-configuration)
+1. [Supported events](#supported-events)
+   - [API Gateway](#api-gateway)
+   - [CloudFormation Custom Resource](#cloudformation-custom-resource)
+   - [DynamoDB Stream](#dynamodb-stream)
+   - [Lambda Authorizer](#lambda-authorizer)
+   - [SNS](#sns)
+   - [Generic event](#generic-event)
+1. [Example projects](#example-projects)
 
-## Package overview
+_Feedback appreciated! If you have an idea for how this library can be improved [please open an issue](https://github.com/manwaring/lambda-wrapper/issues/new)._
 
-This package provides custom Lambda function wrappers to help simplify Lambda application code and to provide default implementations for logging invocation and status information. For information about optional setup information see the [setup section below](#installation-and-setup).
+# Overview
 
-This project supports integrations with both [Epsagon](https://epsagon.com) and [IOPipe](https://iopipe.com) for (IMO) the best serverless logging and monitoring experiences available at the moment. Each wrapper will automatically label the invocations and add appropriate metrics upon receipt of the event payload as well as when helper callback functions are invoked. For more information about what labels, metrics, and logs are configured for each wrapper please see the [Epsagon and IOPipe section below](#epsagon-iopipe).
+### TL;DR
 
-## Installation and setup
+This library provides custom Lambda function wrappers which expose standard, abstracted functionality so that developers can focus on writing business logic instead of parsing event payloads and crafting response objects.
+
+### Rationale and motivation
+
+AWS Lambda supports a wide variety of event triggers, each with unique payloads and expected responses. The Lambda execution environment, however, only provides the raw events and has no included mechanisms for simplifying response object creation. For example, API Gateway events include only the raw request body, leaving it up to developers to implement parsing themselves. Similarly, the developer is responsible for creating a response object which includes the correct HTTP Status Code and headers. Given the standard nature of these kinds of concerns, this library exposes helpful abstractions like parsed HTTP bodies based on content-type headers, and success response functions which apply correct status codes and headers before invoking the Lambda callback.
+
+# Installation and setup
+
+Install and save the package to `package.json` as a dependency:
 
 `npm i --save @manwaring/lambda-wrapper`
 
-If you want to take advantage of either Epsagon or IOPipe logging and monitoring functionality (highly recommmended!) you'll need to create an account with them and setup your project appropriately. If this library detects either of the other two as being present in your application it will automatically apply standard tagging (Epsagon labels and IOPipe labels and metrics) to each invocation for easier logging, monitoring, and troubleshooting.
+`yarn add @manwaring/lambda-wrapper`
 
-Optional Epsagon setup:
+## Optional configuration
 
-1. More information on setting up Epsagon in your application can be found in the [Epsagon configuration documentation here](https://github.com/epsagon/epsagon-node).
-1. If you want Epsagon to add a label for the stage the Lambda function is deployed to will need to set a `STAGE` environment variable
-1. If you want Epsagon to add a label for the git revision of the deployed Lambda code you will need to set a `REVISION` environment variable (see [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) for a JavaScript library that can help with this, and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for a Serverless Framework plugin)
+If you want the wrapper to log request and response messages (helpful for debugging set an environemnt variable for `LAMBDA_WRAPPER_LOG=true`.
 
-Optional IOPipe setup:
+If you want each invocation to be tagged with the AWS region, environment/, and Git revision simply set environment variables for each: `REGION=us-east-1`, `STAGE=prod`, `REVISION=f4ba682` (see [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for libraries that can help you set git revision)
 
-1. More information on setting up IOPipe in your application can be found in the [IOPipe configuration documentation here](https://github.com/iopipe/iopipe-js-core#configuration).
-1. If you want IOPipe to add a metric for the stage the Lambda function is deployed to will need to set a `STAGE` environment variable
-1. If you want IOPipe to add a metric for the git revision of the deployed Lambda code you will need to set a `REVISION` environment variable (see [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) for a JavaScript library that can help with this, and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for a Serverless Framework plugin)
+If you want to take advantage of either [Epsagon](https://epsagon.com/) or [IOPipe](https://www.iopipe.com/) for advanced serverless instrumentation (highly recommmended!) you'll need to create an account with them and follow their instructions for setting up your project. If this library detects either of those packages it will automatically apply standard tagging (Epsagon labels and IOPipe labels and metrics) to each invocation for easier logging, monitoring, and troubleshooting.
 
-## Supported AWS Lambda trigger events
+# Supported events
 
-All of the below wrappers provide a deconstructed method signature exposing parsed/unmarshalled request parameters and helper methods.
+All of the events bellow have a corresponding wrapper which provides a deconstructed method signature exposing parsed/unmarshalled request parameters and helper response methods.
 
-1. [API Gateway event wrapper](#api-event-wrapper) with support for cors headers and 200, 302, 400, and 500 responses
-1. [API Gateway authorizer event wrapper](#auth-event-wrapper) with support for creating access policies for successfully authorized requests
-1. [CloudFormation Custom Resource event wrapper](#cloudformation-custom-resource-event-wrapper) with support for CloudFormation successes and failures
-1. [SNS event wrapper](#sns-event-wrapper) with support for success and failure responses
-1. [DynamoDB Stream event wrapper](#dynamodb-stream-event-wrapper) with support for success and failure responses
-1. A [generic event wrapper](#general-event-wrapper) with support for success and failure responses.
+1. [API Gateway](#api-gateway) with support for cors headers and 200, 302, 400, and 500 responses
+1. [CloudFormation Custom Resource](#cloudformation-custom-resource) with support for CloudFormation successes and failures
+1. [DynamoDB Stream](#dynamodb-stream) with support for success and failure responses
+1. [Lambda Authorizer](#lambda-authorizer) with support for creating access policies for successfully authorized requests
+1. [SNS](#sns) with support for success and failure responses
+1. [Generic event](#generic-event) wrapper with support for success and failure responses
 
-# Example usage
+## API Gateway
 
-## Api event wrapper
-
-### Available properties and methods on api wrapper signature:
+### Sample implementation
 
 ```ts
-interface ApiSignature {
-  event: APIGatewayEvent; // original event
-  body: any; // JSON parsed body payload if exists (otherwise null)
-  path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise null)
-  query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise null)
-  headers: { [name: string]: string }; // headers param payload as key-value pairs if exists (otherwise null)
-  testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
-  auth: any; // auth context from custom authorizer if exists (otherwise null)
-  success(payload?: any): void; // returns 200 status with payload
-  invalid(errors?: string[]): void; // returns 400 status with errors in payload
-  redirect(url: string): void; // returns 302 redirect with new url
-  error(error?: any): void; // returns 500 status with error and original request payload
-}
-```
+import { api } from '@manwaring/lambda-wrapper';
 
-\*Note that each callback helper functions (success, invalid, redirect, error) includes CORS-enabling header information.
-
-### Example implementation:
-
-```ts
-import { apiWrapper, ApiSignature } from '@manwaring/lambda-wrapper';
-...
-
-export const handler = apiWrapper(async ({ path, success, error }: ApiSignature) => {
+export const handler = api(async ({ body, path, success, error }) => {
   try {
     const { pathParam1, pathParam2 } = path;
-    const results = await doSomething(pathParam1, pathParam2);
+    const results = await doSomething(body, pathParam1, pathParam2);
     success(results);
   } catch (err) {
     error(err);
@@ -97,100 +78,33 @@ export const handler = apiWrapper(async ({ path, success, error }: ApiSignature)
 });
 ```
 
-### Information captured with each invocation
-
-**The following information is always included:**
-
-1. (IOPipe metric) Body: parsed or null body object included with event
-1. (IOPipe metric) Path: path parameters included with event
-1. (IOPipe metric) Query: query string parameters included with event
-1. (Debug log) Full request (body, path, query)
-
-Depending on which callback helper is invoked additional information will be associated with the invocation:
-
-**Success callback helper:**
-
-1. (Epsagon label) `success`
-1. (IOPipe label) `success`
-1. (Info log) Response payload/body
-
-**Invalid callback helper:**
-
-1. (Epsagon label) `invalid`
-1. (IOPipe label) `invalid`
-1. (IOPipe metric) Invalid: list of validation messages
-1. (Warn log) List of validation errors
-
-**Redirect callback helper:**
-
-1. (Epsagon label) `redirect`
-1. (IOPipe label) `redirect`
-1. (Info log) Redirect URL
-
-**Error callback helper:**
-
-1. (Epsagon label) `error`
-1. (IOPipe label) `error`
-1. (IOPipe metric) Error: error object or message
-1. (Error log) Error object or message
-
-## Auth event wrapper
-
-### Available properties and methods on auth wrapper signature:
+### Properties and methods available on wrapper signature
 
 ```ts
-interface AuthorizerSignature {
-  event: CustomAuthorizerEvent; // original event
-  token: string; // authorizer token from original event
-  valid(jwt: any): void; // creates AWS policy to authenticate request, and adds auth context if available
-  invalid(message?: string[]): void; // returns 401 unauthorized
-  error(error?: any): void; // records error information and returns 401 unauthorized
+interface ApiSignature {
+  event: APIGatewayEvent; // original event
+  body: any; // JSON or form parsed body payload if exists (based on content-type headers), otherwise the raw body object
+  path: { [name: string]: string }; // path param payload as key-value pairs
+  query: { [name: string]: string }; // query param payload as key-value pairs
+  headers: { [name: string]: string }; // headers param payload as key-value pairs
+  testRequest: boolean; // indicates if this is a test request, based on presence of headers matching 'Test-Request' or process.env.TEST_REQUEST_HEADER
+  auth: any; // auth context from custom authorizer
+  success(payload?: any): void; // returns 200 status with payload
+  invalid(errors?: string[]): void; // returns 400 status with errors
+  redirect(url: string): void; // returns 302 redirect with new url
+  error(error?: any): void; // returns 500 status with error
 }
 ```
 
-### Example implementation:
+\*Note that each callback helper functions (success, invalid, redirect, error) includes CORS-enabling header information.
 
-```ts
-import { authWrapper, AuthorizerSignature } from '@manwaring/lambda-wrapper';
-...
+## CloudFormation Custom Resource
 
-export const handler = authWrapper(async ({ token, valid, invalid }: AuthorizerSignature) => {
-  try {
-    if (!token) {
-      return invalid('Missing token');
-    }
-    const jwt = await verifier.verifyAccessToken(token);
-    valid(jwt);
-  } catch (err) {
-    invalid(err);
-  }
-});
-```
+### Sample implementation
 
-### Information captured with each invocation
+// TODO CloudFormation wrapper implementation example
 
-Depending on which callback helper is invoked additional information will be associated with the invocation:
-
-**Valid callback helper:**
-
-1. (Epsagon label) `valid`
-1. (IOPipe label) `valid`
-
-**Invalid callback helper:**
-
-1. (Epsagon label) `invalid`
-1. (IOPipe label) `invalid`
-1. (IOPipe metric) Invalid: the message indicating cause of invalidation (expired token, unauthorized, etc.)
-
-**Error callback helper:**
-
-1. (Epsagon label) `error`
-1. (IOPipe label) `error`
-1. (IOPipe metric) Error: error object or message
-
-## CloudFormation custom resource event wrapper
-
-### Available properties and methods on CloudFormation wrapper signature:
+### Properties and methods available on wrapper signature
 
 ```ts
 interface CloudFormationSignature {
@@ -200,67 +114,17 @@ interface CloudFormationSignature {
 }
 ```
 
-### Example implementation:
+## DynamoDB Stream
 
-// TODO CloudFormation wrapper implementation example
+### Sample implementation
 
-### Information captured with each invocation
+// TODO DynamoDB stream wrapper implementation example
 
-Depending on which callback helper is invoked additional information will be associated with the invocation:
-
-**Success callback helper:**
-
-1. (Epsagon label) `success`
-1. (IOPipe label) `success`
-1. (Info log) Success message
-
-**Failure callback helper:**
-
-1. (Epsagon label) `failure`
-1. (IOPipe label) `failure`
-1. (Error log) Error message or object
-
-## SNS event wrapper
-
-### Available properties and methods on SNS wrapper signature:
+### Properties and methods available on wrapper signature
 
 ```ts
-interface SnsSignature {
-  event: SNSEvent; // original event
-  message: any; // JSON-parsed message from event
-  success(payload?: any): void; // invokes lambda callback with success
-  error(error?: any): void; // invokes lambda callback with error
-}
-```
-
-### Example implementation:
-
-// TODO SNS event wrapper implementation example
-
-### Information captured with each invocation
-
-Depending on which callback helper is invoked additional information will be associated with the invocation:
-
-**Success callback helper:**
-
-1. (Epsagon label) `success`
-1. (IOPipe label) `success`
-1. (Info log) Success message
-
-**Error callback helper:**
-
-1. (Epsagon label) `error`
-1. (IOPipe label) `error`
-1. (IOPipe metric) Error: Error message or object
-1. (Error log) Error message or object
-
-## DynamoDB stream event wrapper
-
-### Available properties and methods on DynamoDB wrapper signature:
-
-```ts
-interface StreamSignature {
-  event: DynamoDBStreams.GetRecordsOutput; // original event
+interface DynamoDBStreamSignature {
+  event: DynamoDBStreamEvent; // original event
   newVersions: any[]; // array of all unmarshalled javascript objects of new images
   oldVersions: any[]; // array of all unmarshalled javascript objects of old images
   versions: Version[]; // array of full version object (new image, old image, etc - see Version interface)
@@ -278,48 +142,65 @@ interface Version {
 }
 ```
 
-### Example implementation:
+## Lambda Authorizer
 
-// TODO DynamoDB stream wrapper implementation example
-
-### Information captured with each invocation
-
-Depending on which callback helper is invoked additional information will be associated with the invocation:
-
-**Success callback helper:**
-
-1. (Epsagon label) `success`
-1. (IOPipe label) `success`
-1. (Info log) Success message
-
-**Error callback helper:**
-
-1. (Epsagon label) `error`
-1. (IOPipe label) `error`
-1. (IOPipe metric) Error: Error message or object
-1. (Error log) Error message or object
-
-## General event wrapper
-
-### Available properties and methods on general wrapper signature:
+### Sample implementation
 
 ```ts
-interface WrapperSignature {
-  event: any; // original event
-  success(payload?: any): void; // invokes lambda callback with success response
-  error(error?: any): void; // invokes lambda callback with error response
+import { authorizer } from '@manwaring/lambda-wrapper';
+const verifier = new Verifier(); // setup and configure JWT validation library
+
+export const handler = authorizer(async ({ token, valid, invalid }) => {
+  try {
+    if (!token) {
+      return invalid('Missing token');
+    }
+    const jwt = await verifier.verifyAccessToken(token);
+    valid(jwt);
+  } catch (err) {
+    invalid(err);
+  }
+});
+```
+
+### Properties and methods available on wrapper signature
+
+```ts
+interface AuthorizerSignature {
+  event: CustomAuthorizerEvent; // original event
+  token: string; // authorizer token from original event
+  valid(jwt: any): void; // creates AWS policy to authenticate request, and adds auth context if available
+  invalid(message?: string[]): void; // returns 401 unauthorized
+  error(error?: any): void; // records error information and returns 401 unauthorized
 }
 ```
 
-### Example implementation:
+## SNS
+
+### Sample implementation
+
+// TODO SNS event wrapper implementation example
+
+### Properties and methods available on wrapper signature
 
 ```ts
-import { wrapper, WrapperSignature } from '@manwaring/lambda-wrapper';
-...
+interface SnsSignature {
+  event: SNSEvent; // original event
+  message: any; // JSON-parsed message from event (or raw message if not JSON)
+  success(payload?: any): void; // invokes lambda callback with success
+  error(error?: any): void; // invokes lambda callback with error
+}
+```
 
-export const handler = wrapper(async ({ event, success, error }: WrapperSignature) => {
+## Generic event
+
+### Sample implementation
+
+```ts
+import { wrapper } from '@manwaring/lambda-wrapper';
+
+export const handler = wrapper(async ({ event, success, error }) => {
   try {
-    // application logic using any kind of event information
     const { value1, value2 } = event;
     const results = await doSomething(value1, value2);
     success(results);
@@ -329,33 +210,21 @@ export const handler = wrapper(async ({ event, success, error }: WrapperSignatur
 });
 ```
 
-### Information captured with each invocation
+### Properties and methods available on wrapper signature
 
-Depending on which callback helper is invoked additional information will be associated with the invocation:
+```ts
+interface WrapperSignature {
+  event: any; // original event
+  success(payload?: any): void; // invokes lambda callback with success response
+  error(error?: any): void; // invokes lambda callback with error response
+}
+```
 
-**Success callback helper:**
+# Example projects
 
-1. (Epsagon label) `success`
-1. (IOPipe label) `success`
-1. (Info log) Success message
+THere is one [working example](examples) of how this package can be used in a simple 'hello world' serverless application:
 
-**Error callback helper:**
-
-1. (Epsagon label) `error`
-1. (IOPipe label) `error`
-1. (IOPipe metric) Error: Error message or object
-1. (Error log) Error message or object
-
-## Common labels and metrics
-
-For each invocation across all wrapper types you'll get the following:
-
-Labels:
-
-1. Region: AWS region your Lambda is running in
-1. Revision: Git revision of the deployed Lambda code (if you set a `REVISION` environment variable for your Lambda function)
-1. Stage: Name of the stage this Lambda function is deployed with (if you set a `STAGE` environment variable for your Lambda function)
-1. The result of each invocation, determined by the helper callback function that was invoked (`success`, `invalid`, `errors`, etc. - see the per-wrapper details above for more information)
+1. [Using the Serverless Framework and TypeScript](examples/ts)
 
 <!-- Badge icons -->
 

@@ -1,26 +1,26 @@
 {
-  "name": "typescript",
-  "version": "1.0.0",
-  "description": "Serverless webpack example using Typescript",
-  "main": "handler.js",
+  "name": "lambda-wrapper-ts-example",
+  "version": "0.0.1",
+  "description": "Example setup of Lambda Wrapper using Typescript and the Serverless Framework",
   "scripts": {
-    "get-latest-lambda-wrapper": "cd ../../ && npm run setup-package && cd examples/ts && npm i -D ../../dist",
-    "deploy": "sls deploy",
-    "test": "sls invoke -f hello"
+    "predeploy": "rimraf ../../node_modules && npm i",
+    "deploy": "sls deploy"
   },
   "dependencies": {
-    "source-map-support": "^0.5.10"
+    "source-map-support": "^0.5.10",
+    "@manwaring/lambda-wrapper": "*"
   },
   "devDependencies": {
-    "@manwaring/lambda-wrapper": "*",
     "@types/aws-lambda": "^8.10.17",
-    "@types/node": "^10.12.18",
+    "@types/node": "^12.7.4",
+    "rimraf": "^3.0.0",
     "serverless": "^1.51.0",
+    "serverless-plugin-git-variables": "^3.3.2",
     "serverless-webpack": "^5.2.0",
-    "ts-loader": "^5.3.3",
+    "ts-loader": "^6.0.4",
     "typescript": "^3.2.4",
     "webpack": "^4.29.0"
   },
-  "author": "The serverless webpack authors (https://github.com/elastic-coders/serverless-webpack)",
+  "author": "From Phillip with ♥",
   "license": "MIT"
 }

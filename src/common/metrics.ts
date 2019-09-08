@@ -7,9 +7,15 @@ export class Metrics {
   common(payload): void {
     const { REVISION, STAGE, AWS_REGION } = process.env;
     logger.debug(`Received ${this.type} event payload`, payload);
-    tagger.tagAndLog('region', AWS_REGION);
-    tagger.tagAndLog('revision', REVISION);
-    tagger.tagAndLog('stage', STAGE);
+    if (AWS_REGION) {
+      tagger.tagAndLog('region', AWS_REGION);
+    }
+    if (REVISION) {
+      tagger.tagAndLog('revision', REVISION);
+    }
+    if (STAGE) {
+      tagger.tagAndLog('stage', STAGE);
+    }
     tagger.tagOnly('payload', payload);
   }
 

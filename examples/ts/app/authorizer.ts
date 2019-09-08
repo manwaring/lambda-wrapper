@@ -1,7 +1,7 @@
-import { authorizer, AuthorizerSignature } from '@manwaring/lambda-wrapper';
+import { authorizer } from '@manwaring/lambda-wrapper';
 import 'source-map-support/register';
 
-export const handler = authorizer(async ({ token, valid, invalid, error }: AuthorizerSignature) => {
+export const handler = authorizer(async ({ token, valid, invalid, error }) => {
   try {
     if (!token) {
       return invalid('Missing token');
