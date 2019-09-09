@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Example setup of Lambda Wrapper using Typescript and the Serverless Framework",
   "scripts": {
-    "predeploy": "rimraf ../../node_modules && npm i",
+    "predeploy": "npm i && rimraf ../../node_modules && rimraf node_modules package-lock.json && npm i",
     "deploy": "sls deploy"
   },
   "dependencies": {
