@@ -1,7 +1,7 @@
 {
   "name": "@manwaring/lambda-wrapper",
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "scripts": {
     "publish-please-dry-run": "publish-please --dry-run",
     "publish-please": "publish-please",
@@ -12,7 +12,7 @@
     "codecov": "codecov -f coverage/*.json"
   },
   "dependencies": {
-    "cfn-custom-response": "0.0.3"
+    "cfn-custom-response": "0.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
