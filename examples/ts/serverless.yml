@@ -1,5 +1,5 @@
 service:
-  name: lambda-wrapper-ts
+  name: lambda-wrapper-ts3
 
 plugins:
   - serverless-webpack

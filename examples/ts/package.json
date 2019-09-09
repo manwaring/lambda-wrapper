@@ -7,8 +7,10 @@
     "deploy": "sls deploy"
   },
   "dependencies": {
-    "source-map-support": "^0.5.10",
-    "@manwaring/lambda-wrapper": "*"
+    "@manwaring/lambda-wrapper": "*",
+    "async-retry": "^1.2.3",
+    "axios": "^0.19.0",
+    "source-map-support": "^0.5.10"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.17",
