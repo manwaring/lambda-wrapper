@@ -1,8 +1,8 @@
 import { Context, CloudFormationCustomResourceEvent } from 'aws-lambda';
-import { send } from 'cfn-response';
+import { send } from 'cfn-custom-response';
 import { successWrapper, failureWrapper } from './responses';
 
-jest.mock('cfn-response');
+jest.mock('cfn-custom-response');
 
 describe('Cloudformation responses', () => {
   const event: CloudFormationCustomResourceEvent = {
