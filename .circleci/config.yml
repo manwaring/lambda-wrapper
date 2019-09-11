@@ -99,7 +99,7 @@ workflows:
               ignore: /.*/
             tags:
               only: /v.*/
-      - deploy-default-example:
+      - deploy-example-app:
           context: manwaring-aws
           requires:
             - publish
