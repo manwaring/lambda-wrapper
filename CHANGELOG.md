@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [1.1.3]&nbsp;&nbsp;(2019-09-10)
+
+### Changed
+
+- Reverted CloudFormation Custom Resource responder library - realized that issue was with async function instead of lib
+
 ## [1.1.2]&nbsp;&nbsp;(2019-09-09)
 
 ### Changed
@@ -78,9 +84,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), 
 - Update older libraries
 - Now publish from Git tags instead of master pushes
 
+[1.1.3]: https://github.com/manwaring/lambda-wrapper/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/manwaring/lambda-wrapper/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/manwaring/lambda-wrapper/compare/v1.1.0...v1.1.1
-[1.1.0]: https://github.com/manwaring/lambda-wrapper/compare/v1.0.9...v1.1.0
+[1.1.0]: https://github.com/manwaring/lambda-wrapper/compare/v1.0.10...v1.1.0
+[1.0.10]: https://github.com/manwaring/lambda-wrapper/compare/v1.0.9...v1.0.10
 [1.0.9]: https://github.com/manwaring/lambda-wrapper/compare/v1.0.8...v1.0.9
 [1.0.8]: https://github.com/manwaring/lambda-wrapper/compare/v1.0.7...v1.0.8
 [1.0.7]: https://github.com/manwaring/lambda-wrapper/compare/v1.0.1...v1.0.7

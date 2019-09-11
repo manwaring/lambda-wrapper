@@ -59,6 +59,15 @@ jobs:
           name: Publish on npm
           command: npm run publish-please
 
+  deploy-example-app:
+    <<: *container-config
+    steps:
+      - checkout
+      - *load-cache
+      - run:
+          name: Deploy example app
+          command: npm run deploy-example-app
+
 workflows:
   version: 2
 
@@ -90,12 +99,12 @@ workflows:
               ignore: /.*/
             tags:
               only: /v.*/
-      # - test-default-example:
-      #     context: manwaring-aws
-      #     requires:
-      #       - publish
-      #     filters:
-      #       branches:
-      #         ignore: /.*/
-      #       tags:
-      #         only: /v.*/
+      - deploy-default-example:
+          context: manwaring-aws
+          requires:
+            - publish
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v.*/

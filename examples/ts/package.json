@@ -3,13 +3,10 @@
   "version": "0.0.1",
   "description": "Example setup of Lambda Wrapper using Typescript and the Serverless Framework",
   "scripts": {
-    "predeploy": "npm i && rimraf ../../node_modules && rimraf node_modules package-lock.json && npm i",
     "deploy": "sls deploy"
   },
   "dependencies": {
     "@manwaring/lambda-wrapper": "*",
-    "async-retry": "^1.2.3",
-    "axios": "^0.19.0",
     "source-map-support": "^0.5.10"
   },
   "devDependencies": {
