@@ -63,7 +63,6 @@ jobs:
     <<: *container-config
     steps:
       - checkout
-      - *load-cache
       - run:
           name: Deploy example app
           command: npm run deploy-example-app
