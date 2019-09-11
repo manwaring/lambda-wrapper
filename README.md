@@ -96,13 +96,26 @@ interface ApiSignature {
 }
 ```
 
-\*Note that each callback helper functions (success, invalid, redirect, error) includes CORS-enabling header information.
+\*Note that each callback helper functions (success, invalid, redirect, error) includes CORS-enabling header information
 
 ## CloudFormation Custom Resource
 
 ### Sample implementation
 
-// TODO CloudFormation wrapper implementation example
+```ts
+import { cloudFormation } from '@manwaring/lambda-wrapper';
+
+export const handler = cloudFormation(({ event, success, failure }) => {
+  try {
+    const { BucketName } = event.ResourceProperties;
+    success();
+  } catch (err) {
+    failure(err);
+  }
+});
+```
+
+\*Note that currently the method wrapped by cloudFormation cannot be async - for reasons that aren't entirely clear to me when the method is async the requests to update CloudFormation with the correct action status fail, leaving a stack in the 'pending' state
 
 ### Properties and methods available on wrapper signature
 
@@ -118,7 +131,18 @@ interface CloudFormationSignature {
 
 ### Sample implementation
 
-// TODO DynamoDB stream wrapper implementation example
+```ts
+import { dynamodbStream } from '@manwaring/lambda-wrapper';
+
+export const handler = dynamodbStream(async ({ newVersions, success, error }) => {
+  try {
+    newVersions.forEach(version => console.log(version));
+    return success(newVersions);
+  } catch (err) {
+    return error(err);
+  }
+});
+```
 
 ### Properties and methods available on wrapper signature
 
@@ -179,7 +203,18 @@ interface AuthorizerSignature {
 
 ### Sample implementation
 
-// TODO SNS event wrapper implementation example
+```ts
+import { sns } from '@manwaring/lambda-wrapper';
+
+export const handler = sns(async ({ message, success, error }) => {
+  try {
+    console.log(message);
+    return success();
+  } catch (err) {
+    return error(err);
+  }
+});
+```
 
 ### Properties and methods available on wrapper signature
 

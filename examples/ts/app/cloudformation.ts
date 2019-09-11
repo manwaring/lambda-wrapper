@@ -1,9 +1,9 @@
 import { cloudFormation } from '@manwaring/lambda-wrapper';
 import 'source-map-support/register';
 
-export const handler = cloudFormation(({ success, failure }) => {
+export const handler = cloudFormation(({ event, success, failure }) => {
   try {
-    success();
+    success(event.ResourceProperties.BucketName);
   } catch (err) {
     failure(err);
   }
