@@ -28,6 +28,24 @@ describe('API responses', () => {
     });
   });
 
+  it('Handles success response with replacer', () => {
+    const success = successWrapper(metrics, callback);
+    const replacer = (key, value) => {
+      switch (key) {
+        case 'that':
+          return undefined;
+        default:
+          return value;
+      }
+    };
+    success({ hello: 'world', replace: { that: 'property', not: 'this one' } }, replacer);
+    expect(callback).toHaveBeenCalledWith(null, {
+      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
+      body: JSON.stringify({ hello: 'world', replace: { not: 'this one' } }),
+      statusCode: 200
+    });
+  });
+
   it('Handles error response', () => {
     const error = errorWrapper(metrics, callback);
     error('error');

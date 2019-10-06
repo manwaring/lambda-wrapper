@@ -89,7 +89,7 @@ interface ApiSignature {
   headers: { [name: string]: string }; // headers param payload as key-value pairs
   testRequest: boolean; // indicates if this is a test request, based on presence of headers matching 'Test-Request' or process.env.TEST_REQUEST_HEADER
   auth: any; // auth context from custom authorizer
-  success(payload?: any): void; // returns 200 status with payload
+  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): void; // returns 200 status with payload
   invalid(errors?: string[]): void; // returns 400 status with errors
   redirect(url: string): void; // returns 302 redirect with new url
   error(error?: any): void; // returns 500 status with error

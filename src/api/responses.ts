@@ -7,10 +7,12 @@ const HEADERS = {
 };
 
 export function successWrapper(metrics: Metrics, callback: Callback) {
-  return function success(payload?: any) {
+  return function success(payload?: any, replacer?: (this: any, key: string, value: any) => any) {
     const response = { statusCode: 200, headers: HEADERS };
-    if (payload) {
+    if (payload && !replacer) {
       response['body'] = JSON.stringify(payload);
+    } else if (payload && replacer) {
+      response['body'] = JSON.stringify(payload, replacer);
     }
     metrics.success(payload);
     callback(null, response);
