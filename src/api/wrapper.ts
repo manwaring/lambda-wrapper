@@ -35,7 +35,7 @@ export interface ApiSignature {
   headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise null)
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
   auth: any; // auth context from custom authorizer if exists (otherwise null)
-  success(payload?: any): void; // returns 200 status with payload
+  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): void; // returns 200 status with payload
   invalid(errors?: string[]): void; // returns 400 status with errors in payload
   redirect(url: string): void; // returns 302 redirect with new url
   error(error?: any): void; // returns 500 status with error and original request payload
