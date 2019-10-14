@@ -1,7 +1,7 @@
 {
   "name": "@manwaring/lambda-wrapper",
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "scripts": {
     "publish-please-dry-run": "publish-please --dry-run",
     "publish-please": "publish-please",

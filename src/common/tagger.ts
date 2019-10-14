@@ -11,7 +11,7 @@ class Tagger {
       this.epsagon.installed = true;
       this.epsagon.label = epsagon.label;
     } catch (err) {
-      logger.debug('Epsagon not installed in project, not tagging with Epsagon labels');
+      logger.info('Epsagon not installed in project, not tagging with Epsagon labels');
     }
     try {
       const iopipe = require('@iopipe/iopipe');
@@ -19,7 +19,7 @@ class Tagger {
       this.iopipe.metric = iopipe.metric;
       this.iopipe.label = iopipe.label;
     } catch (err) {
-      logger.debug('IOPipe not installed in project, not tagging with IOPipe metrics');
+      logger.info('IOPipe not installed in project, not tagging with IOPipe metrics');
     }
   }
 
