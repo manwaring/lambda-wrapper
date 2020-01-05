@@ -36,6 +36,9 @@ export function notFound(message?: string): ApiResponse {
 
 export function error(message?: any): ApiResponse {
   const response = { statusCode: 503, headers: DEFAULT_HEADERS };
+  if (message && message instanceof Error) {
+    message = message.message;
+  }
   if (message) {
     response['body'] = JSON.stringify({ message });
   }

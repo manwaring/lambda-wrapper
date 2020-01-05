@@ -40,7 +40,7 @@ describe('API responses', () => {
   });
 
   it('Handles error response', () => {
-    const response = error('error');
+    const response = error(new Error('error'));
     expect(response).toEqual({
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
       body: JSON.stringify({ message: 'error' }),

@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [2.1.0]&nbsp;&nbsp;(2020-01-04)
+
+### Changed
+
+- Api error response includes Error message if passed an Error object
+
+### Fixed
+
+- Removed extra files from published package
+- Correct package.json entry point to lib
+
 ## [2.0.1]&nbsp;&nbsp;(2020-01-04)
 
 ### Fixed
@@ -126,6 +137,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), 
 - Update older libraries
 - Now publish from Git tags instead of master pushes
 
+[2.1.0]: https://github.com/manwaring/lambda-wrapper/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/manwaring/lambda-wrapper/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/manwaring/lambda-wrapper/compare/v1.2.2...v2.0.0
 [1.2.2]: https://github.com/manwaring/lambda-wrapper/compare/v1.2.1...v1.2.2
