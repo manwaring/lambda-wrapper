@@ -3,13 +3,9 @@
   <img height="150" src="https://user-images.githubusercontent.com/2955468/44874383-0168f780-ac69-11e8-8e51-774678cbd966.png">
 </p>
 
-[![version]][version-url] [![downloads]][downloads-url] [![coverage]][coverage-url] [![size]][size-url] [![license]][license-url]
-
-[![build]][build-url] [![dependabot]][dependabot-url] [![dependency]][dependency-url] [![dev-dependency]][dev-dependency-url]
-
 # AWS Lambda wrapper library
 
-### This documentation is for v3 of the library - [go here for v1](old-docs/v1/README.md) and [here for v2](old-docs/v2/README.md)
+### This documentation is for v2 of the library
 
 1. [Overview](#overview)
 1. [Installation and setup](#installation-and-setup)
@@ -93,7 +89,7 @@ interface ApiSignature {
   invalid(errors?: string[]): ApiResponse; // returns 400 status with errors
   notFound(message?: string): ApiResponse; // returns 404 status with message
   redirect(url: string): ApiResponse; // returns 302 redirect with new url
-  error(error?: any): ApiResponse; // returns 500 status with error
+  error(error?: any): ApiResponse; // returns 503 status with error
 }
 
 interface ApiResponse {
@@ -279,29 +275,3 @@ interface WrapperSignature {
 THere is one [working example](examples) of how this package can be used in a simple 'hello world' serverless application:
 
 1. [Using the Serverless Framework and TypeScript](examples/ts)
-
-<!-- Badge icons -->
-
-[version]: https://flat.badgen.net/npm/v/@manwaring/lambda-wrapper?icon=npm&label=npm@latest
-[downloads]: https://flat.badgen.net/npm/dt/@manwaring/lambda-wrapper?icon=npm
-[coverage]: https://flat.badgen.net/codecov/c/github/manwaring/lambda-wrapper/?icon=codecov
-[size]: https://flat.badgen.net/packagephobia/install/@manwaring/lambda-wrapper
-[license]: https://flat.badgen.net/npm/license/@manwaring/lambda-wrapper/
-[language]: https://flat.badgen.net/badge/typescript/typescript/?icon&label
-[style]: https://flat.badgen.net/badge/code%20style/prettier?color=purple&icon=terminal&label
-[build]: https://flat.badgen.net/circleci/github/manwaring/lambda-wrapper/master?icon=circleci
-[dependabot]: https://flat.badgen.net/dependabot/manwaring/lambda-wrapper/?icon=dependabot&label=dependabot
-[dependency]: https://flat.badgen.net/david/dep/manwaring/lambda-wrapper
-[dev-dependency]: https://flat.badgen.net/david/dev/manwaring/lambda-wrapper/?label=dev+dependencies
-
-<!-- Badge URLs -->
-
-[version-url]: https://npmjs.com/package/@manwaring/lambda-wrapper
-[downloads-url]: https://www.npmjs.com/package/@manwaring/lambda-wrapper
-[coverage-url]: https://codecov.io/gh/manwaring/lambda-wrapper
-[size-url]: https://packagephobia.now.sh/result?p=@manwaring/lambda-wrapper
-[license-url]: https://www.npmjs.com/package/@manwaring/lambda-wrapper
-[build-url]: https://circleci.com/gh/manwaring/lambda-wrapper
-[dependabot-url]: https://flat.badgen.net/dependabot/manwaring/lambda-wrapper
-[dependency-url]: https://david-dm.org/manwaring/lambda-wrapper
-[dev-dependency-url]: https://david-dm.org/manwaring/lambda-wrapper?type=dev

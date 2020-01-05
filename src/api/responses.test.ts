@@ -44,7 +44,7 @@ describe('API responses', () => {
     expect(response).toEqual({
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
       body: JSON.stringify({ message: 'error' }),
-      statusCode: 503
+      statusCode: 500
     });
   });
 

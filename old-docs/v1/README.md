@@ -5,6 +5,8 @@
 
 # AWS Lambda wrapper library
 
+### This documentation is for v1 of the library
+
 1. [Overview](#overview)
 1. [Installation and setup](#installation-and-setup)
    - [Optional configuration](#optional-configuration)

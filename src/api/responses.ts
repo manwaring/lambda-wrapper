@@ -35,7 +35,7 @@ export function notFound(message?: string): ApiResponse {
 }
 
 export function error(message?: any): ApiResponse {
-  const response = { statusCode: 503, headers: DEFAULT_HEADERS };
+  const response = { statusCode: 500, headers: DEFAULT_HEADERS };
   if (message && message instanceof Error) {
     logger.debug('Encountered error while processing request', message);
     message = message.message;
