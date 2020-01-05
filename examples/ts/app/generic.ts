@@ -3,8 +3,8 @@ import 'source-map-support/register';
 
 export const handler = wrapper(async ({ event, success, error }) => {
   try {
-    success(event);
+    return success(event);
   } catch (err) {
-    error(err);
+    return error(err);
   }
 });

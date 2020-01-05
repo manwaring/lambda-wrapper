@@ -3,13 +3,7 @@
   <img height="150" src="https://user-images.githubusercontent.com/2955468/44874383-0168f780-ac69-11e8-8e51-774678cbd966.png">
 </p>
 
-[![version]][version-url] [![downloads]][downloads-url] [![coverage]][coverage-url] [![size]][size-url] [![license]][license-url]
-
-[![build]][build-url] [![dependabot]][dependabot-url] [![dependency]][dependency-url] [![dev-dependency]][dev-dependency-url]
-
 # AWS Lambda wrapper library
-
-### This documentation is for v2 of the library - see [old-docs/v1/README.md for the v1 documentation](old-docs/v1/README.md)
 
 1. [Overview](#overview)
 1. [Installation and setup](#installation-and-setup)
@@ -33,7 +27,7 @@ This library provides custom Lambda function wrappers which expose standard, abs
 
 ### Rationale and motivation
 
-AWS Lambda supports a wide variety of event triggers, each with unique payloads and expected responses. The Lambda execution environment, however, only provides the raw events and has no included mechanisms for simplifying response object creation. For example, API Gateway events include only the raw request body, leaving it up to developers to implement parsing themselves. Similarly, the developer is responsible for creating a response object which includes the correct HTTP status code and headers. Given the standard nature of these kinds of concerns, this library exposes helpful abstractions like parsed HTTP bodies based on content-type headers, and success response functions which create response objects with the correct status codes and headers for returning.
+AWS Lambda supports a wide variety of event triggers, each with unique payloads and expected responses. The Lambda execution environment, however, only provides the raw events and has no included mechanisms for simplifying response object creation. For example, API Gateway events include only the raw request body, leaving it up to developers to implement parsing themselves. Similarly, the developer is responsible for creating a response object which includes the correct HTTP Status Code and headers. Given the standard nature of these kinds of concerns, this library exposes helpful abstractions like parsed HTTP bodies based on content-type headers, and success response functions which apply correct status codes and headers before invoking the Lambda callback.
 
 # Installation and setup
 
@@ -73,9 +67,9 @@ export const handler = api(async ({ body, path, success, error }) => {
   try {
     const { pathParam1, pathParam2 } = path;
     const results = await doSomething(body, pathParam1, pathParam2);
-    return success(results);
+    success(results);
   } catch (err) {
-    return error(err);
+    error(err);
   }
 });
 ```
@@ -91,17 +85,10 @@ interface ApiSignature {
   headers: { [name: string]: string }; // headers param payload as key-value pairs
   testRequest: boolean; // indicates if this is a test request, based on presence of headers matching 'Test-Request' or process.env.TEST_REQUEST_HEADER
   auth: any; // auth context from custom authorizer
-  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status with payload
-  invalid(errors?: string[]): ApiResponse; // returns 400 status with errors
-  notFound(message?: string): ApiResponse; // returns 404 status with message
-  redirect(url: string): ApiResponse; // returns 302 redirect with new url
-  error(error?: any): ApiResponse; // returns 500 status with error
-}
-
-interface ApiResponse {
-  statusCode: number;
-  headers: { [name: string]: string | boolean };
-  body?: string;
+  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): void; // returns 200 status with payload
+  invalid(errors?: string[]): void; // returns 400 status with errors
+  redirect(url: string): void; // returns 302 redirect with new url
+  error(error?: any): void; // returns 500 status with error
 }
 ```
 
@@ -117,9 +104,9 @@ import { cloudFormation } from '@manwaring/lambda-wrapper';
 export const handler = cloudFormation(({ event, success, failure }) => {
   try {
     const { BucketName } = event.ResourceProperties;
-    return success();
+    success();
   } catch (err) {
-    return failure(err);
+    failure(err);
   }
 });
 ```
@@ -161,8 +148,8 @@ interface DynamoDBStreamSignature {
   newVersions: any[]; // array of all unmarshalled javascript objects of new images
   oldVersions: any[]; // array of all unmarshalled javascript objects of old images
   versions: Version[]; // array of full version object (new image, old image, etc - see Version interface)
-  success(message?: any): any; // logs and returns the message
-  error(error?: any): void; // logs the error and throws it
+  success(message?: any): void; // invokes lambda callback with success
+  error(error?: any): void; // invokes lambda callback with error
 }
 
 interface Version {
@@ -189,9 +176,9 @@ export const handler = authorizer(async ({ token, valid, invalid }) => {
       return invalid('Missing token');
     }
     const jwt = await verifier.verifyAccessToken(token);
-    return valid(jwt);
+    valid(jwt);
   } catch (err) {
-    return invalid(err);
+    invalid(err);
   }
 });
 ```
@@ -202,21 +189,9 @@ export const handler = authorizer(async ({ token, valid, invalid }) => {
 interface AuthorizerSignature {
   event: CustomAuthorizerEvent; // original event
   token: string; // authorizer token from original event
-  valid(jwt: any): Policy; // returns AWS policy to authenticate request, and adds auth context if available
-  invalid(message?: any): void; // records invalid information and throws 401 unauthorized
-  error(error?: any): void; // records error information and throws 401 unauthorized
-}
-
-interface Policy {
-  principalId: string;
-  policyDocument: {
-    Version: string;
-    Statement: {
-      Action: string;
-      Effect: string;
-      Resource: string;
-    }[];
-  };
+  valid(jwt: any): void; // creates AWS policy to authenticate request, and adds auth context if available
+  invalid(message?: string[]): void; // returns 401 unauthorized
+  error(error?: any): void; // records error information and returns 401 unauthorized
 }
 ```
 
@@ -242,9 +217,9 @@ export const handler = sns(async ({ message, success, error }) => {
 ```ts
 interface SnsSignature {
   event: SNSEvent; // original event
-  message: any; // JSON-parsed message from event
-  success(message?: any): any; // logs and returns the message
-  error(error?: any): void; // logs the error and throws
+  message: any; // JSON-parsed message from event (or raw message if not JSON)
+  success(payload?: any): void; // invokes lambda callback with success
+  error(error?: any): void; // invokes lambda callback with error
 }
 ```
 
@@ -259,9 +234,9 @@ export const handler = wrapper(async ({ event, success, error }) => {
   try {
     const { value1, value2 } = event;
     const results = await doSomething(value1, value2);
-    return success(results);
+    success(results);
   } catch (err) {
-    return error(err);
+    error(err);
   }
 });
 ```
@@ -271,8 +246,8 @@ export const handler = wrapper(async ({ event, success, error }) => {
 ```ts
 interface WrapperSignature {
   event: any; // original event
-  success(message?: any): any; // logs and returns the message
-  error(error?: any): void; // logs the error and throws
+  success(payload?: any): void; // invokes lambda callback with success response
+  error(error?: any): void; // invokes lambda callback with error response
 }
 ```
 
@@ -281,29 +256,3 @@ interface WrapperSignature {
 THere is one [working example](examples) of how this package can be used in a simple 'hello world' serverless application:
 
 1. [Using the Serverless Framework and TypeScript](examples/ts)
-
-<!-- Badge icons -->
-
-[version]: https://flat.badgen.net/npm/v/@manwaring/lambda-wrapper?icon=npm&label=npm@latest
-[downloads]: https://flat.badgen.net/npm/dt/@manwaring/lambda-wrapper?icon=npm
-[coverage]: https://flat.badgen.net/codecov/c/github/manwaring/lambda-wrapper/?icon=codecov
-[size]: https://flat.badgen.net/packagephobia/install/@manwaring/lambda-wrapper
-[license]: https://flat.badgen.net/npm/license/@manwaring/lambda-wrapper/
-[language]: https://flat.badgen.net/badge/typescript/typescript/?icon&label
-[style]: https://flat.badgen.net/badge/code%20style/prettier?color=purple&icon=terminal&label
-[build]: https://flat.badgen.net/circleci/github/manwaring/lambda-wrapper/master?icon=circleci
-[dependabot]: https://flat.badgen.net/dependabot/manwaring/lambda-wrapper/?icon=dependabot&label=dependabot
-[dependency]: https://flat.badgen.net/david/dep/manwaring/lambda-wrapper
-[dev-dependency]: https://flat.badgen.net/david/dev/manwaring/lambda-wrapper/?label=dev+dependencies
-
-<!-- Badge URLs -->
-
-[version-url]: https://npmjs.com/package/@manwaring/lambda-wrapper
-[downloads-url]: https://www.npmjs.com/package/@manwaring/lambda-wrapper
-[coverage-url]: https://codecov.io/gh/manwaring/lambda-wrapper
-[size-url]: https://packagephobia.now.sh/result?p=@manwaring/lambda-wrapper
-[license-url]: https://www.npmjs.com/package/@manwaring/lambda-wrapper
-[build-url]: https://circleci.com/gh/manwaring/lambda-wrapper
-[dependabot-url]: https://flat.badgen.net/dependabot/manwaring/lambda-wrapper
-[dependency-url]: https://david-dm.org/manwaring/lambda-wrapper
-[dev-dependency-url]: https://david-dm.org/manwaring/lambda-wrapper?type=dev

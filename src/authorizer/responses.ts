@@ -1,29 +1,24 @@
-import { Callback } from 'aws-lambda';
 import { Metrics } from '../common';
 
-export function validWrapper(metrics: Metrics, callback: Callback) {
-  return function valid(jwt: any) {
-    const policy = generatePolicy(jwt);
-    metrics.valid(policy);
-    callback(null, policy);
-  };
+const metrics = new Metrics('Lambda Authorizer');
+
+export function valid(jwt: any): Policy {
+  const policy = generatePolicy(jwt);
+  metrics.valid(policy);
+  return policy;
 }
 
-export function invalidWrapper(metrics: Metrics, callback: Callback) {
-  return function invalid(message?: any): void {
-    metrics.invalid(message);
-    callback('Unauthorized');
-  };
+export function invalid(message?: any): void {
+  metrics.invalid(message);
+  throw new Error('Unauthorized');
 }
 
-export function errorWrapper(metrics: Metrics, callback: Callback) {
-  return function error(error?: any) {
-    metrics.error(error);
-    callback(error);
-  };
+export function error(error?: any) {
+  metrics.error(error);
+  throw new Error(error);
 }
 
-function generatePolicy(jwt: any): any {
+function generatePolicy(jwt: any): Policy {
   const principalId = jwt.sub ? jwt.sub : jwt.claims ? jwt.claims : '';
   return {
     principalId,
@@ -37,5 +32,17 @@ function generatePolicy(jwt: any): any {
         }
       ]
     }
+  };
+}
+
+export interface Policy {
+  principalId: string;
+  policyDocument: {
+    Version: string;
+    Statement: {
+      Action: string;
+      Effect: string;
+      Resource: string;
+    }[];
   };
 }

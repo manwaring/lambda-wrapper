@@ -1,18 +1,13 @@
-import { successWrapper, errorWrapper, invalidWrapper, redirectWrapper } from './responses';
-import { Metrics } from '../common';
+import { success, error, invalid, notFound, redirect } from './responses';
 
 describe('API responses', () => {
-  const metrics = new Metrics('API Gateway');
-  const callback = jest.fn((err, result) => (err ? new Error(err) : result));
-
   beforeEach(() => {
     jest.resetAllMocks();
   });
 
   it('Handles success response', () => {
-    const success = successWrapper(metrics, callback);
-    success('success');
-    expect(callback).toHaveBeenCalledWith(null, {
+    const response = success('success');
+    expect(response).toEqual({
       body: JSON.stringify('success'),
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
       statusCode: 200
@@ -20,16 +15,14 @@ describe('API responses', () => {
   });
 
   it('Handles success response without payload', () => {
-    const success = successWrapper(metrics, callback);
-    success();
-    expect(callback).toHaveBeenCalledWith(null, {
+    const response = success();
+    expect(response).toEqual({
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
       statusCode: 200
     });
   });
 
   it('Handles success response with replacer', () => {
-    const success = successWrapper(metrics, callback);
     const replacer = (key, value) => {
       switch (key) {
         case 'that':
@@ -38,8 +31,8 @@ describe('API responses', () => {
           return value;
       }
     };
-    success({ hello: 'world', replace: { that: 'property', not: 'this one' } }, replacer);
-    expect(callback).toHaveBeenCalledWith(null, {
+    const response = success({ hello: 'world', replace: { that: 'property', not: 'this one' } }, replacer);
+    expect(response).toEqual({
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
       body: JSON.stringify({ hello: 'world', replace: { not: 'this one' } }),
       statusCode: 200
@@ -47,15 +40,17 @@ describe('API responses', () => {
   });
 
   it('Handles error response', () => {
-    const error = errorWrapper(metrics, callback);
-    error('error');
-    expect(callback).toHaveBeenCalledWith('error');
+    const response = error('error');
+    expect(response).toEqual({
+      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
+      body: JSON.stringify({ message: 'error' }),
+      statusCode: 503
+    });
   });
 
   it('Handles invalid response', () => {
-    const invalid = invalidWrapper(metrics, callback);
-    invalid(['invalid']);
-    expect(callback).toHaveBeenCalledWith(null, {
+    const response = invalid(['invalid']);
+    expect(response).toEqual({
       body: JSON.stringify({ errors: ['invalid'] }),
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
       statusCode: 400
@@ -63,18 +58,25 @@ describe('API responses', () => {
   });
 
   it('Handles invalid response without validation errors', () => {
-    const invalid = invalidWrapper(metrics, callback);
-    invalid();
-    expect(callback).toHaveBeenCalledWith(null, {
+    const response = invalid();
+    expect(response).toEqual({
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
       statusCode: 400
     });
   });
 
+  it('Handles notFound response', () => {
+    const response = notFound('not found');
+    expect(response).toEqual({
+      body: JSON.stringify({ message: 'not found' }),
+      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
+      statusCode: 404
+    });
+  });
+
   it('Handles redirect response', () => {
-    const redirect = redirectWrapper(metrics, callback);
-    redirect('url');
-    expect(callback).toHaveBeenCalledWith(null, {
+    const response = redirect('url');
+    expect(response).toEqual({
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true, Location: 'url' },
       statusCode: 302
     });

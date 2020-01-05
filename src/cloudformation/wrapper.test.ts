@@ -19,7 +19,7 @@ describe('Stream wrapper', () => {
     functionName: 'function-name',
     functionVersion: '$LATEST',
     invokedFunctionArn: 'arn:',
-    memoryLimitInMB: 128,
+    memoryLimitInMB: '128',
     awsRequestId: 'request',
     logGroupName: 'group',
     logStreamName: 'stream',

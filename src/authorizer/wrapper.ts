@@ -1,6 +1,6 @@
 import { CustomAuthorizerEvent, Context, Callback } from 'aws-lambda';
+import { valid, invalid, error, Policy } from './responses';
 import { Metrics } from '../common';
-import { validWrapper, invalidWrapper, errorWrapper } from './responses';
 
 const metrics = new Metrics('Lambda Authorizer');
 
@@ -10,21 +10,14 @@ export function authorizer(
   return function handler(event: CustomAuthorizerEvent, context: Context, callback: Callback) {
     metrics.common(event);
     const token = event.authorizationToken;
-
-    return custom({
-      event,
-      token,
-      valid: validWrapper(metrics, callback),
-      invalid: invalidWrapper(metrics, callback),
-      error: errorWrapper(metrics, callback)
-    });
+    return custom({ event, token, valid, invalid, error });
   };
 }
 
 export interface AuthorizerSignature {
   event: CustomAuthorizerEvent; // original event
   token: string; // authorizer token from original event
-  valid(jwt: any): void; // creates AWS policy to authenticate request, and adds auth context if available
-  invalid(message?: any): void; // returns 401 unauthorized
-  error(error?: any): void; // records error information and returns 401 unauthorized
+  valid(jwt: any): Policy; // returns AWS policy to authenticate request, and adds auth context if available
+  invalid(message?: any): void; // records invalid information and throws 401 unauthorized
+  error(error?: any): void; // records error information and throws 401 unauthorized
 }

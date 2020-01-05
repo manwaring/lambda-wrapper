@@ -5,7 +5,7 @@ const context = {
   functionName: 'function-name',
   functionVersion: '$LATEST',
   invokedFunctionArn: 'arn:',
-  memoryLimitInMB: 128,
+  memoryLimitInMB: '128',
   awsRequestId: 'request',
   logGroupName: 'group',
   logStreamName: 'stream',
@@ -30,7 +30,11 @@ describe('Stream wrapper', () => {
       expect(valid).toBeInstanceOf(Function);
       expect(invalid).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
-      error('error');
+      valid({
+        claims: 'abcdefghij',
+        name: 'John Doe',
+        admin: true
+      });
     }
     authorizer(custom)(requestEvent, context, callback);
   });

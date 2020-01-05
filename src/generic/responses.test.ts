@@ -1,23 +1,12 @@
-import { successWrapper, errorWrapper } from './responses';
-import { Metrics } from '../common';
+import { success, error } from './responses';
 
 describe('Generic responses', () => {
-  const metrics = new Metrics('API Gateway');
-  const callback = jest.fn((err, result) => (err ? new Error(err) : result));
-
-  beforeEach(() => {
-    jest.resetAllMocks();
-  });
-
   it('Handles success response', () => {
-    const success = successWrapper(metrics, callback);
-    success('success');
-    expect(callback).toHaveBeenCalledWith(null, 'success');
+    const response = success('success');
+    expect(response).toEqual('success');
   });
 
   it('Handles error response', () => {
-    const error = errorWrapper(metrics, callback);
-    error('error');
-    expect(callback).toHaveBeenCalledWith('error');
+    expect(() => error('error')).toThrow();
   });
 });

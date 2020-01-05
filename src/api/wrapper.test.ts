@@ -14,7 +14,7 @@ describe('API wrapper', () => {
     functionName: 'function-name',
     functionVersion: '$LATEST',
     invokedFunctionArn: 'arn:',
-    memoryLimitInMB: 128,
+    memoryLimitInMB: '128',
     awsRequestId: 'request',
     logGroupName: 'group',
     logStreamName: 'stream',
@@ -35,6 +35,7 @@ describe('API wrapper', () => {
       testRequest,
       auth,
       success,
+      notFound,
       invalid,
       redirect,
       error
@@ -47,6 +48,7 @@ describe('API wrapper', () => {
       expect(testRequest).toEqual(true);
       expect(auth).toBeFalsy();
       expect(success).toBeInstanceOf(Function);
+      expect(notFound).toBeInstanceOf(Function);
       expect(invalid).toBeInstanceOf(Function);
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);

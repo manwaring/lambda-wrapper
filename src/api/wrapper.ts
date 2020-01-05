@@ -1,17 +1,13 @@
 import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
 import { Request } from './parser';
-import { Metrics } from '../common';
-import { successWrapper, invalidWrapper, errorWrapper, redirectWrapper } from './responses';
-
-const metrics = new Metrics('API Gateway');
+import { success, invalid, notFound, error, redirect, ApiResponse } from './responses';
 
 export function api(
   custom: (props: ApiSignature) => any
 ): (event: APIGatewayEvent, context: Context, callback: Callback) => any {
-  return function handler(event: APIGatewayEvent, context: Context, callback: Callback) {
+  return function handler(event: APIGatewayEvent) {
     const { body, path, query, auth, headers, testRequest } = new Request(event).getProperties();
-
-    return custom({
+    const signature: ApiSignature = {
       event,
       body,
       path,
@@ -19,11 +15,13 @@ export function api(
       headers,
       testRequest,
       auth,
-      success: successWrapper(metrics, callback),
-      invalid: invalidWrapper(metrics, callback),
-      error: errorWrapper(metrics, callback),
-      redirect: redirectWrapper(metrics, callback)
-    });
+      success,
+      invalid,
+      notFound,
+      error,
+      redirect
+    };
+    return custom(signature);
   };
 }
 
@@ -35,8 +33,9 @@ export interface ApiSignature {
   headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise null)
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
   auth: any; // auth context from custom authorizer if exists (otherwise null)
-  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): void; // returns 200 status with payload
-  invalid(errors?: string[]): void; // returns 400 status with errors in payload
-  redirect(url: string): void; // returns 302 redirect with new url
-  error(error?: any): void; // returns 500 status with error and original request payload
+  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status with payload
+  invalid(errors?: string[]): ApiResponse; // returns 400 status with errors in payload
+  notFound(message?: string): ApiResponse;
+  redirect(url: string): ApiResponse; // returns 302 redirect with new url
+  error(error?: any): ApiResponse; // returns 500 status with error and original request payload
 }

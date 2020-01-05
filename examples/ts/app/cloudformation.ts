@@ -3,8 +3,8 @@ import 'source-map-support/register';
 
 export const handler = cloudFormation(({ event, success, failure }) => {
   try {
-    success(event.ResourceProperties.BucketName);
+    return success(event.ResourceProperties.BucketName);
   } catch (err) {
-    failure(err);
+    return failure(err);
   }
 });
