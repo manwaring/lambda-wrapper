@@ -49,8 +49,6 @@ If you want the wrapper to log request and response messages (helpful for debugg
 
 If you want each invocation to be tagged with the AWS region, environment/, and Git revision simply set environment variables for each: `REGION=us-east-1`, `STAGE=prod`, `REVISION=f4ba682` (see [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for libraries that can help you set git revision)
 
-If you want to take advantage of either [Epsagon](https://epsagon.com/) or [IOPipe](https://www.iopipe.com/) for advanced serverless instrumentation (highly recommmended!) you'll need to create an account with them and follow their instructions for setting up your project. If this library detects either of those packages it will automatically apply standard tagging (Epsagon labels and IOPipe labels and metrics) to each invocation for easier logging, monitoring, and troubleshooting.
-
 # Supported events
 
 All of the events bellow have a corresponding wrapper which provides a deconstructed method signature exposing parsed/unmarshalled request parameters and helper response methods.

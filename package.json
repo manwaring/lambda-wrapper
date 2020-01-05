@@ -1,7 +1,7 @@
 {
   "name": "@manwaring/lambda-wrapper",
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "scripts": {
     "publish-please-dry-run": "publish-please --dry-run",
     "publish-please": "publish-please",
@@ -37,7 +37,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm test && npm run generate-docs"
+      "pre-commit": "npm test"
     }
   },
   "publishConfig": {
@@ -51,8 +51,8 @@
     "url": "https://github.com/manwaring/lambda-wrapper/issues"
   },
   "homepage": "https://github.com/manwaring/lambda-wrapper",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "From Phillip with ♥",
   "license": "MIT",
   "keywords": [

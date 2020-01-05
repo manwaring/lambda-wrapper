@@ -12,3 +12,5 @@ src/
 .publishrc
 jest.config.js
 tsconfig.*json
+old-docs
+CHANGELOG.md
