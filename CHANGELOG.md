@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [3.0.1]&nbsp;&nbsp;(2020-01-20)
+
+### Changed
+
+- Missing signature params as undefined instead of null to allow for default values
+- Updated libraries
+
 ## [3.0.0]&nbsp;&nbsp;(2020-01-05)
 
 ### Changed

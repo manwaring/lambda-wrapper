@@ -9,10 +9,10 @@ export class Request {
 
   getProperties(): any {
     const event = this.event;
-    const path = event.pathParameters ? event.pathParameters : null;
-    const query = event.queryStringParameters ? event.queryStringParameters : null;
-    const auth = event.requestContext && event.requestContext.authorizer ? event.requestContext.authorizer : null;
-    const headers = event.headers ? event.headers : null;
+    const path = event.pathParameters ? event.pathParameters : undefined;
+    const query = event.queryStringParameters ? event.queryStringParameters : undefined;
+    const auth = event.requestContext && event.requestContext.authorizer ? event.requestContext.authorizer : undefined;
+    const headers = event.headers ? event.headers : undefined;
     const body = new Body(event.body, headers).getParsedBody();
     const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || 'Test-Request';
     const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : false;

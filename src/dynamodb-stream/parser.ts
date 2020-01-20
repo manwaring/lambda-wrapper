@@ -26,8 +26,8 @@ export class DynamoDBStreamParser {
   private parseVersions(record: DynamoDBRecord) {
     const { eventName } = record;
     const { NewImage, OldImage, Keys } = record.dynamodb;
-    const newVersion = NewImage ? DynamoDB.Converter.unmarshall(NewImage) : null;
-    const oldVersion = OldImage ? DynamoDB.Converter.unmarshall(OldImage) : null;
+    const newVersion = NewImage ? DynamoDB.Converter.unmarshall(NewImage) : undefined;
+    const oldVersion = OldImage ? DynamoDB.Converter.unmarshall(OldImage) : undefined;
     const keys = DynamoDB.Converter.unmarshall(Keys);
     const { tableName, tableArn } = this.getTableInformation(record);
     const version: Version = { newVersion, oldVersion, keys, tableName, tableArn, eventName };

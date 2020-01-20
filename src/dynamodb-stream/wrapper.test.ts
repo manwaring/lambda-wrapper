@@ -28,7 +28,7 @@ describe('DynamoDB Stream wrapper', () => {
       expect(versions).toEqual([
         {
           newVersion: { Message: 'New item!', Id: 101 },
-          oldVersion: null,
+          oldVersion: undefined,
           keys: { Id: 101 },
           tableName: 'images',
           tableArn: 'arn:aws:dynamodb:us-east-1:123456789012:table/images',

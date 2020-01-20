@@ -117,14 +117,14 @@ describe('DynamoDB stream parsing', () => {
     });
     expect(versions).toContainEqual({
       newVersion: { Message: 'hasta la vista', Id: 456 },
-      oldVersion: null,
+      oldVersion: undefined,
       keys: { Id: 456 },
       tableName: 'table',
       tableArn: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
       eventName: 'INSERT'
     });
     expect(versions).toContainEqual({
-      newVersion: null,
+      newVersion: undefined,
       oldVersion: { Message: 'buongiorno', Id: 789 },
       keys: { Id: 789 },
       tableName: 'table',

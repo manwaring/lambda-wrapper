@@ -1,7 +1,7 @@
 {
   "name": "@manwaring/lambda-wrapper",
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "scripts": {
     "publish-please-dry-run": "publish-please --dry-run",
     "publish-please": "publish-please",
@@ -16,24 +16,24 @@
     "cfn-response": "^1.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.7",
-    "@babel/plugin-proposal-class-properties": "^7.7.4",
-    "@babel/preset-env": "^7.7.7",
-    "@babel/preset-typescript": "^7.7.7",
+    "@babel/core": "^7.8.3",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-typescript": "^7.8.3",
     "@serverless/event-mocks": "^1.1.1",
     "@types/aws-lambda": "^8.10.39",
     "@types/cfn-response": "^1.0.1",
-    "@types/jest": "^24.0.25",
-    "@types/node": "^13.1.4",
-    "aws-lambda": "^1.0.4",
-    "aws-sdk": "^2.597.0",
+    "@types/jest": "^24.9.0",
+    "@types/node": "^13.1.8",
+    "aws-lambda": "^1.0.5",
+    "aws-sdk": "^2.606.0",
     "babel-jest": "^24.9.0",
     "codecov": "^3.6.1",
     "husky": "^2.7.0",
     "jest": "^24.9.0",
     "publish-please": "^5.5.1",
     "rimraf": "^3.0.0",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   },
   "husky": {
     "hooks": {

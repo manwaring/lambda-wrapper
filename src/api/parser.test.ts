@@ -74,4 +74,20 @@ describe('Request parsing', () => {
     expect(headers).toBeFalsy();
     expect(testRequest).toBeFalsy();
   });
+
+  it('Supports default values in method signature', () => {
+    // @ts-ignore
+    const event = createEvent('aws:apiGateway', {});
+    delete event.body;
+    delete event.headers;
+    delete event.pathParameters;
+    delete event.queryStringParameters;
+    const { path = {}, query = {} } = new Request(event).getProperties();
+
+    const { notThere = 2 } = query;
+    expect(notThere).toEqual(2);
+
+    const { alsoNotThere = 3 } = path;
+    expect(alsoNotThere).toEqual(3);
+  });
 });
