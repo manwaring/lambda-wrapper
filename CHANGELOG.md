@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-## [3.0.1]&nbsp;&nbsp;(2020-01-20)
+## [3.1.0]&nbsp;&nbsp;(2020-01-20)
 
 ### Changed
 
@@ -156,6 +156,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), 
 - Update older libraries
 - Now publish from Git tags instead of master pushes
 
+[3.0.1]: https://github.com/manwaring/lambda-wrapper/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/manwaring/lambda-wrapper/compare/v2.1.1...v3.0.0
 [2.1.1]: https://github.com/manwaring/lambda-wrapper/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/manwaring/lambda-wrapper/compare/v2.0.1...v2.1.0
