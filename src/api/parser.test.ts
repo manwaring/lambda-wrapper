@@ -10,6 +10,13 @@ describe('Body parsing', () => {
     expect(body).toEqual(json);
   });
 
+  it('Parses json body when charset is also defined in the context-type', () => {
+    const json = { hello: 'world' };
+    const headers = { 'content-type': 'application/json;charset=UTF-8' };
+    const body = new Body(JSON.stringify(json), headers).getParsedBody();
+    expect(body).toEqual(json);
+  });
+
   it('Parses form url encoded body', () => {
     const form = { hello: 'world' };
     const headers = { 'content-type': 'application/x-www-form-urlencoded' };

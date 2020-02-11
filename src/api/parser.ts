@@ -54,6 +54,6 @@ export class Body {
   }
 
   private isJSON(contentType: string): boolean {
-    return contentType && contentType.toUpperCase() === 'APPLICATION/JSON';
+    return contentType && contentType.toUpperCase().includes('APPLICATION/JSON');
   }
 }
