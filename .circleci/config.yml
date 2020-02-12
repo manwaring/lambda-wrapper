@@ -9,7 +9,7 @@
 anchors:
   container-config: &container-config
     docker:
-      - image: circleci/node
+      - image: circleci/node:lts
         environment:
           TERM: dumb
 
