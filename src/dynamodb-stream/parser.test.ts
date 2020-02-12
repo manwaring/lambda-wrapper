@@ -1,4 +1,4 @@
-import createEvent from '@serverless/event-mocks';
+import { dynamoDBStreamEvent } from 'serverless-plugin-test-helper';
 import { DynamoDBStreamParser } from './parser';
 
 describe('DynamoDB stream parsing', () => {
@@ -27,12 +27,12 @@ describe('DynamoDB stream parsing', () => {
           N: '123'
         }
       },
-      StreamViewType: 'NEW_AND_OLD_IMAGES',
+      StreamViewType: 'NEW_AND_OLD_IMAGES' as 'NEW_AND_OLD_IMAGES',
       SequenceNumber: '111',
       SizeBytes: 26
     },
     awsRegion: 'us-east-1',
-    eventName: 'PUT',
+    eventName: 'INSERT' as 'INSERT',
     eventSourceARN: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
     eventSource: 'aws-dynamodb'
   };
@@ -53,12 +53,12 @@ describe('DynamoDB stream parsing', () => {
           N: '456'
         }
       },
-      StreamViewType: 'NEW_AND_OLD_IMAGES',
+      StreamViewType: 'NEW_AND_OLD_IMAGES' as 'NEW_AND_OLD_IMAGES',
       SequenceNumber: '111',
       SizeBytes: 26
     },
     awsRegion: 'us-east-1',
-    eventName: 'INSERT',
+    eventName: 'INSERT' as 'INSERT',
     eventSourceARN: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
     eventSource: 'aws-dynamodb'
   };
@@ -79,17 +79,16 @@ describe('DynamoDB stream parsing', () => {
           N: '789'
         }
       },
-      StreamViewType: 'NEW_AND_OLD_IMAGES',
+      StreamViewType: 'NEW_AND_OLD_IMAGES' as 'NEW_AND_OLD_IMAGES',
       SequenceNumber: '111',
       SizeBytes: 26
     },
     awsRegion: 'us-east-1',
-    eventName: 'DELETE',
+    eventName: 'REMOVE' as 'REMOVE',
     eventSourceARN: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
     eventSource: 'aws-dynamodb'
   };
-  // @ts-ignore
-  const event = createEvent('aws:dynamo', { Records: [firstRecord, secondRecord, thirdRecord] });
+  const event = dynamoDBStreamEvent({ Records: [firstRecord, secondRecord, thirdRecord] });
   const stream = new DynamoDBStreamParser(event);
   const { newVersions, oldVersions, versions } = stream.getVersions();
 
@@ -108,28 +107,28 @@ describe('DynamoDB stream parsing', () => {
   it('Gets versions correctly', () => {
     expect(versions).toHaveLength(3);
     expect(versions).toContainEqual({
-      newVersion: { Message: 'goodbye', Id: 123 },
-      oldVersion: { Message: 'hello', Id: 123 },
+      eventName: 'INSERT',
       keys: { Id: 123 },
-      tableName: 'table',
+      newVersion: { Id: 123, Message: 'goodbye' },
+      oldVersion: { Id: 123, Message: 'hello' },
       tableArn: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
-      eventName: 'PUT'
+      tableName: 'table'
     });
     expect(versions).toContainEqual({
-      newVersion: { Message: 'hasta la vista', Id: 456 },
-      oldVersion: undefined,
+      eventName: 'INSERT',
       keys: { Id: 456 },
-      tableName: 'table',
+      newVersion: { Id: 456, Message: 'hasta la vista' },
+      oldVersion: undefined,
       tableArn: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
-      eventName: 'INSERT'
+      tableName: 'table'
     });
     expect(versions).toContainEqual({
-      newVersion: undefined,
-      oldVersion: { Message: 'buongiorno', Id: 789 },
+      eventName: 'REMOVE',
       keys: { Id: 789 },
-      tableName: 'table',
+      newVersion: undefined,
+      oldVersion: { Id: 789, Message: 'buongiorno' },
       tableArn: 'arn:aws:dynamodb:us-east-1:1234567890:table/table',
-      eventName: 'DELETE'
+      tableName: 'table'
     });
   });
 });

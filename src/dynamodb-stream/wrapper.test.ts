@@ -1,38 +1,23 @@
-import createEvent from '@serverless/event-mocks';
+import { dynamoDBStreamEvent, context } from 'serverless-plugin-test-helper';
 import { dynamodbStream, DynamoDBStreamSignature } from './wrapper';
 
 describe('DynamoDB Stream wrapper', () => {
-  // @ts-ignore
-  const requestEvent = createEvent('aws:dynamo', {});
-  const context = {
-    callbackWaitsForEmptyEventLoop: false,
-    functionName: 'function-name',
-    functionVersion: '$LATEST',
-    invokedFunctionArn: 'arn:',
-    memoryLimitInMB: '128',
-    awsRequestId: 'request',
-    logGroupName: 'group',
-    logStreamName: 'stream',
-    getRemainingTimeInMillis: () => 2,
-    done: () => {},
-    fail: () => {},
-    succeed: () => {}
-  };
+  const requestEvent = dynamoDBStreamEvent();
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response function', () => {
     function custom({ event, newVersions, oldVersions, versions, success, error }: DynamoDBStreamSignature) {
       expect(event).toEqual(requestEvent);
-      expect(newVersions).toEqual([{ Message: 'New item!', Id: 101 }]);
-      expect(oldVersions).toEqual([]);
+      expect(newVersions).toEqual([{ Message: 'This item has changed', Id: 101 }]);
+      expect(oldVersions).toEqual([{ Id: 101, Message: 'New item!' }]);
       expect(versions).toEqual([
         {
-          newVersion: { Message: 'New item!', Id: 101 },
-          oldVersion: undefined,
+          newVersion: { Message: 'This item has changed', Id: 101 },
+          oldVersion: { Message: 'New item!', Id: 101 },
           keys: { Id: 101 },
-          tableName: 'images',
           tableArn: 'arn:aws:dynamodb:us-east-1:123456789012:table/images',
-          eventName: 'INSERT'
+          tableName: 'images',
+          eventName: 'MODIFY'
         }
       ]);
       expect(success).toBeInstanceOf(Function);

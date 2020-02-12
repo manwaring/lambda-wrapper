@@ -1,6 +1,6 @@
 import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
 import { Request } from './parser';
-import { success, invalid, notFound, error, redirect, ApiResponse } from './responses';
+import { success, invalid, notFound, notAuthorized, error, redirect, ApiResponse } from './responses';
 
 export function api(
   custom: (props: ApiSignature) => any
@@ -18,6 +18,7 @@ export function api(
       success,
       invalid,
       notFound,
+      notAuthorized,
       error,
       redirect
     };
@@ -33,9 +34,10 @@ export interface ApiSignature {
   headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise null)
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
   auth: any; // auth context from custom authorizer if exists (otherwise null)
-  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status with payload
-  invalid(errors?: string[]): ApiResponse; // returns 400 status with errors in payload
-  notFound(message?: string): ApiResponse;
-  redirect(url: string): ApiResponse; // returns 302 redirect with new url
-  error(error?: any): ApiResponse; // returns 500 status with error and original request payload
+  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status code with optional payload as body
+  invalid(errors?: string[]): ApiResponse; // returns 400 status code with optional errors as body
+  notFound(message?: string): ApiResponse; // returns 404 status code with optional message as body
+  notAuthorized(message?: string): ApiResponse; // returns 403 status code with optional message as body
+  redirect(url: string): ApiResponse; // returns 302 status code (redirect) with new url
+  error(error?: any): ApiResponse; // returns 500 status code with optional error as body
 }

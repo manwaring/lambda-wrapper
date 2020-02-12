@@ -1,9 +1,8 @@
-import createEvent from '@serverless/event-mocks';
+import { apiGatewayEvent } from 'serverless-plugin-test-helper';
 import { api, ApiSignature } from './wrapper';
 
 describe('API wrapper', () => {
-  // @ts-ignore
-  const requestEvent = createEvent('aws:apiGateway', {
+  const requestEvent = apiGatewayEvent({
     body: JSON.stringify({ hello: 'world' }),
     pathParameters: { proxy: 'not today' },
     queryStringParameters: { name: 'a test' },
@@ -36,6 +35,7 @@ describe('API wrapper', () => {
       auth,
       success,
       notFound,
+      notAuthorized,
       invalid,
       redirect,
       error
@@ -49,6 +49,7 @@ describe('API wrapper', () => {
       expect(auth).toBeFalsy();
       expect(success).toBeInstanceOf(Function);
       expect(notFound).toBeInstanceOf(Function);
+      expect(notAuthorized).toBeInstanceOf(Function);
       expect(invalid).toBeInstanceOf(Function);
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);

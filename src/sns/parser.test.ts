@@ -1,4 +1,4 @@
-import createEvent from '@serverless/event-mocks';
+import { snsEvent } from 'serverless-plugin-test-helper';
 import { SnsParser } from './parser';
 
 describe('Stream parsing', () => {
@@ -6,8 +6,7 @@ describe('Stream parsing', () => {
     const Sns = {
       Message: 'hello world'
     };
-    // @ts-ignore
-    const event = createEvent('aws:sns', { Records: [{ Sns }] });
+    const event = snsEvent({ Records: [{ Sns }] });
     const message = new SnsParser(event).getMessage();
     expect(message).toEqual('hello world');
   });
@@ -16,8 +15,7 @@ describe('Stream parsing', () => {
     const Sns = {
       Message: JSON.stringify({ hello: 'world' })
     };
-    // @ts-ignore
-    const event = createEvent('aws:sns', { Records: [{ Sns }] });
+    const event = snsEvent({ Records: [{ Sns }] });
     const message = new SnsParser(event).getMessage();
     expect(message).toEqual({ hello: 'world' });
   });

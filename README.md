@@ -1,11 +1,31 @@
 <p align="center">
-  <img height="150" src="https://avatars0.githubusercontent.com/u/36457275?s=400&u=16d355f384ed7f8e0655b7ed1d70ff2e411690d8&v=4e">
-  <img height="150" src="https://user-images.githubusercontent.com/2955468/44874383-0168f780-ac69-11e8-8e51-774678cbd966.png">
+  <img height="140" src="https://avatars0.githubusercontent.com/u/36457275?s=400&u=16d355f384ed7f8e0655b7ed1d70ff2e411690d8&v=4e">
+  <img height="140" src="https://user-images.githubusercontent.com/2955468/44874383-0168f780-ac69-11e8-8e51-774678cbd966.png">
 </p>
 
-[![version]][version-url] [![downloads]][downloads-url] [![coverage]][coverage-url] [![size]][size-url] [![license]][license-url]
+<p align="center">
+  <a href="https://npmjs.com/package/@manwaring/lambda-wrapper">
+    <img src="https://flat.badgen.net/npm/v/@manwaring/lambda-wrapper?icon=npm&label=npm@latest"></a>
+  <a href="https://www.npmjs.com/package/@manwaring/lambda-wrapper">
+    <img src="https://flat.badgen.net/npm/dt/@manwaring/lambda-wrapper?icon=npm"></a>
+  <a href="https://codecov.io/gh/manwaring/lambda-wrapper">
+    <img src="https://flat.badgen.net/codecov/c/github/manwaring/lambda-wrapper/?icon=codecov"></a>
+  <a href="https://packagephobia.now.sh/result?p=@manwaring/lambda-wrapper">
+    <img src="https://flat.badgen.net/packagephobia/install/@manwaring/lambda-wrapper"></a>
+  <a href="https://www.npmjs.com/package/@manwaring/lambda-wrapper">
+    <img src="https://flat.badgen.net/npm/license/@manwaring/lambda-wrapper"></a>
+</p>
 
-[![build]][build-url] [![dependabot]][dependabot-url] [![dependency]][dependency-url] [![dev-dependency]][dev-dependency-url]
+<p align="center">
+  <a href="https://circleci.com/gh/manwaring/lambda-wrapper">
+    <img src="https://flat.badgen.net/circleci/github/manwaring/lambda-wrapper/master?icon=circleci"></a>
+  <a href="https://flat.badgen.net/dependabot/manwaring/lambda-wrapper">
+    <img src="https://flat.badgen.net/dependabot/manwaring/lambda-wrapper/?icon=dependabot&label=dependabot"></a>
+  <a href="https://david-dm.org/manwaring/lambda-wrapper">
+    <img src="https://flat.badgen.net/david/dep/manwaring/lambda-wrapper"></a>
+  <a href="https://david-dm.org/manwaring/lambda-wrapper?type=dev">
+    <img src="https://flat.badgen.net/david/dev/manwaring/lambda-wrapper/?label=dev+dependencies"></a>
+</p>
 
 # AWS Lambda wrapper library
 
@@ -81,19 +101,20 @@ export const handler = api(async ({ body, path, success, error }) => {
 ### Properties and methods available on wrapper signature
 
 ```ts
-interface ApiSignature {
+export interface ApiSignature {
   event: APIGatewayEvent; // original event
-  body: any; // JSON or form parsed body payload if exists (based on content-type headers), otherwise the raw body object
-  path: { [name: string]: string }; // path param payload as key-value pairs
-  query: { [name: string]: string }; // query param payload as key-value pairs
-  headers: { [name: string]: string }; // headers param payload as key-value pairs
-  testRequest: boolean; // indicates if this is a test request, based on presence of headers matching 'Test-Request' or process.env.TEST_REQUEST_HEADER
-  auth: any; // auth context from custom authorizer
-  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status with payload
-  invalid(errors?: string[]): ApiResponse; // returns 400 status with errors
-  notFound(message?: string): ApiResponse; // returns 404 status with message
-  redirect(url: string): ApiResponse; // returns 302 redirect with new url
-  error(error?: any): ApiResponse; // returns 500 status with error
+  body: any; // JSON parsed body payload if exists (otherwise null)
+  path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise null)
+  query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise null)
+  headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise null)
+  testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
+  auth: any; // auth context from custom authorizer if exists (otherwise null)
+  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status code with optional payload as body
+  invalid(errors?: string[]): ApiResponse; // returns 400 status code with optional errors as body
+  notFound(message?: string): ApiResponse; // returns 404 status code with optional message as body
+  notAuthorized(message?: string): ApiResponse; // returns 403 status code with optional message as body
+  redirect(url: string): ApiResponse; // returns 302 status code (redirect) with new url
+  error(error?: any): ApiResponse; // returns 500 status code with optional error as body
 }
 
 interface ApiResponse {
@@ -276,32 +297,6 @@ interface WrapperSignature {
 
 # Example projects
 
-THere is one [working example](examples) of how this package can be used in a simple 'hello world' serverless application:
+There is one [working example](examples) of how this package can be used in a simple 'hello world' serverless application:
 
 1. [Using the Serverless Framework and TypeScript](examples/ts)
-
-<!-- Badge icons -->
-
-[version]: https://flat.badgen.net/npm/v/@manwaring/lambda-wrapper?icon=npm&label=npm@latest
-[downloads]: https://flat.badgen.net/npm/dt/@manwaring/lambda-wrapper?icon=npm
-[coverage]: https://flat.badgen.net/codecov/c/github/manwaring/lambda-wrapper/?icon=codecov
-[size]: https://flat.badgen.net/packagephobia/install/@manwaring/lambda-wrapper
-[license]: https://flat.badgen.net/npm/license/@manwaring/lambda-wrapper/
-[language]: https://flat.badgen.net/badge/typescript/typescript/?icon&label
-[style]: https://flat.badgen.net/badge/code%20style/prettier?color=purple&icon=terminal&label
-[build]: https://flat.badgen.net/circleci/github/manwaring/lambda-wrapper/master?icon=circleci
-[dependabot]: https://flat.badgen.net/dependabot/manwaring/lambda-wrapper/?icon=dependabot&label=dependabot
-[dependency]: https://flat.badgen.net/david/dep/manwaring/lambda-wrapper
-[dev-dependency]: https://flat.badgen.net/david/dev/manwaring/lambda-wrapper/?label=dev+dependencies
-
-<!-- Badge URLs -->
-
-[version-url]: https://npmjs.com/package/@manwaring/lambda-wrapper
-[downloads-url]: https://www.npmjs.com/package/@manwaring/lambda-wrapper
-[coverage-url]: https://codecov.io/gh/manwaring/lambda-wrapper
-[size-url]: https://packagephobia.now.sh/result?p=@manwaring/lambda-wrapper
-[license-url]: https://www.npmjs.com/package/@manwaring/lambda-wrapper
-[build-url]: https://circleci.com/gh/manwaring/lambda-wrapper
-[dependabot-url]: https://flat.badgen.net/dependabot/manwaring/lambda-wrapper
-[dependency-url]: https://david-dm.org/manwaring/lambda-wrapper
-[dev-dependency-url]: https://david-dm.org/manwaring/lambda-wrapper?type=dev

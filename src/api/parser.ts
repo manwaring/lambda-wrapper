@@ -50,7 +50,7 @@ export class Body {
   }
 
   private isFormUrlEncoded(contentType: string): boolean {
-    return contentType && contentType.toUpperCase() === 'APPLICATION/X-WWW-FORM-URLENCODED';
+    return contentType && contentType.toUpperCase().includes('APPLICATION/X-WWW-FORM-URLENCODED');
   }
 
   private isJSON(contentType: string): boolean {

@@ -1,19 +1,18 @@
+import { cloudFormationCustomResourceEvent } from 'serverless-plugin-test-helper';
 import { cloudFormation, CloudFormationSignature } from './wrapper';
 import { CloudFormationCustomResourceEvent } from 'aws-lambda';
 
 describe('Stream wrapper', () => {
-  const requestEvent: CloudFormationCustomResourceEvent = {
+  const requestEvent = cloudFormationCustomResourceEvent({
     RequestType: 'Create',
     ServiceToken: 'token',
     ResponseURL: 'url',
     StackId: 'stackId',
     RequestId: 'requestId',
     LogicalResourceId: 'resourceId',
-    ResourceType: 'resourceType',
-    ResourceProperties: {
-      ServiceToken: 'serviceToken'
-    }
-  };
+    ResourceType: 'resourceType'
+  });
+  // const requestEvent: CloudFormationCustomResourceEvent = ;
   const context = {
     callbackWaitsForEmptyEventLoop: false,
     functionName: 'function-name',

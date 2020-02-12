@@ -1,10 +1,9 @@
-import createEvent from '@serverless/event-mocks';
+import { snsEvent } from 'serverless-plugin-test-helper';
 import { sns, SnsSignature } from './wrapper';
 
 describe('Stream wrapper', () => {
   const Sns = { Message: 'hello world' };
-  // @ts-ignore
-  const requestEvent = createEvent('aws:sns', { Records: [{ Sns }] });
+  const requestEvent = snsEvent({ Records: [{ Sns }] });
   const context = {
     callbackWaitsForEmptyEventLoop: false,
     functionName: 'function-name',

@@ -1,5 +1,5 @@
 import { stringify } from 'querystring';
-import createEvent from '@serverless/event-mocks';
+import { apiGatewayEvent } from 'serverless-plugin-test-helper';
 import { Request, Body } from './parser';
 
 describe('Body parsing', () => {
@@ -10,7 +10,7 @@ describe('Body parsing', () => {
     expect(body).toEqual(json);
   });
 
-  it('Parses json body when charset is also defined in the context-type', () => {
+  it('Parses json body when charset is also defined in the content-type', () => {
     const json = { hello: 'world' };
     const headers = { 'content-type': 'application/json;charset=UTF-8' };
     const body = new Body(JSON.stringify(json), headers).getParsedBody();
@@ -20,6 +20,13 @@ describe('Body parsing', () => {
   it('Parses form url encoded body', () => {
     const form = { hello: 'world' };
     const headers = { 'content-type': 'application/x-www-form-urlencoded' };
+    const body = new Body(stringify(form), headers).getParsedBody();
+    expect(body).toEqual(form);
+  });
+
+  it('Parses form url encoded body when charset is also defined in the content-type', () => {
+    const form = { hello: 'world' };
+    const headers = { 'content-type': 'application/x-www-form-urlencoded;charset=UTF-8' };
     const body = new Body(stringify(form), headers).getParsedBody();
     expect(body).toEqual(form);
   });
@@ -48,8 +55,7 @@ describe('Body parsing', () => {
 
 describe('Request parsing', () => {
   it('Gets all fields with optional parameters', () => {
-    // @ts-ignore
-    const event = createEvent('aws:apiGateway', {
+    const event = apiGatewayEvent({
       body: JSON.stringify({ hello: 'world' }),
       pathParameters: { proxy: 'not today' },
       queryStringParameters: { name: 'a test' },
@@ -66,8 +72,7 @@ describe('Request parsing', () => {
   });
 
   it("Get's falsy fields when optional parameters not used", () => {
-    // @ts-ignore
-    const event = createEvent('aws:apiGateway', {});
+    const event = apiGatewayEvent();
     delete event.body;
     delete event.headers;
     delete event.pathParameters;
@@ -83,8 +88,7 @@ describe('Request parsing', () => {
   });
 
   it('Supports default values in method signature', () => {
-    // @ts-ignore
-    const event = createEvent('aws:apiGateway', {});
+    const event = apiGatewayEvent();
     delete event.body;
     delete event.headers;
     delete event.pathParameters;

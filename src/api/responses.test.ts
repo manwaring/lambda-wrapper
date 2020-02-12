@@ -1,4 +1,4 @@
-import { success, error, invalid, notFound, redirect } from './responses';
+import { success, error, invalid, notFound, notAuthorized, redirect } from './responses';
 
 describe('API responses', () => {
   beforeEach(() => {
@@ -9,7 +9,11 @@ describe('API responses', () => {
     const response = success('success');
     expect(response).toEqual({
       body: JSON.stringify('success'),
-      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+        'Content-Type': 'application/json'
+      },
       statusCode: 200
     });
   });
@@ -33,7 +37,11 @@ describe('API responses', () => {
     };
     const response = success({ hello: 'world', replace: { that: 'property', not: 'this one' } }, replacer);
     expect(response).toEqual({
-      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ hello: 'world', replace: { not: 'this one' } }),
       statusCode: 200
     });
@@ -42,7 +50,11 @@ describe('API responses', () => {
   it('Handles error response', () => {
     const response = error(new Error('error'));
     expect(response).toEqual({
-      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ message: 'error' }),
       statusCode: 500
     });
@@ -52,7 +64,11 @@ describe('API responses', () => {
     const response = invalid(['invalid']);
     expect(response).toEqual({
       body: JSON.stringify({ errors: ['invalid'] }),
-      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+        'Content-Type': 'application/json'
+      },
       statusCode: 400
     });
   });
@@ -60,7 +76,10 @@ describe('API responses', () => {
   it('Handles invalid response without validation errors', () => {
     const response = invalid();
     expect(response).toEqual({
-      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true
+      },
       statusCode: 400
     });
   });
@@ -69,15 +88,36 @@ describe('API responses', () => {
     const response = notFound('not found');
     expect(response).toEqual({
       body: JSON.stringify({ message: 'not found' }),
-      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+        'Content-Type': 'application/json'
+      },
       statusCode: 404
+    });
+  });
+
+  it('Handles notAuthorized response', () => {
+    const response = notAuthorized('not found');
+    expect(response).toEqual({
+      body: JSON.stringify({ message: 'not found' }),
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+        'Content-Type': 'application/json'
+      },
+      statusCode: 403
     });
   });
 
   it('Handles redirect response', () => {
     const response = redirect('url');
     expect(response).toEqual({
-      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true, Location: 'url' },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+        Location: 'url'
+      },
       statusCode: 302
     });
   });
