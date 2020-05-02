@@ -91,7 +91,7 @@ workflows:
             tags:
               only: /v.*/
       - deploy-example-app:
-          context: manwaring-aws
+          context: aws-manwaring
           requires:
             - publish
           filters:
