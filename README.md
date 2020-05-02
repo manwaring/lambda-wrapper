@@ -162,35 +162,41 @@ interface CloudFormationSignature {
 ```ts
 import { dynamodbStream } from '@manwaring/lambda-wrapper';
 
-export const handler = dynamodbStream(async ({ newVersions, success, error }) => {
+// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
+export const handler = dynamodbStream<CustomInterface>(async ({ newVersions, success, error }) => {
   try {
-    newVersions.forEach(version => console.log(version));
+    newVersions.forEach((version) => console.log(version));
     return success(newVersions);
   } catch (err) {
     return error(err);
   }
 });
+
+interface CustomInterface {
+  id: number;
+  value: string;
+}
 ```
 
 ### Properties and methods available on wrapper signature
 
 ```ts
-interface DynamoDBStreamSignature {
+interface DynamoDBStreamSignature<T> {
   event: DynamoDBStreamEvent; // original event
-  newVersions: any[]; // array of all unmarshalled javascript objects of new images
-  oldVersions: any[]; // array of all unmarshalled javascript objects of old images
-  versions: Version[]; // array of full version object (new image, old image, etc - see Version interface)
+  newVersions: T[]; // array of all unmarshalled javascript objects of new images
+  oldVersions: T[]; // array of all unmarshalled javascript objects of old images
+  versions: Version<T>[]; // array of full version object (new image, old image, etc - see Version interface)
   success(message?: any): any; // logs and returns the message
   error(error?: any): void; // logs the error and throws it
 }
 
-interface Version {
-  newVersion: any; // unmarshalled javascript object of new image (if exists) or null
-  oldVersion: any; // unmarshalled javascript object of old image (if exists) or null
+interface Version<T> {
+  newVersion: T; // unmarshalled javascript object of new image (if exists) or null
+  oldVersion: T; // unmarshalled javascript object of old image (if exists) or null
   keys: any; // unmarshalled javascript object of keys (includes key values)
   tableName: string; // name of the table the object came from
   tableArn: string; // arn of the table the object came from
-  eventName: string; // name of the event (INSERT || MODIFY || REMOVE)
+  eventName: 'INSERT' | 'MODIFY' | 'REMOVE'; // name of the event (INSERT || MODIFY || REMOVE)
 }
 ```
 
