@@ -1,16 +1,2 @@
 __mocks__
-.circleci/
-.dependabot/
-coverage/
-dist/*.test*
-examples/
-src/
-.babelrc.js
-.prettierrc.yml
-.gitignore
-.npmignore
-.publishrc
-jest.config.js
-tsconfig.*json
-old-docs
-CHANGELOG.md
+.test.

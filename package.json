@@ -1,7 +1,7 @@
 {
   "name": "@manwaring/lambda-wrapper",
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
-  "version": "3.3.2",
+  "version": "3.3.3",
   "scripts": {
     "publish-please-dry-run": "publish-please --dry-run",
     "publish-please": "publish-please",
@@ -53,6 +53,9 @@
   "homepage": "https://github.com/manwaring/lambda-wrapper",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
   "author": "From Phillip with ♥",
   "license": "MIT",
   "keywords": [
