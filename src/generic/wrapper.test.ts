@@ -19,7 +19,6 @@ describe('Stream wrapper', () => {
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response funtions', () => {
-    // @ts-ignore
     function custom({ event, success, error }: WrapperSignature) {
       expect(event).toEqual(requestEvent);
       expect(success).toBeInstanceOf(Function);

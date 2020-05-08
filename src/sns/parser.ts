@@ -1,6 +1,6 @@
 import { SNSEvent } from 'aws-lambda';
 
-export class SnsParser<T> {
+export class SnsParser<T = any> {
   constructor(private event: SNSEvent) {}
 
   getMessage(): T {

@@ -2,7 +2,7 @@ import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
 import { Request } from './parser';
 import { success, invalid, notFound, notAuthorized, error, redirect, ApiResponse } from './responses';
 
-export function api<T>(
+export function api<T = any>(
   custom: (props: ApiSignature<T>) => any
 ): (event: APIGatewayEvent, context: Context, callback: Callback) => any {
   return function handler(event: APIGatewayEvent) {
@@ -26,7 +26,7 @@ export function api<T>(
   };
 }
 
-export interface ApiSignature<T> {
+export interface ApiSignature<T = any> {
   event: APIGatewayEvent; // original event
   body: T; // JSON parsed body payload if exists (otherwise undefined)
   path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise undefined)

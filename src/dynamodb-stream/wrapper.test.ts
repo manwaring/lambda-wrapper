@@ -6,7 +6,6 @@ describe('DynamoDB Stream wrapper', () => {
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response function', () => {
-    // @ts-ignore
     function custom({ event, newVersions, oldVersions, versions, success, error }: DynamoDBStreamSignature) {
       expect(event).toEqual(requestEvent);
       expect(newVersions).toEqual([{ Message: 'This item has changed', Id: 101 }]);

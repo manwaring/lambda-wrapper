@@ -5,7 +5,7 @@ import { SnsParser } from './parser';
 
 const metrics = new Metrics('Sns');
 
-export function sns<T>(
+export function sns<T = any>(
   custom: (props: SnsSignature<T>) => any
 ): (event: SNSEvent, context: Context, callback: Callback) => any {
   return function handler(event: SNSEvent, context: Context, callback: Callback) {
@@ -15,7 +15,7 @@ export function sns<T>(
   };
 }
 
-export interface SnsSignature<T> {
+export interface SnsSignature<T = any> {
   event: SNSEvent; // original event
   message: T; // JSON-parsed message from event
   success(message?: any): any; // logs and returns the message

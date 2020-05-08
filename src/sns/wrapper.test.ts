@@ -21,7 +21,6 @@ describe('Stream wrapper', () => {
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response funtions', () => {
-    // @ts-ignore
     function custom({ event, message, success, error }: SnsSignature) {
       expect(event).toEqual(requestEvent);
       expect(message).toEqual('hello world');

@@ -5,7 +5,7 @@ import { success, error } from './responses';
 
 const metrics = new Metrics('DynamoDB Stream');
 
-export function dynamodbStream<T>(
+export function dynamodbStream<T = any>(
   custom: (props: DynamoDBStreamSignature<T>) => any
 ): (event: DynamoDBStreamEvent, context: Context, callback: Callback) => any {
   return function handler(event: DynamoDBStreamEvent, context: Context, callback: Callback) {
@@ -15,7 +15,7 @@ export function dynamodbStream<T>(
   };
 }
 
-export interface DynamoDBStreamSignature<T> {
+export interface DynamoDBStreamSignature<T = any> {
   event: DynamoDBStreamEvent; // original event
   newVersions: T[]; // array of all unmarshalled javascript objects of new images
   oldVersions: T[]; // array of all unmarshalled javascript objects of old images
