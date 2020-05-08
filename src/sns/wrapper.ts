@@ -5,19 +5,19 @@ import { SnsParser } from './parser';
 
 const metrics = new Metrics('Sns');
 
-export function sns(
-  custom: (props: SnsSignature) => any
+export function sns<T>(
+  custom: (props: SnsSignature<T>) => any
 ): (event: SNSEvent, context: Context, callback: Callback) => any {
   return function handler(event: SNSEvent, context: Context, callback: Callback) {
-    const message = new SnsParser(event).getMessage();
+    const message = new SnsParser<T>(event).getMessage();
     metrics.common(message);
     return custom({ event, message, success, error });
   };
 }
 
-export interface SnsSignature {
+export interface SnsSignature<T> {
   event: SNSEvent; // original event
-  message: any; // JSON-parsed message from event
+  message: T; // JSON-parsed message from event
   success(message?: any): any; // logs and returns the message
   error(error?: any): void; // logs the error and throws
 }

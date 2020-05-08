@@ -5,7 +5,8 @@ describe('DynamoDB Stream wrapper', () => {
   const requestEvent = dynamoDBStreamEvent();
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
-  it('Has expected properties and response function without optional types', () => {
+  it('Has expected properties and response function', () => {
+    // @ts-ignore
     function custom({ event, newVersions, oldVersions, versions, success, error }: DynamoDBStreamSignature) {
       expect(event).toEqual(requestEvent);
       expect(newVersions).toEqual([{ Message: 'This item has changed', Id: 101 }]);
@@ -27,7 +28,7 @@ describe('DynamoDB Stream wrapper', () => {
     dynamodbStream(custom)(requestEvent, context, callback);
   });
 
-  it('Has expected properties and response function with optional types', () => {
+  it('Has expected properties and response function with optional type generics', () => {
     interface CustomType {
       Message: string;
       Id: number;

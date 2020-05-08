@@ -1,6 +1,6 @@
 <p align="center">
-  <img height="140" src="https://avatars0.githubusercontent.com/u/36457275?s=400&u=16d355f384ed7f8e0655b7ed1d70ff2e411690d8&v=4e">
-  <img height="140" src="https://user-images.githubusercontent.com/2955468/44874383-0168f780-ac69-11e8-8e51-774678cbd966.png">
+  <img height="150" src="https://d1wzvcwrgjaybe.cloudfront.net/repos/manwaring/lambda-wrapper/readme-category-icon.png">
+  <img height="150" src="https://d1wzvcwrgjaybe.cloudfront.net/repos/manwaring/lambda-wrapper/readme-repo-icon.png">
 </p>
 
 <p align="center">
@@ -86,8 +86,10 @@ All of the events bellow have a corresponding wrapper which provides a deconstru
 
 ```ts
 import { api } from '@manwaring/lambda-wrapper';
+import { CustomInterface } from './custom-interface';
 
-export const handler = api(async ({ body, path, success, error }) => {
+// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
+export const handler = api<CustomInterface>(async ({ body, path, success, error }) => {
   try {
     const { pathParam1, pathParam2 } = path;
     const results = await doSomething(body, pathParam1, pathParam2);
@@ -101,12 +103,12 @@ export const handler = api(async ({ body, path, success, error }) => {
 ### Properties and methods available on wrapper signature
 
 ```ts
-export interface ApiSignature {
+export interface ApiSignature<T> {
   event: APIGatewayEvent; // original event
-  body: any; // JSON parsed body payload if exists (otherwise null)
-  path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise null)
-  query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise null)
-  headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise null)
+  body: T; // JSON parsed body payload if exists (otherwise undefined)
+  path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise undefined)
+  query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise undefined)
+  headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise undefined)
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
   auth: any; // auth context from custom authorizer if exists (otherwise null)
   success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status code with optional payload as body
@@ -161,6 +163,7 @@ interface CloudFormationSignature {
 
 ```ts
 import { dynamodbStream } from '@manwaring/lambda-wrapper';
+import { CustomInterface } from './custom-interface';
 
 // By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
 export const handler = dynamodbStream<CustomInterface>(async ({ newVersions, success, error }) => {
@@ -251,8 +254,10 @@ interface Policy {
 
 ```ts
 import { sns } from '@manwaring/lambda-wrapper';
+import { CustomInterface } from './custom-interface';
 
-export const handler = sns(async ({ message, success, error }) => {
+// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
+export const handler = sns<CustomInterface>(async ({ message, success, error }) => {
   try {
     console.log(message);
     return success();
@@ -279,8 +284,10 @@ interface SnsSignature {
 
 ```ts
 import { wrapper } from '@manwaring/lambda-wrapper';
+import { CustomInterface } from './custom-interface';
 
-export const handler = wrapper(async ({ event, success, error }) => {
+// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
+export const handler = wrapper<CustomInterface>(async ({ event, success, error }) => {
   try {
     const { value1, value2 } = event;
     const results = await doSomething(value1, value2);
@@ -294,8 +301,8 @@ export const handler = wrapper(async ({ event, success, error }) => {
 ### Properties and methods available on wrapper signature
 
 ```ts
-interface WrapperSignature {
-  event: any; // original event
+interface WrapperSignature<T> {
+  event: T; // original event
   success(message?: any): any; // logs and returns the message
   error(error?: any): void; // logs the error and throws
 }

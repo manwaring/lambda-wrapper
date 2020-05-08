@@ -16,11 +16,12 @@ describe('Stream wrapper', () => {
     getRemainingTimeInMillis: () => 2,
     done: () => {},
     fail: () => {},
-    succeed: () => {}
+    succeed: () => {},
   };
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response funtions', () => {
+    // @ts-ignore
     function custom({ event, message, success, error }: SnsSignature) {
       expect(event).toEqual(requestEvent);
       expect(message).toEqual('hello world');
@@ -29,5 +30,20 @@ describe('Stream wrapper', () => {
       success('success');
     }
     sns(custom)(requestEvent, context, callback);
+  });
+
+  it('Has expected properties and response funtions with optional type generics', () => {
+    interface CustomType {
+      Message: string;
+      Id: number;
+    }
+    function custom({ event, message, success, error }: SnsSignature<CustomType>) {
+      expect(event).toEqual(requestEvent);
+      expect(message).toEqual('hello world');
+      expect(success).toBeInstanceOf(Function);
+      expect(error).toBeInstanceOf(Function);
+      success('success');
+    }
+    sns<CustomType>(custom)(requestEvent, context, callback);
   });
 });

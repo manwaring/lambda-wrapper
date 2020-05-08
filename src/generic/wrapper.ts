@@ -4,8 +4,8 @@ import { success, error } from './responses';
 
 const metrics = new Metrics('Generic');
 
-export function wrapper(
-  custom: (props: WrapperSignature) => any
+export function wrapper<T>(
+  custom: (props: WrapperSignature<T>) => any
 ): (event: any, context: Context, callback: Callback) => any {
   return function handler(event: any, context: Context, callback: Callback) {
     metrics.common(event);
@@ -13,8 +13,8 @@ export function wrapper(
   };
 }
 
-export interface WrapperSignature {
-  event: any; // original event
+export interface WrapperSignature<T> {
+  event: T; // original event
   success(message?: any): any; // logs and returns the message
   error(error?: any): void; // logs the error and throws
 }
