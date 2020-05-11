@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), 
 
 ### Added
 
-- Added support for API Gateway v2 HTTP API Auth property
+- Added support for the API Gateway v2 HTTP API Auth property
 
 ## [3.3.3]&nbsp;&nbsp;(2020-05-08)
 
