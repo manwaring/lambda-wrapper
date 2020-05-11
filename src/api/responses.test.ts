@@ -12,9 +12,9 @@ describe('API responses', () => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      statusCode: 200
+      statusCode: 200,
     });
   });
 
@@ -22,7 +22,7 @@ describe('API responses', () => {
     const response = success();
     expect(response).toEqual({
       headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': true },
-      statusCode: 200
+      statusCode: 200,
     });
   });
 
@@ -40,10 +40,10 @@ describe('API responses', () => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ hello: 'world', replace: { not: 'this one' } }),
-      statusCode: 200
+      statusCode: 200,
     });
   });
 
@@ -53,10 +53,10 @@ describe('API responses', () => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ message: 'error' }),
-      statusCode: 500
+      statusCode: 500,
     });
   });
 
@@ -67,9 +67,9 @@ describe('API responses', () => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      statusCode: 400
+      statusCode: 400,
     });
   });
 
@@ -78,9 +78,9 @@ describe('API responses', () => {
     expect(response).toEqual({
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true
+        'Access-Control-Allow-Credentials': true,
       },
-      statusCode: 400
+      statusCode: 400,
     });
   });
 
@@ -91,9 +91,9 @@ describe('API responses', () => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      statusCode: 404
+      statusCode: 404,
     });
   });
 
@@ -104,9 +104,9 @@ describe('API responses', () => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      statusCode: 403
+      statusCode: 401,
     });
   });
 
@@ -116,9 +116,9 @@ describe('API responses', () => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
-        Location: 'url'
+        Location: 'url',
       },
-      statusCode: 302
+      statusCode: 302,
     });
   });
 });

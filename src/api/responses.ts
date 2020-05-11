@@ -2,7 +2,7 @@ import { Metrics, logger } from '../common';
 
 const DEFAULT_HEADERS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Credentials': true
+  'Access-Control-Allow-Credentials': true,
 };
 
 const metrics = new Metrics('API Gateway');
@@ -38,7 +38,7 @@ export function notFound(message?: string): ApiResponse {
 }
 
 export function notAuthorized(message?: string): ApiResponse {
-  const response = { statusCode: 403, headers: { ...DEFAULT_HEADERS } };
+  const response = { statusCode: 401, headers: { ...DEFAULT_HEADERS } };
   if (message) {
     response['body'] = JSON.stringify({ message });
     response.headers['Content-Type'] = 'application/json';

@@ -114,7 +114,7 @@ export interface ApiSignature<T> {
   success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status code with optional payload as body
   invalid(errors?: string[]): ApiResponse; // returns 400 status code with optional errors as body
   notFound(message?: string): ApiResponse; // returns 404 status code with optional message as body
-  notAuthorized(message?: string): ApiResponse; // returns 403 status code with optional message as body
+  notAuthorized(message?: string): ApiResponse; // returns 401 status code with optional message as body
   redirect(url: string): ApiResponse; // returns 302 status code (redirect) with new url
   error(error?: any): ApiResponse; // returns 500 status code with optional error as body
 }
