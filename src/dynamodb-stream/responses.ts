@@ -10,5 +10,9 @@ export function success(message: any): void {
 
 export function error(error: any): void {
   metrics.error(error);
-  throw new Error(error);
+  if (error instanceof Error) {
+    throw error;
+  } else {
+    throw new Error(error);
+  }
 }

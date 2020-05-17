@@ -47,7 +47,7 @@ describe('API wrapper', () => {
       expect(query).toEqual({ name: 'a test' });
       expect(headers['content-type']).toEqual('application/json');
       expect(testRequest).toEqual(true);
-      expect(auth).toBeFalsy();
+      expect(auth).toBeTruthy();
       expect(success).toBeInstanceOf(Function);
       expect(notFound).toBeInstanceOf(Function);
       expect(notAuthorized).toBeInstanceOf(Function);
@@ -85,7 +85,7 @@ describe('API wrapper', () => {
       expect(query).toEqual({ name: 'a test' });
       expect(headers['content-type']).toEqual('application/json');
       expect(testRequest).toEqual(true);
-      expect(auth).toBeFalsy();
+      expect(auth).toBeTruthy();
       expect(success).toBeInstanceOf(Function);
       expect(notFound).toBeInstanceOf(Function);
       expect(notAuthorized).toBeInstanceOf(Function);

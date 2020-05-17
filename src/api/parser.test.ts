@@ -59,7 +59,7 @@ describe('Request parsing', () => {
       body: JSON.stringify({ hello: 'world' }),
       pathParameters: { proxy: 'not today' },
       queryStringParameters: { name: 'a test' },
-      headers: { 'content-type': 'application/json', 'Test-Request': 'true' }
+      headers: { 'content-type': 'application/json', 'Test-Request': 'true' },
     });
     const { body, path, query, auth, headers, testRequest } = new Request(event).getProperties();
 
@@ -68,7 +68,7 @@ describe('Request parsing', () => {
     expect(query).toEqual({ name: 'a test' });
     expect(headers['content-type']).toEqual('application/json');
     expect(testRequest).toEqual(true);
-    expect(auth).toBeFalsy();
+    expect(auth).toBeTruthy();
   });
 
   it("Get's falsy fields when optional parameters not used", () => {
@@ -82,7 +82,7 @@ describe('Request parsing', () => {
     expect(body).toBeFalsy();
     expect(path).toBeFalsy();
     expect(query).toBeFalsy();
-    expect(auth).toBeFalsy();
+    expect(auth).toBeTruthy();
     expect(headers).toBeFalsy();
     expect(testRequest).toBeFalsy();
   });
