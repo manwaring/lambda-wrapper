@@ -54,7 +54,9 @@ export class Body {
   }
 
   private getContentType(): string {
-    return this?.headers['Content-Type'] || this?.headers['CONTENT-TYPE'] || this?.headers['content-type'];
+    return (
+      this.headers && (this.headers['Content-Type'] || this.headers['CONTENT-TYPE'] || this.headers['content-type'])
+    );
   }
 
   private isFormUrlEncoded(contentType?: string): boolean {

@@ -33,7 +33,7 @@ describe('Body parsing', () => {
 
   it("Tries to parse body as JSON when content type isn't specified", () => {
     const json = { hello: 'world' };
-    const headers = {};
+    const headers = undefined;
     const body = new Body(JSON.stringify(json), headers).getParsedBody();
     expect(body).toEqual(json);
   });
