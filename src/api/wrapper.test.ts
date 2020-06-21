@@ -31,7 +31,7 @@ describe('API wrapper', () => {
     // @ts-ignore
     function custom({
       event,
-      requestContext,
+      websocket,
       body,
       path,
       query,
@@ -46,7 +46,7 @@ describe('API wrapper', () => {
       error,
     }: ApiSignature) {
       expect(event).toEqual(requestEvent);
-      expect(requestContext.connectionId).toEqual('abc-123');
+      expect(websocket.connectionId).toEqual('abc-123');
       expect(body).toEqual({ hello: 'world' });
       expect(path).toEqual({ proxy: 'not today' });
       expect(query).toEqual({ name: 'a test' });
@@ -71,7 +71,7 @@ describe('API wrapper', () => {
     }
     function custom<CustomType>({
       event,
-      requestContext,
+      websocket,
       body,
       path,
       query,
@@ -86,7 +86,7 @@ describe('API wrapper', () => {
       error,
     }: ApiSignature<CustomType>) {
       expect(event).toEqual(requestEvent);
-      expect(requestContext.connectionId).toEqual('abc-123');
+      expect(websocket.connectionId).toEqual('abc-123');
       expect(body).toEqual({ hello: 'world' });
       expect(path).toEqual({ proxy: 'not today' });
       expect(query).toEqual({ name: 'a test' });

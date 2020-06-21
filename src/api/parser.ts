@@ -9,7 +9,7 @@ export class Request {
 
   getProperties(): any {
     const event = this.event;
-    const requestContext = event.requestContext ? event.requestContext : undefined;
+    const websocket = event.requestContext ? event.requestContext : undefined;
     const path = event.pathParameters ? event.pathParameters : undefined;
     const query = event.queryStringParameters ? event.queryStringParameters : undefined;
     const auth = this.getAuth();
@@ -18,7 +18,7 @@ export class Request {
     const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || 'Test-Request';
     const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : false;
     metrics.common({ body, path, query, auth, headers, testRequest });
-    return { body, requestContext, path, query, auth, headers, testRequest };
+    return { body, websocket, path, query, auth, headers, testRequest };
   }
 
   private getAuth() {
