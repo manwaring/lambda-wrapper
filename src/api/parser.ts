@@ -42,11 +42,11 @@ export class Body {
         } else if (this.isJSON(contentType)) {
           parsedBody = JSON.parse(this.body);
         } else {
-          logger.error('Content-Type header not found, unable to parse body');
-          parsedBody = this.body;
+          logger.error('Content-Type header not found, attempting to parse as JSON');
+          parsedBody = JSON.parse(this.body);
         }
       } catch (err) {
-        logger.error('Error parsing body', err, this.body);
+        logger.error('Error parsing body, returning as-is', err, this.body);
         parsedBody = this.body;
       }
     }
@@ -54,14 +54,14 @@ export class Body {
   }
 
   private getContentType(): string {
-    return this.headers['Content-Type'] || this.headers['CONTENT-TYPE'] || this.headers['content-type'];
+    return this?.headers['Content-Type'] || this?.headers['CONTENT-TYPE'] || this?.headers['content-type'];
   }
 
-  private isFormUrlEncoded(contentType: string): boolean {
-    return contentType && contentType.toUpperCase().includes('APPLICATION/X-WWW-FORM-URLENCODED');
+  private isFormUrlEncoded(contentType?: string): boolean {
+    return contentType?.toUpperCase().includes('APPLICATION/X-WWW-FORM-URLENCODED');
   }
 
   private isJSON(contentType: string): boolean {
-    return contentType && contentType.toUpperCase().includes('APPLICATION/JSON');
+    return contentType?.toUpperCase().includes('APPLICATION/JSON');
   }
 }

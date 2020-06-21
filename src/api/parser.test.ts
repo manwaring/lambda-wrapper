@@ -31,11 +31,11 @@ describe('Body parsing', () => {
     expect(body).toEqual(form);
   });
 
-  it("Passes body through when content type isn't specified", () => {
+  it("Tries to parse body as JSON when content type isn't specified", () => {
     const json = { hello: 'world' };
     const headers = {};
     const body = new Body(JSON.stringify(json), headers).getParsedBody();
-    expect(body).toEqual(JSON.stringify(json));
+    expect(body).toEqual(json);
   });
 
   it("Errors when encoding and content-type don't match", () => {
