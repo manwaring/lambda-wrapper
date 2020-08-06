@@ -3,33 +3,9 @@
   <img height="150" src="https://d1wzvcwrgjaybe.cloudfront.net/repos/manwaring/lambda-wrapper/readme-repo-icon.png">
 </p>
 
-<p align="center">
-  <a href="https://npmjs.com/package/@manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/npm/v/@manwaring/lambda-wrapper?icon=npm&label=npm@latest"></a>
-  <a href="https://www.npmjs.com/package/@manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/npm/dt/@manwaring/lambda-wrapper?icon=npm"></a>
-  <a href="https://codecov.io/gh/manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/codecov/c/github/manwaring/lambda-wrapper/?icon=codecov"></a>
-  <a href="https://packagephobia.now.sh/result?p=@manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/packagephobia/install/@manwaring/lambda-wrapper"></a>
-  <a href="https://www.npmjs.com/package/@manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/npm/license/@manwaring/lambda-wrapper"></a>
-</p>
-
-<p align="center">
-  <a href="https://circleci.com/gh/manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/circleci/github/manwaring/lambda-wrapper/master?icon=circleci"></a>
-  <a href="https://flat.badgen.net/dependabot/manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/dependabot/manwaring/lambda-wrapper/?icon=dependabot&label=dependabot"></a>
-  <a href="https://david-dm.org/manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/david/dep/manwaring/lambda-wrapper"></a>
-  <a href="https://david-dm.org/manwaring/lambda-wrapper?type=dev">
-    <img src="https://flat.badgen.net/david/dev/manwaring/lambda-wrapper/?label=dev+dependencies"></a>
-</p>
-
 # AWS Lambda wrapper library
 
-### This documentation is for v4 of the library - [go here for v1](old-docs/v1/README.md), [here for v2](old-docs/v2/README.md), and [here for v3](old-docs/v3/README.md).
+### This documentation is for v3 of the library
 
 1. [Overview](#overview)
 1. [Installation and setup](#installation-and-setup)
@@ -44,6 +20,8 @@
    - [Generic event](#generic-event)
 1. [Example projects](#example-projects)
 
+_Feedback appreciated! If you have an idea for how this library can be improved [please open an issue](https://github.com/manwaring/lambda-wrapper/issues/new)._
+
 # Overview
 
 ### TL;DR
@@ -52,9 +30,7 @@ This library provides custom Lambda function wrappers which expose standard, abs
 
 ### Rationale and motivation
 
-AWS Lambda supports a wide variety of event triggers, each with unique payloads and expected responses. The Lambda execution environment, however, only provides the raw events and has no included mechanisms for simplifying response object creation. For example, API Gateway events include only the raw request body, leaving it up to developers to implement parsing themselves. Similarly, the developer is responsible for creating a response object which includes the correct HTTP status code and headers. Given the standard nature of these kinds of concerns, this library exposes helpful abstractions like parsed HTTP bodies based on content-type headers, and success response functions which create response objects with the correct status codes and headers for returning to API Gateway.
-
-_Feedback is much appreciated! If you have an idea for how this library can be improved (or just a complaint/criticism) then [please open an issue](https://github.com/manwaring/lambda-wrapper/issues/new)._
+AWS Lambda supports a wide variety of event triggers, each with unique payloads and expected responses. The Lambda execution environment, however, only provides the raw events and has no included mechanisms for simplifying response object creation. For example, API Gateway events include only the raw request body, leaving it up to developers to implement parsing themselves. Similarly, the developer is responsible for creating a response object which includes the correct HTTP status code and headers. Given the standard nature of these kinds of concerns, this library exposes helpful abstractions like parsed HTTP bodies based on content-type headers, and success response functions which create response objects with the correct status codes and headers for returning.
 
 # Installation and setup
 
@@ -66,9 +42,9 @@ Install and save the package to `package.json` as a dependency:
 
 ## Optional configuration
 
-If you want the wrapper to log request and response messages (helpful for debugging) set an environemnt variable for `LAMBDA_WRAPPER_LOG=true`.
+If you want the wrapper to log request and response messages (helpful for debugging set an environemnt variable for `LAMBDA_WRAPPER_LOG=true`.
 
-If you want each invocation to be tagged with the AWS region, stage/environment, and Git revision simply set environment variables for each and the library will pick them up: `REGION=us-east-1`, `STAGE=prod`, `REVISION=f4ba682`. See [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for libraries that can help you set git revision automatically.
+If you want each invocation to be tagged with the AWS region, environment/, and Git revision simply set environment variables for each: `REGION=us-east-1`, `STAGE=prod`, `REVISION=f4ba682` (see [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for libraries that can help you set git revision)
 
 # Supported events
 
@@ -90,44 +66,36 @@ All of the events bellow have a corresponding wrapper which provides a deconstru
 import { api } from '@manwaring/lambda-wrapper';
 import { CustomInterface } from './custom-interface';
 
-// By passing in CustomInterface as a generic type the async method signature will correctly identify the body object as an instance of CustomInterface, making TypeScript development easier (note that the generic is not required and defaults to `any` if not defined)
+// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
 export const handler = api<CustomInterface>(async ({ body, path, success, error }) => {
   try {
     const { pathParam1, pathParam2 } = path;
     const results = await doSomething(body, pathParam1, pathParam2);
-    return success({ body: results });
+    return success(results);
   } catch (err) {
-    return error({ err });
+    return error(err);
   }
 });
 ```
 
 ### Properties and methods available on wrapper signature
 
-Note that all properties are undefined if not present on the original request
-
 ```ts
 export interface ApiSignature<T = any> {
-  event: APIGatewayEvent; // original event provided by AWS
-  body: T; // body payload parsed according to content-type headers (or raw if no content-type headers found)
+  event: APIGatewayEvent; // original event
+  body: T; // JSON parsed body payload if exists (otherwise undefined)
   websocket: WebsocketRequest; // websocket connection payload
-  path: { [name: string]: string }; // path param payload as key-value pairs
-  query: { [name: string]: string }; // query param payload as key-value pairs
-  headers: { [name: string]: string }; // header payload as key-value pairs
+  path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise undefined)
+  query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise undefined)
+  headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise undefined)
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
-  auth: any; // auth context from custom authorizer
-  success(payload?: any): ApiResponse; // returns 200 status code with optional payload as body
+  auth: any; // auth context from custom authorizer if exists (otherwise undefined)
+  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status code with optional payload as body
   invalid(errors?: string[]): ApiResponse; // returns 400 status code with optional errors as body
   notFound(message?: string): ApiResponse; // returns 404 status code with optional message as body
   notAuthorized(message?: string): ApiResponse; // returns 403 status code with optional message as body
   redirect(url: string): ApiResponse; // returns 302 status code (redirect) with new url
   error(error?: any): ApiResponse; // returns 500 status code with optional error as body
-}
-
-interface ApiResponse {
-  statusCode: number;
-  headers: { [name: string]: string | boolean };
-  body?: string;
 }
 
 export interface WebsocketRequest {
@@ -152,6 +120,12 @@ export interface WebsocketRequest {
   resourceId: string;
   resourcePath: string;
   routeKey?: string;
+}
+
+interface ApiResponse {
+  statusCode: number;
+  headers: { [name: string]: string | boolean };
+  body?: string;
 }
 ```
 

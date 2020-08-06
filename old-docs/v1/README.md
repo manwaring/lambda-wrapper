@@ -1,6 +1,6 @@
 <p align="center">
-  <img height="150" src="https://avatars0.githubusercontent.com/u/36457275?s=400&u=16d355f384ed7f8e0655b7ed1d70ff2e411690d8&v=4e">
-  <img height="150" src="https://user-images.githubusercontent.com/2955468/44874383-0168f780-ac69-11e8-8e51-774678cbd966.png">
+  <img height="150" src="https://d1wzvcwrgjaybe.cloudfront.net/repos/manwaring/lambda-wrapper/readme-category-icon.png">
+  <img height="150" src="https://d1wzvcwrgjaybe.cloudfront.net/repos/manwaring/lambda-wrapper/readme-repo-icon.png">
 </p>
 
 # AWS Lambda wrapper library
@@ -134,7 +134,7 @@ import { dynamodbStream } from '@manwaring/lambda-wrapper';
 
 export const handler = dynamodbStream(async ({ newVersions, success, error }) => {
   try {
-    newVersions.forEach(version => console.log(version));
+    newVersions.forEach((version) => console.log(version));
     return success(newVersions);
   } catch (err) {
     return error(err);

@@ -6,7 +6,7 @@ describe('API responses', () => {
   });
 
   it('Handles success response', () => {
-    const response = success('success');
+    const response = success({ body: 'success' });
     expect(response).toEqual({
       body: JSON.stringify('success'),
       headers: {
@@ -26,44 +26,106 @@ describe('API responses', () => {
     });
   });
 
-  it('Handles success response with replacer', () => {
-    const replacer = (key, value) => {
-      switch (key) {
-        case 'that':
-          return undefined;
-        default:
-          return value;
-      }
-    };
-    const response = success({ hello: 'world', replace: { that: 'property', not: 'this one' } }, replacer);
+  it('Handles success response without cors', () => {
+    const response = success({ cors: false });
     expect(response).toEqual({
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ hello: 'world', replace: { not: 'this one' } }),
       statusCode: 200,
     });
   });
 
-  it('Handles error response', () => {
-    const response = error(new Error('error'));
+  it('Handles success response with non-json', () => {
+    const body = '<svg width="20" height="20"></svg>';
+    const response = success({
+      body,
+      json: false,
+      headers: { 'Content-Type': 'image/svg+xml' },
+    });
+    expect(response).toEqual({
+      body,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+        'Content-Type': 'image/svg+xml',
+      },
+      statusCode: 200,
+    });
+  });
+
+  it('Handles success response with non-json and no cors', () => {
+    const body = '<svg width="20" height="20"></svg>';
+    const response = success({
+      body,
+      json: false,
+      cors: false,
+      headers: { 'Content-Type': 'image/svg+xml' },
+    });
+    expect(response).toEqual({
+      body,
+      headers: {
+        'Content-Type': 'image/svg+xml',
+      },
+      statusCode: 200,
+    });
+  });
+
+  it('Handles success response with complex payload', () => {
+    const body = { hello: 'world', replace: { that: 'property', not: 'this one' } };
+    const response = success({ body });
     expect(response).toEqual({
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: 'error' }),
+      body: JSON.stringify(body),
+      statusCode: 200,
+    });
+  });
+
+  it('Handles success response with custom headers', () => {
+    const body = { hello: 'world', replace: { that: 'property', not: 'this one' } };
+    const headers = { Custom: 'header' };
+    const response = success({ body, headers });
+    expect(response).toEqual({
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+        'Content-Type': 'application/json',
+        Custom: 'header',
+      },
+      body: JSON.stringify(body),
+      statusCode: 200,
+    });
+  });
+
+  it('Handles error response with raw error', () => {
+    const response = error({ err: new Error('error') });
+    expect(response).toEqual({
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+      },
+      statusCode: 500,
+    });
+  });
+
+  it('Handles error response with custom body', () => {
+    const response = error({ body: 'error' });
+    expect(response).toEqual({
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify('error'),
       statusCode: 500,
     });
   });
 
   it('Handles invalid response', () => {
-    const response = invalid(['invalid']);
+    const response = invalid({ body: 'invalid' });
     expect(response).toEqual({
-      body: JSON.stringify({ errors: ['invalid'] }),
+      body: JSON.stringify('invalid'),
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
@@ -85,9 +147,9 @@ describe('API responses', () => {
   });
 
   it('Handles notFound response', () => {
-    const response = notFound('not found');
+    const response = notFound({ body: 'not found' });
     expect(response).toEqual({
-      body: JSON.stringify({ message: 'not found' }),
+      body: JSON.stringify('not found'),
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
@@ -98,9 +160,9 @@ describe('API responses', () => {
   });
 
   it('Handles notAuthorized response', () => {
-    const response = notAuthorized('not found');
+    const response = notAuthorized({ body: 'not found' });
     expect(response).toEqual({
-      body: JSON.stringify({ message: 'not found' }),
+      body: JSON.stringify('not found'),
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
@@ -111,7 +173,7 @@ describe('API responses', () => {
   });
 
   it('Handles redirect response', () => {
-    const response = redirect('url');
+    const response = redirect({ url: 'url' });
     expect(response).toEqual({
       headers: {
         'Access-Control-Allow-Origin': '*',
