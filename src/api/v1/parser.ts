@@ -1,6 +1,6 @@
 import { APIGatewayEvent } from 'aws-lambda';
 import { parse } from 'querystring';
-import { Metrics, logger } from '../common';
+import { Metrics, logger } from '../../common';
 
 const metrics = new Metrics('API Gateway');
 

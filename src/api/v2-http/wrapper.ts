@@ -12,10 +12,10 @@ import {
   ResponseParameters,
   RedirectParameters,
   ErrorParameters,
-} from './responses';
+} from '../shared';
 
 export function httpApi<T = any>(
-  custom: (props: HttpApiSignature) => any
+  custom: (props: HttpApiSignature<T>) => any
 ): (event: HttpApiEvent, context: Context, callback: Callback) => any {
   return function handler(event: HttpApiEvent) {
     const { body, path, query, auth, headers, testRequest } = new Request(event).getProperties();
@@ -39,13 +39,13 @@ export function httpApi<T = any>(
 }
 
 export interface HttpApiSignature<T = any> {
-  event: HttpApiEvent; // original event provided by AWS (https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html)
-  body: T; // body parsed according to content-type headers (or in original format if no content-type headers found)
-  path: { [name: string]: string }; // path params as key-value pairs
-  query: { [name: string]: string }; // query params as key-value pairs
-  headers: { [name: string]: string }; // headers as key-value pairs
-  testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
-  auth: any; // auth context from JWT authorizer
+  event: HttpApiEvent;
+  body: T;
+  path: { [name: string]: string };
+  query: { [name: string]: string };
+  headers: { [name: string]: string };
+  testRequest: boolean;
+  auth: any;
   success(params: ResponseParameters): ApiResponse;
   invalid(params: ResponseParameters): ApiResponse;
   notFound(params: ResponseParameters): ApiResponse;

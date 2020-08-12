@@ -1,4 +1,4 @@
-import { Metrics, logger } from '../common';
+import { Metrics, logger } from '../../common';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',

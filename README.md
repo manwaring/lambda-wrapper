@@ -575,6 +575,8 @@ console.debug(err);
 
 # API Gateway HTTP API
 
+Note that other than the raw payload from AWS the HTTP API method signature and response functions match the API Gateway signature and functions. Hooray for wrappers!
+
 ## Sample TypeScript implementation
 
 ```ts
@@ -621,8 +623,6 @@ export interface HttpApiSignature<T = any> {
   error(parameters: ErrorParameters): ApiResponse;
 }
 ```
-
-_[AWS documentation of raw event](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.proxy-format)_
 
 </details>
 
@@ -679,6 +679,53 @@ interface ErrorParameters {
   statusCode?: number; // status code to return, defaults to 500
   headers?: { [key: string]: any }; // custom headers to include
   err?: Error; // optional Error object for automatic logging
+}
+```
+
+</details>
+
+<details>
+<summary>HttpApiEvent</summary>
+
+_[AWS documentation of raw event](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.proxy-format)_
+
+```ts
+export interface HttpApiEvent {
+  version: string;
+  routeKey: string;
+  rawPath: string;
+  rawQueryString: string;
+  cookies: string[];
+  headers: { [key: string]: string };
+  queryStringParameters: { [key: string]: string };
+  requestContext: {
+    accountId: string;
+    apiId: string;
+    authorizer: {
+      jwt: {
+        claims: { [key: string]: string };
+        scopes: string[];
+      };
+    };
+    domainName: string;
+    domainPrefix: string;
+    http: {
+      method: string;
+      path: string;
+      protocol: string;
+      sourceIp: string;
+      userAgent: string;
+    };
+    requestId: string;
+    routeKey: string;
+    stage: string;
+    time: string;
+    timeEpoch: number;
+  };
+  body: string;
+  pathParameters: { [key: string]: string };
+  isBase64Encoded: boolean;
+  stageVariables: { [key: string]: string };
 }
 ```
 
