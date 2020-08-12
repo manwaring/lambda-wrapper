@@ -4,6 +4,17 @@ orbs:
   node: circleci/node@4.0.0
 
 jobs:
+  build:
+    executor:
+      name: node/default
+      tag: lts
+    steps:
+      - checkout
+      - node/install-packages
+      - run:
+          name: Build the library
+          command: npm run build
+
   publish:
     executor:
       name: node/default
@@ -35,6 +46,10 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - build:
+          filters:
+            tags:
+              only: /.*/
       # TODO add a dry-run step to non-tagged changes
       # - publish-dry-run:
       #     requires:
@@ -44,7 +59,9 @@ workflows:
       #         only: /.*/
       - publish:
           context: manwaring-npm
-          requires: [node/test]
+          requires:
+            - node/test
+            - build
           filters:
             branches:
               ignore: /.*/
