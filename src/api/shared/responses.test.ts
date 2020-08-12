@@ -159,7 +159,18 @@ describe('API responses', () => {
     });
   });
 
-  it('Handles notAuthorized response', () => {
+  it('Handles basic notAuthorized response', () => {
+    const response = notAuthorized();
+    expect(response).toEqual({
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+      },
+      statusCode: 401,
+    });
+  });
+
+  it('Handles overridden notAuthorized response', () => {
     const response = notAuthorized({ body: 'not found' });
     expect(response).toEqual({
       body: JSON.stringify('not found'),
