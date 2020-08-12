@@ -29,7 +29,7 @@
 
 # AWS Lambda wrapper library
 
-### This documentation is for v4 of the library - [go here for v1](old-docs/v1/README.md), [here for v2](old-docs/v2/README.md), and [here for v3](old-docs/v3/README.md).
+### This documentation is for v4 of the library - [go here](old-docs) for [v1](old-docs/v1/README.md), [v2](old-docs/v2/README.md), and [v3](old-docs/v3/README.md) documentation.
 
 1. [Overview](#overview)
 1. [Installation and setup](#installation-and-setup)
