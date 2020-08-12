@@ -1,10 +1,4 @@
-import {
-  APIGatewayEvent,
-  Context,
-  Callback,
-  APIGatewayEventRequestContextWithAuthorizer,
-  APIGatewayEventIdentity,
-} from 'aws-lambda';
+import { APIGatewayEvent, Context, Callback, APIGatewayEventIdentity } from 'aws-lambda';
 import { Request } from './parser';
 import { success, invalid, notFound, notAuthorized, error, redirect, ApiResponse } from './responses';
 

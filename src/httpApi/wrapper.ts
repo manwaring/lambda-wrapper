@@ -1,10 +1,21 @@
 import { Context, Callback } from 'aws-lambda';
 import { HttpApiEvent } from './payload';
 import { Request } from './parser';
-import { success, invalid, notFound, notAuthorized, error, redirect, ApiResponse } from './responses';
+import {
+  success,
+  invalid,
+  notFound,
+  notAuthorized,
+  error,
+  redirect,
+  ApiResponse,
+  ResponseParameters,
+  RedirectParameters,
+  ErrorParameters,
+} from './responses';
 
 export function httpApi<T = any>(
-  custom: (props: HttpApiSignature<T>) => any
+  custom: (props: HttpApiSignature) => any
 ): (event: HttpApiEvent, context: Context, callback: Callback) => any {
   return function handler(event: HttpApiEvent) {
     const { body, path, query, auth, headers, testRequest } = new Request(event).getProperties();
@@ -28,17 +39,17 @@ export function httpApi<T = any>(
 }
 
 export interface HttpApiSignature<T = any> {
-  event: HttpApiEvent; // original event
-  body: T; // JSON parsed body payload if exists (otherwise undefined)
-  path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise undefined)
-  query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise undefined)
-  headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise undefined)
+  event: HttpApiEvent; // original event provided by AWS (https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html)
+  body: T; // body parsed according to content-type headers (or in original format if no content-type headers found)
+  path: { [name: string]: string }; // path params as key-value pairs
+  query: { [name: string]: string }; // query params as key-value pairs
+  headers: { [name: string]: string }; // headers as key-value pairs
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
-  auth: any; // auth context from custom authorizer if exists (otherwise undefined)
-  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status code with optional payload as body
-  invalid(errors?: string[]): ApiResponse; // returns 400 status code with optional errors as body
-  notFound(message?: string): ApiResponse; // returns 404 status code with optional message as body
-  notAuthorized(message?: string): ApiResponse; // returns 403 status code with optional message as body
-  redirect(url: string): ApiResponse; // returns 302 status code (redirect) with new url
-  error(error?: any): ApiResponse; // returns 500 status code with optional error as body
+  auth: any; // auth context from JWT authorizer
+  success(params: ResponseParameters): ApiResponse;
+  invalid(params: ResponseParameters): ApiResponse;
+  notFound(params: ResponseParameters): ApiResponse;
+  notAuthorized(params: ResponseParameters): ApiResponse;
+  redirect(params: RedirectParameters): ApiResponse;
+  error(params: ErrorParameters): ApiResponse;
 }
