@@ -123,12 +123,12 @@ export interface ApiSignature<T = any> {
   headers: { [name: string]: string }; // headers as key-value pairs
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
   auth: any; // auth context from custom authorizer
-  success(paramaters: ResponseParameters): ApiResponse;
-  invalid(paramaters: ResponseParameters): ApiResponse;
-  notFound(paramaters: ResponseParameters): ApiResponse;
-  notAuthorized(paramaters: ResponseParameters): ApiResponse;
-  redirect(parameters: RedirectParameters): ApiResponse;
-  error(parameters: ErrorParameters): ApiResponse;
+  success(params?: ResponseParameters): ApiResponse;
+  invalid(params?: ResponseParameters): ApiResponse;
+  notFound(params?: ResponseParameters): ApiResponse;
+  notAuthorized(params?: ResponseParameters): ApiResponse;
+  redirect(params: RedirectParameters): ApiResponse;
+  error(params?: ErrorParameters): ApiResponse;
 }
 ```
 
@@ -615,12 +615,12 @@ export interface HttpApiSignature<T = any> {
   headers: { [name: string]: string }; // headers as key-value pairs
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
   auth: any; // auth context from JWT authorizer
-  success(paramaters: ResponseParameters): ApiResponse;
-  invalid(paramaters: ResponseParameters): ApiResponse;
-  notFound(paramaters: ResponseParameters): ApiResponse;
-  notAuthorized(paramaters: ResponseParameters): ApiResponse;
-  redirect(parameters: RedirectParameters): ApiResponse;
-  error(parameters: ErrorParameters): ApiResponse;
+  success(params?: ResponseParameters): ApiResponse;
+  invalid(params?: ResponseParameters): ApiResponse;
+  notFound(params?: ResponseParameters): ApiResponse;
+  notAuthorized(params?: ResponseParameters): ApiResponse;
+  redirect(params: RedirectParameters): ApiResponse;
+  error(params?: ErrorParameters): ApiResponse;
 }
 ```
 

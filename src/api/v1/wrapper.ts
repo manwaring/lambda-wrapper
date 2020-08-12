@@ -47,12 +47,12 @@ export interface ApiSignature<T = any> {
   headers: { [name: string]: string };
   testRequest: boolean;
   auth: any;
-  success(params: ResponseParameters): ApiResponse;
-  invalid(params: ResponseParameters): ApiResponse;
-  notFound(params: ResponseParameters): ApiResponse;
-  notAuthorized(params: ResponseParameters): ApiResponse;
+  success(params?: ResponseParameters): ApiResponse;
+  invalid(params?: ResponseParameters): ApiResponse;
+  notFound(params?: ResponseParameters): ApiResponse;
+  notAuthorized(params?: ResponseParameters): ApiResponse;
   redirect(params: RedirectParameters): ApiResponse;
-  error(params: ErrorParameters): ApiResponse;
+  error(params?: ErrorParameters): ApiResponse;
 }
 
 export interface WebsocketRequest {
