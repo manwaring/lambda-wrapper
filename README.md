@@ -597,35 +597,442 @@ export const handler = httpApi<CustomInterface>(async ({ body, path, success, in
 
 By passing in CustomInterface as a generic type the method signature will cast the `body` object as an instance of CustomInterface, making TypeScript development easier (note that the generic is not required and the body parameter defaults to type `any`)
 
-### Properties and methods available on wrapper signature
+## Properties and methods available on wrapper signature
 
-Note that all properties are undefined if not present on the original request
+<details open>
+<summary>Deconstructable wrapper signature</summary>
+
+Note that all properties are undefined if not present on the original request.
 
 ```ts
 export interface HttpApiSignature<T = any> {
-  event: HttpApiEvent; // original event from https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.proxy-format
-  body: T; // JSON parsed body payload if exists (otherwise undefined)
-  path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise undefined)
-  query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise undefined)
-  headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise undefined)
+  event: HttpApiEvent; // original event provided by AWS
+  body: T; // body payload parsed according to content-type headers (or raw if no content-type headers found) and cast as T if provided (defaults to `any`)
+  path: { [name: string]: string }; // path params as key-value pairs
+  query: { [name: string]: string }; // query params as key-value pairs
+  headers: { [name: string]: string }; // headers as key-value pairs
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
-  auth: any; // auth context from custom authorizer if exists (otherwise undefined)
-  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status code with optional payload as body
-  invalid(errors?: string[]): ApiResponse; // returns 400 status code with optional errors as body
-  notFound(message?: string): ApiResponse; // returns 404 status code with optional message as body
-  notAuthorized(message?: string): ApiResponse; // returns 403 status code with optional message as body
-  redirect(url: string): ApiResponse; // returns 302 status code (redirect) with new url
-  error(error?: any): ApiResponse; // returns 500 status code with optional error as body
+  auth: any; // auth context from JWT authorizer
+  success(paramaters: ResponseParameters): ApiResponse;
+  invalid(paramaters: ResponseParameters): ApiResponse;
+  notFound(paramaters: ResponseParameters): ApiResponse;
+  notAuthorized(paramaters: ResponseParameters): ApiResponse;
+  redirect(parameters: RedirectParameters): ApiResponse;
+  error(parameters: ErrorParameters): ApiResponse;
 }
+```
 
+_[AWS documentation of raw event](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.proxy-format)_
+
+</details>
+
+<details>
+<summary>ApiResponse</summary>
+
+```ts
 interface ApiResponse {
   statusCode: number;
-  headers: { [name: string]: string | boolean };
+  headers: { [name: string]: any };
   body?: string;
 }
 ```
 
-\*Note that each callback helper function (success, invalid, redirect, error) includes CORS-enabling header information
+</details>
+
+<details>
+<summary>ResponseParameters</summary>
+
+```ts
+interface ResponseParameters {
+  body?: any; // response body
+  json?: boolean; // indicates if body should be JSON-stringified and content-type header set to application/json, defaults to true
+  cors?: boolean; // indicates if CORS headers should be added, defaults to true
+  statusCode?: number; // status code to return, defaults by callback (success: 200, invalid: 400, notFound: 404, notAuthorized: 401, redirect: 302, error: 500)
+  headers?: { [key: string]: any }; // custom headers to include
+}
+```
+
+</details>
+
+<details>
+<summary>RedirectParameters</summary>
+
+```ts
+interface RedirectParameters {
+  url: string; // url to redirect to
+  cors?: boolean; // indicates if CORS headers should be added, defaults to true
+  statusCode?: number; // status code to return, defaults to 302
+  headers?: { [key: string]: any }; // custom headers to include
+}
+```
+
+</details>
+
+<details>
+<summary>ErrorParameters</summary>
+
+```ts
+interface ErrorParameters {
+  body?: any; // response body
+  json?: boolean; // indicates if body should be JSON-stringified and content-type header set to application/json, defaults to true
+  cors?: boolean; // indicates if CORS headers should be added, defaults to true
+  statusCode?: number; // status code to return, defaults to 500
+  headers?: { [key: string]: any }; // custom headers to include
+  err?: Error; // optional Error object for automatic logging
+}
+```
+
+</details>
+
+## Response functions
+
+<details open>
+<summary>Success</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 200
+}
+```
+
+### Invocation with defaults
+
+```ts
+const response = { hello: 'world' };
+return success({ body: response });
+
+// returns
+{
+  body: "{\"hello\":\"world\"}",
+  statusCode: 200,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+    'Content-Type': 'application/json'
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const response = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+const headers = { 'Content-Type': 'image/svg+xml' };
+return success({ body: response, json: false, cors: false, headers });
+
+// returns
+{
+  body: "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>",
+  statusCode: 200,
+  headers: { 'Content-Type': 'image/svg+xml' }
+}
+```
+
+</details>
+
+<details>
+<summary>Invalid</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 400
+}
+```
+
+### Invocation with defaults
+
+```ts
+return invalid();
+
+// returns
+{
+  statusCode: 400,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const response = { invalid: 'properties' };
+return invalid({ body: response, cors: false });
+
+// returns
+{
+  body: "{\"invalid\":\"properties\"}",
+  statusCode: 400,
+  headers: { 'Content-Type': 'application/json' }
+}
+```
+
+</details>
+
+<details>
+<summary>Not found</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 404
+}
+```
+
+### Invocation with defaults
+
+```ts
+return notFound();
+
+// returns
+{
+  statusCode: 404,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const response = 'Not found';
+return notFound({ body: response, cors: false });
+
+// returns
+{
+  body: "Not found",
+  statusCode: 404,
+}
+```
+
+</details>
+
+<details>
+<summary>Not authorized</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 401
+}
+```
+
+### Invocation with defaults
+
+```ts
+return notAuthorized();
+
+// returns
+{
+  statusCode: 401,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const response = 'Not authorized';
+return notAuthorized({ body: response, cors: false });
+
+// returns
+{
+  body: "Not Authorized",
+  statusCode: 401,
+}
+```
+
+</details>
+
+<details>
+<summary>Redirect</summary>
+
+### Available parameters
+
+```ts
+{
+  url: string,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  cors: true,
+  statusCode: 302
+}
+```
+
+### Invocation with defaults
+
+```ts
+const url = 'https://github.com/manwaring/lambda-wrapper';
+return redirect({ url });
+
+// returns
+{
+  statusCode: 302,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+    'Location': 'https://github.com/manwaring/lambda-wrapper'
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const url = 'https://github.com/manwaring/lambda-wrapper';
+return redirect({ url, statusCode: 308, cors: false });
+
+// returns
+{
+  statusCode: 308,
+  headers: {
+    'Location': 'https://github.com/manwaring/lambda-wrapper'
+  }
+}
+```
+
+</details>
+
+<details>
+<summary>Error</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any},
+  err?: Error;
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 500
+}
+```
+
+### Invocation with defaults
+
+```ts
+return error();
+
+// returns
+{
+  statusCode: 500,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+catch (err) {
+  const body = { error: 'Unexpected error' };
+  return error({ body, err });
+}
+
+// logs
+console.debug(err);
+
+// returns
+{
+  body: "{\"error\": \"Unexpected error\"}",
+  statusCode: 500,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+</details>
 
 # CloudFormation Custom Resource
 
