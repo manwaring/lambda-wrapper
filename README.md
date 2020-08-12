@@ -5,13 +5,13 @@
 
 <p align="center">
   <a href="https://npmjs.com/package/@manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/npm/v/@manwaring/lambda-wrapper?icon=npm&label=npm@latest"></a>
+    <img src="https://flat.badgen.net/npm/v/@manwaring/lambda-wrapper?icon=npm&label=@latest"></a>
   <a href="https://www.npmjs.com/package/@manwaring/lambda-wrapper">
     <img src="https://flat.badgen.net/npm/dt/@manwaring/lambda-wrapper?icon=npm"></a>
   <a href="https://codecov.io/gh/manwaring/lambda-wrapper">
     <img src="https://flat.badgen.net/codecov/c/github/manwaring/lambda-wrapper/?icon=codecov"></a>
   <a href="https://packagephobia.now.sh/result?p=@manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/packagephobia/install/@manwaring/lambda-wrapper"></a>
+    <img src="https://flat.badgen.net/packagephobia/install/@manwaring/lambda-wrapper?icon=packagephobia"></a>
   <a href="https://www.npmjs.com/package/@manwaring/lambda-wrapper">
     <img src="https://flat.badgen.net/github/license/manwaring/lambda-wrapper"></a>
 </p>
@@ -87,11 +87,10 @@ All of the events bellow have a corresponding wrapper which provides a deconstru
 ## Sample TypeScript implementation
 
 ```ts
-import { api, ApiSignature } from '@manwaring/lambda-wrapper';
+import { api } from '@manwaring/lambda-wrapper';
 import { CustomInterface } from './custom-interface';
 
-// By passing in CustomInterface as a generic type the method signature will correctly identify the `body` object as an instance of CustomInterface, making TypeScript development easier (note that the generic is not required and defaults to `any` if not defined)
-export const handler = api<CustomInterface>(async ({ body, path, success, invalid, error }: ApiSignature) => {
+export const handler = api<CustomInterface>(async ({ body, path, success, invalid, error }) => {
   try {
     const { pathParam1, pathParam2 } = path;
     if (!pathParam1) {
@@ -104,6 +103,8 @@ export const handler = api<CustomInterface>(async ({ body, path, success, invali
   }
 });
 ```
+
+By passing in CustomInterface as a generic type the method signature will cast the `body` object as an instance of CustomInterface, making TypeScript development easier (note that the generic is not required and the body parameter defaults to type `any`)
 
 ## Properties and methods available on wrapper signature
 
@@ -572,25 +573,29 @@ console.debug(err);
 
 </details>
 
-## API Gateway HTTP API
+# API Gateway HTTP API
 
-### Sample implementation
+## Sample TypeScript implementation
 
 ```ts
 import { httpApi } from '@manwaring/lambda-wrapper';
 import { CustomInterface } from './custom-interface';
 
-// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
-export const handler = httpApi<CustomInterface>(async ({ body, path, success, error }) => {
+export const handler = httpApi<CustomInterface>(async ({ body, path, success, invalid, error }) => {
   try {
     const { pathParam1, pathParam2 } = path;
+    if (!pathParam1) {
+      return invalid();
+    }
     const results = await doSomething(body, pathParam1, pathParam2);
-    return success(results);
+    return success({ body: results });
   } catch (err) {
-    return error(err);
+    return error({ err });
   }
 });
 ```
+
+By passing in CustomInterface as a generic type the method signature will cast the `body` object as an instance of CustomInterface, making TypeScript development easier (note that the generic is not required and the body parameter defaults to type `any`)
 
 ### Properties and methods available on wrapper signature
 
@@ -622,9 +627,9 @@ interface ApiResponse {
 
 \*Note that each callback helper function (success, invalid, redirect, error) includes CORS-enabling header information
 
-## CloudFormation Custom Resource
+# CloudFormation Custom Resource
 
-### Sample implementation
+## Sample TypeScript implementation
 
 ```ts
 import { cloudFormation } from '@manwaring/lambda-wrapper';
@@ -641,7 +646,7 @@ export const handler = cloudFormation(({ event, success, failure }) => {
 
 \*Note that currently the method wrapped by cloudFormation cannot be async - for reasons that aren't entirely clear to me when the method is async the requests to update CloudFormation with the correct action status fail, leaving a stack in the 'pending' state
 
-### Properties and methods available on wrapper signature
+## Properties and methods available on wrapper signature
 
 ```ts
 interface CloudFormationSignature {
@@ -651,9 +656,9 @@ interface CloudFormationSignature {
 }
 ```
 
-## DynamoDB Stream
+# DynamoDB Stream
 
-### Sample implementation
+## Sample TypeScript implementation
 
 ```ts
 import { dynamodbStream } from '@manwaring/lambda-wrapper';
@@ -675,7 +680,7 @@ interface CustomInterface {
 }
 ```
 
-### Properties and methods available on wrapper signature
+## Properties and methods available on wrapper signature
 
 ```ts
 interface DynamoDBStreamSignature<T> {
@@ -697,9 +702,9 @@ interface Version<T> {
 }
 ```
 
-## Lambda Authorizer
+# Lambda Authorizer
 
-### Sample implementation
+## Sample TypeScript implementation
 
 ```ts
 import { authorizer } from '@manwaring/lambda-wrapper';
@@ -718,7 +723,7 @@ export const handler = authorizer(async ({ token, valid, invalid }) => {
 });
 ```
 
-### Properties and methods available on wrapper signature
+## Properties and methods available on wrapper signature
 
 ```ts
 interface AuthorizerSignature {
@@ -742,9 +747,9 @@ interface Policy {
 }
 ```
 
-## SNS
+# SNS
 
-### Sample implementation
+## Sample TypeScript implementation
 
 ```ts
 import { sns } from '@manwaring/lambda-wrapper';
@@ -761,7 +766,7 @@ export const handler = sns<CustomInterface>(async ({ message, success, error }) 
 });
 ```
 
-### Properties and methods available on wrapper signature
+## Properties and methods available on wrapper signature
 
 ```ts
 interface SnsSignature {
@@ -772,9 +777,9 @@ interface SnsSignature {
 }
 ```
 
-## Generic event
+# Generic event
 
-### Sample implementation
+## Sample TypeScript implementation
 
 ```ts
 import { wrapper } from '@manwaring/lambda-wrapper';
@@ -792,7 +797,7 @@ export const handler = wrapper<CustomInterface>(async ({ event, success, error }
 });
 ```
 
-### Properties and methods available on wrapper signature
+## Properties and methods available on wrapper signature
 
 ```ts
 interface WrapperSignature<T> {
