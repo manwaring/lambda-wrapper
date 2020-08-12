@@ -575,7 +575,7 @@ console.debug(err);
 
 # API Gateway HTTP API
 
-Note that other than the raw payload from AWS the HTTP API method signature and response functions match the API Gateway signature and functions. Hooray for wrappers!
+Other than the raw payload from AWS the HTTP API method signature and response functions match the API Gateway signature and functions. Hooray for wrappers! Note that you still need to provide the correct wrapper function so that the library can parse the AWS event correctly.
 
 ## Sample TypeScript implementation
 
