@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [4.0.0]&nbsp;&nbsp;(2020-08-11)
+
+### Changed
+
+- Updated the API Gateway and HTTP API response function signatures for easier overriding of defaults
+
 ## [3.7.0]&nbsp;&nbsp;(2020-08-03)
 
 ### Added
@@ -253,6 +259,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), 
 - Update older libraries
 - Now publish from Git tags instead of master pushes
 
+[4.0.0]: https://github.com/manwaring/lambda-wrapper/compare/v3.7.0...v4.0.0
 [3.7.0]: https://github.com/manwaring/lambda-wrapper/compare/v3.6.3...v3.7.0
 [3.6.3]: https://github.com/manwaring/lambda-wrapper/compare/v3.6.2...v3.6.3
 [3.6.2]: https://github.com/manwaring/lambda-wrapper/compare/v3.6.1...v3.6.2
