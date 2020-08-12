@@ -5,15 +5,15 @@
 
 <p align="center">
   <a href="https://npmjs.com/package/@manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/npm/v/@manwaring/lambda-wrapper?icon=npm&label=npm@latest"></a>
+    <img src="https://flat.badgen.net/npm/v/@manwaring/lambda-wrapper?icon=npm&label=@latest"></a>
   <a href="https://www.npmjs.com/package/@manwaring/lambda-wrapper">
     <img src="https://flat.badgen.net/npm/dt/@manwaring/lambda-wrapper?icon=npm"></a>
   <a href="https://codecov.io/gh/manwaring/lambda-wrapper">
     <img src="https://flat.badgen.net/codecov/c/github/manwaring/lambda-wrapper/?icon=codecov"></a>
   <a href="https://packagephobia.now.sh/result?p=@manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/packagephobia/install/@manwaring/lambda-wrapper"></a>
+    <img src="https://flat.badgen.net/packagephobia/install/@manwaring/lambda-wrapper?icon=packagephobia"></a>
   <a href="https://www.npmjs.com/package/@manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/npm/license/@manwaring/lambda-wrapper"></a>
+    <img src="https://flat.badgen.net/github/license/manwaring/lambda-wrapper"></a>
 </p>
 
 <p align="center">
@@ -29,7 +29,7 @@
 
 # AWS Lambda wrapper library
 
-### This documentation is for v3 of the library - [go here for v1](old-docs/v1/README.md) and [here for v2](old-docs/v2/README.md)
+### This documentation is for v4 of the library - [go here](old-docs) for [v1](old-docs/v1/README.md), [v2](old-docs/v2/README.md), and [v3](old-docs/v3/README.md) documentation.
 
 1. [Overview](#overview)
 1. [Installation and setup](#installation-and-setup)
@@ -44,8 +44,6 @@
    - [Generic event](#generic-event)
 1. [Example projects](#example-projects)
 
-_Feedback appreciated! If you have an idea for how this library can be improved [please open an issue](https://github.com/manwaring/lambda-wrapper/issues/new)._
-
 # Overview
 
 ### TL;DR
@@ -54,74 +52,150 @@ This library provides custom Lambda function wrappers which expose standard, abs
 
 ### Rationale and motivation
 
-AWS Lambda supports a wide variety of event triggers, each with unique payloads and expected responses. The Lambda execution environment, however, only provides the raw events and has no included mechanisms for simplifying response object creation. For example, API Gateway events include only the raw request body, leaving it up to developers to implement parsing themselves. Similarly, the developer is responsible for creating a response object which includes the correct HTTP status code and headers. Given the standard nature of these kinds of concerns, this library exposes helpful abstractions like parsed HTTP bodies based on content-type headers, and success response functions which create response objects with the correct status codes and headers for returning.
+AWS Lambda supports a wide variety of event triggers, each with unique payloads and expected response objects. The Lambda method signature, however, only provides a raw event object and has no included mechanisms for simplifying payload parsing or response object creation. For example, API Gateway events include only the raw request body, leaving it up to developers to implement parsing themselves. Similarly, the developer is responsible for creating a response object which includes the correct HTTP status code and headers. This library exposes helpful abstractions like parsed HTTP bodies based on content-type headers, and success functions which create response objects with the correct status codes and headers for returning to API Gateway.
+
+_Feedback is much appreciated! If you have an idea for how this library can be improved (or just a complaint/criticism) then [please open an issue](https://github.com/manwaring/lambda-wrapper/issues/new)._
 
 # Installation and setup
 
-Install and save the package to `package.json` as a dependency:
+Install and save the package:
 
-`npm i --save @manwaring/lambda-wrapper`
+`npm i -S @manwaring/lambda-wrapper`
 
 `yarn add @manwaring/lambda-wrapper`
 
 ## Optional configuration
 
-If you want the wrapper to log request and response messages (helpful for debugging set an environemnt variable for `LAMBDA_WRAPPER_LOG=true`.
+If you want the wrapper to log request and response messages (helpful for debugging) set an environemnt variable for `LAMBDA_WRAPPER_LOG=true`.
 
-If you want each invocation to be tagged with the AWS region, environment/, and Git revision simply set environment variables for each: `REGION=us-east-1`, `STAGE=prod`, `REVISION=f4ba682` (see [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for libraries that can help you set git revision)
+If you want each invocation to be tagged with the AWS region, stage/environment, and Git revision simply set environment variables for each and the library will pick them up: `REGION=us-east-1`, `STAGE=prod`, `REVISION=f4ba682`. See [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for libraries that can help you set git revision automatically.
 
 # Supported events
 
-All of the events bellow have a corresponding wrapper which provides a deconstructed method signature exposing parsed/unmarshalled request parameters and helper response methods.
+All of the events bellow have a corresponding wrapper which provides a deconstructable method signature exposing parsed/unmarshalled request parameters and helper response methods.
 
-1. [API Gateway](#api-gateway) with support for cors headers and 200, 302, 400, and 500 responses
-1. [API Gateway HTTP API](#api-gateway-http-api) with support for cors headers and 200, 302, 400, and 500 responses
-1. [CloudFormation Custom Resource](#cloudformation-custom-resource) with support for CloudFormation successes and failures
-1. [DynamoDB Stream](#dynamodb-stream) with support for success and failure responses
-1. [Lambda Authorizer](#lambda-authorizer) with support for creating access policies for successfully authorized requests
-1. [SNS](#sns) with support for success and failure responses
-1. [Generic event](#generic-event) wrapper with support for success and failure responses
+1. [API Gateway](#api-gateway)
+1. [API Gateway HTTP API](#api-gateway-http-api)
+1. [CloudFormation Custom Resource](#cloudformation-custom-resource)
+1. [DynamoDB Stream](#dynamodb-stream)
+1. [Lambda Authorizer](#lambda-authorizer)
+1. [SNS](#sns)
+1. [Generic event](#generic-event) (a basic wrapper with support for success and failure responses)
 
-## API Gateway
+# API Gateway
 
-### Sample implementation
+## Sample TypeScript implementation
 
 ```ts
 import { api } from '@manwaring/lambda-wrapper';
 import { CustomInterface } from './custom-interface';
 
-// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
-export const handler = api<CustomInterface>(async ({ body, path, success, error }) => {
+export const handler = api<CustomInterface>(async ({ body, path, success, invalid, error }) => {
   try {
     const { pathParam1, pathParam2 } = path;
+    if (!pathParam1) {
+      return invalid();
+    }
     const results = await doSomething(body, pathParam1, pathParam2);
-    return success(results);
+    return success({ body: results });
   } catch (err) {
-    return error(err);
+    return error({ err });
   }
 });
 ```
 
-### Properties and methods available on wrapper signature
+By passing in CustomInterface as a generic type the method signature will cast the `body` object as an instance of CustomInterface, making TypeScript development easier (note that the generic is not required and the body parameter defaults to type `any`)
+
+## Properties and methods available on wrapper signature
+
+<details open>
+<summary>Deconstructable wrapper signature</summary>
+
+Note that all properties are undefined if not present on the original request.
 
 ```ts
 export interface ApiSignature<T = any> {
-  event: APIGatewayEvent; // original event
-  body: T; // JSON parsed body payload if exists (otherwise undefined)
+  event: APIGatewayEvent; // original event provided by AWS
+  body: T; // body payload parsed according to content-type headers (or raw if no content-type headers found) and cast as T if provided (defaults to `any`)
   websocket: WebsocketRequest; // websocket connection payload
-  path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise undefined)
-  query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise undefined)
-  headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise undefined)
+  path: { [name: string]: string }; // path params as key-value pairs
+  query: { [name: string]: string }; // query params as key-value pairs
+  headers: { [name: string]: string }; // headers as key-value pairs
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
-  auth: any; // auth context from custom authorizer if exists (otherwise undefined)
-  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status code with optional payload as body
-  invalid(errors?: string[]): ApiResponse; // returns 400 status code with optional errors as body
-  notFound(message?: string): ApiResponse; // returns 404 status code with optional message as body
-  notAuthorized(message?: string): ApiResponse; // returns 403 status code with optional message as body
-  redirect(url: string): ApiResponse; // returns 302 status code (redirect) with new url
-  error(error?: any): ApiResponse; // returns 500 status code with optional error as body
+  auth: any; // auth context from custom authorizer
+  success(paramaters: ResponseParameters): ApiResponse;
+  invalid(paramaters: ResponseParameters): ApiResponse;
+  notFound(paramaters: ResponseParameters): ApiResponse;
+  notAuthorized(paramaters: ResponseParameters): ApiResponse;
+  redirect(parameters: RedirectParameters): ApiResponse;
+  error(parameters: ErrorParameters): ApiResponse;
 }
+```
 
+</details>
+
+<details>
+<summary>ApiResponse</summary>
+
+```ts
+interface ApiResponse {
+  statusCode: number;
+  headers: { [name: string]: any };
+  body?: string;
+}
+```
+
+</details>
+
+<details>
+<summary>ResponseParameters</summary>
+
+```ts
+interface ResponseParameters {
+  body?: any; // response body
+  json?: boolean; // indicates if body should be JSON-stringified and content-type header set to application/json, defaults to true
+  cors?: boolean; // indicates if CORS headers should be added, defaults to true
+  statusCode?: number; // status code to return, defaults by callback (success: 200, invalid: 400, notFound: 404, notAuthorized: 401, redirect: 302, error: 500)
+  headers?: { [key: string]: any }; // custom headers to include
+}
+```
+
+</details>
+
+<details>
+<summary>RedirectParameters</summary>
+
+```ts
+interface RedirectParameters {
+  url: string; // url to redirect to
+  cors?: boolean; // indicates if CORS headers should be added, defaults to true
+  statusCode?: number; // status code to return, defaults to 302
+  headers?: { [key: string]: any }; // custom headers to include
+}
+```
+
+</details>
+
+<details>
+<summary>ErrorParameters</summary>
+
+```ts
+interface ErrorParameters {
+  body?: any; // response body
+  json?: boolean; // indicates if body should be JSON-stringified and content-type header set to application/json, defaults to true
+  cors?: boolean; // indicates if CORS headers should be added, defaults to true
+  statusCode?: number; // status code to return, defaults to 500
+  headers?: { [key: string]: any }; // custom headers to include
+  err?: Error; // optional Error object for automatic logging
+}
+```
+
+</details>
+
+<details>
+<summary>WebsocketRequest</summary>
+
+```ts
 export interface WebsocketRequest {
   accountId: string;
   apiId: string;
@@ -145,67 +219,871 @@ export interface WebsocketRequest {
   resourcePath: string;
   routeKey?: string;
 }
+```
 
-interface ApiResponse {
-  statusCode: number;
-  headers: { [name: string]: string | boolean };
-  body?: string;
+</details>
+
+## Response functions
+
+<details open>
+<summary>Success</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
 }
 ```
 
-\*Note that each callback helper function (success, invalid, redirect, error) includes CORS-enabling header information
+### Default parameters
 
-## API Gateway HTTP API
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 200
+}
+```
 
-### Sample implementation
+### Invocation with defaults
+
+```ts
+const response = { hello: 'world' };
+return success({ body: response });
+
+// returns
+{
+  body: "{\"hello\":\"world\"}",
+  statusCode: 200,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+    'Content-Type': 'application/json'
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const response = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+const headers = { 'Content-Type': 'image/svg+xml' };
+return success({ body: response, json: false, cors: false, headers });
+
+// returns
+{
+  body: "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>",
+  statusCode: 200,
+  headers: { 'Content-Type': 'image/svg+xml' }
+}
+```
+
+</details>
+
+<details>
+<summary>Invalid</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 400
+}
+```
+
+### Invocation with defaults
+
+```ts
+return invalid();
+
+// returns
+{
+  statusCode: 400,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const response = { invalid: 'properties' };
+return invalid({ body: response, cors: false });
+
+// returns
+{
+  body: "{\"invalid\":\"properties\"}",
+  statusCode: 400,
+  headers: { 'Content-Type': 'application/json' }
+}
+```
+
+</details>
+
+<details>
+<summary>Not found</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 404
+}
+```
+
+### Invocation with defaults
+
+```ts
+return notFound();
+
+// returns
+{
+  statusCode: 404,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const response = 'Not found';
+return notFound({ body: response, cors: false });
+
+// returns
+{
+  body: "Not found",
+  statusCode: 404,
+}
+```
+
+</details>
+
+<details>
+<summary>Not authorized</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 401
+}
+```
+
+### Invocation with defaults
+
+```ts
+return notAuthorized();
+
+// returns
+{
+  statusCode: 401,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const response = 'Not authorized';
+return notAuthorized({ body: response, cors: false });
+
+// returns
+{
+  body: "Not Authorized",
+  statusCode: 401,
+}
+```
+
+</details>
+
+<details>
+<summary>Redirect</summary>
+
+### Available parameters
+
+```ts
+{
+  url: string,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  cors: true,
+  statusCode: 302
+}
+```
+
+### Invocation with defaults
+
+```ts
+const url = 'https://github.com/manwaring/lambda-wrapper';
+return redirect({ url });
+
+// returns
+{
+  statusCode: 302,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+    'Location': 'https://github.com/manwaring/lambda-wrapper'
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const url = 'https://github.com/manwaring/lambda-wrapper';
+return redirect({ url, statusCode: 308, cors: false });
+
+// returns
+{
+  statusCode: 308,
+  headers: {
+    'Location': 'https://github.com/manwaring/lambda-wrapper'
+  }
+}
+```
+
+</details>
+
+<details>
+<summary>Error</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any},
+  err?: Error;
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 500
+}
+```
+
+### Invocation with defaults
+
+```ts
+return error();
+
+// returns
+{
+  statusCode: 500,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+catch (err) {
+  const body = { error: 'Unexpected error' };
+  return error({ body, err });
+}
+
+// logs
+console.debug(err);
+
+// returns
+{
+  body: "{\"error\": \"Unexpected error\"}",
+  statusCode: 500,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+</details>
+
+# API Gateway HTTP API
+
+Other than the raw payload from AWS the HTTP API method signature and response functions match the API Gateway signature and functions. Hooray for wrappers! Note that you still need to provide the correct wrapper function so that the library can parse the AWS event correctly.
+
+## Sample TypeScript implementation
 
 ```ts
 import { httpApi } from '@manwaring/lambda-wrapper';
 import { CustomInterface } from './custom-interface';
 
-// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
-export const handler = httpApi<CustomInterface>(async ({ body, path, success, error }) => {
+export const handler = httpApi<CustomInterface>(async ({ body, path, success, invalid, error }) => {
   try {
     const { pathParam1, pathParam2 } = path;
+    if (!pathParam1) {
+      return invalid();
+    }
     const results = await doSomething(body, pathParam1, pathParam2);
-    return success(results);
+    return success({ body: results });
   } catch (err) {
-    return error(err);
+    return error({ err });
   }
 });
 ```
 
-### Properties and methods available on wrapper signature
+By passing in CustomInterface as a generic type the method signature will cast the `body` object as an instance of CustomInterface, making TypeScript development easier (note that the generic is not required and the body parameter defaults to type `any`)
+
+## Properties and methods available on wrapper signature
+
+<details open>
+<summary>Deconstructable wrapper signature</summary>
+
+Note that all properties are undefined if not present on the original request.
 
 ```ts
 export interface HttpApiSignature<T = any> {
-  event: HttpApiEvent; // original event from https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.proxy-format
-  body: T; // JSON parsed body payload if exists (otherwise undefined)
-  path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise undefined)
-  query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise undefined)
-  headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise undefined)
+  event: HttpApiEvent; // original event provided by AWS
+  body: T; // body payload parsed according to content-type headers (or raw if no content-type headers found) and cast as T if provided (defaults to `any`)
+  path: { [name: string]: string }; // path params as key-value pairs
+  query: { [name: string]: string }; // query params as key-value pairs
+  headers: { [name: string]: string }; // headers as key-value pairs
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
-  auth: any; // auth context from custom authorizer if exists (otherwise undefined)
-  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status code with optional payload as body
-  invalid(errors?: string[]): ApiResponse; // returns 400 status code with optional errors as body
-  notFound(message?: string): ApiResponse; // returns 404 status code with optional message as body
-  notAuthorized(message?: string): ApiResponse; // returns 403 status code with optional message as body
-  redirect(url: string): ApiResponse; // returns 302 status code (redirect) with new url
-  error(error?: any): ApiResponse; // returns 500 status code with optional error as body
+  auth: any; // auth context from JWT authorizer
+  success(paramaters: ResponseParameters): ApiResponse;
+  invalid(paramaters: ResponseParameters): ApiResponse;
+  notFound(paramaters: ResponseParameters): ApiResponse;
+  notAuthorized(paramaters: ResponseParameters): ApiResponse;
+  redirect(parameters: RedirectParameters): ApiResponse;
+  error(parameters: ErrorParameters): ApiResponse;
 }
+```
 
+</details>
+
+<details>
+<summary>ApiResponse</summary>
+
+```ts
 interface ApiResponse {
   statusCode: number;
-  headers: { [name: string]: string | boolean };
+  headers: { [name: string]: any };
   body?: string;
 }
 ```
 
-\*Note that each callback helper function (success, invalid, redirect, error) includes CORS-enabling header information
+</details>
 
-## CloudFormation Custom Resource
+<details>
+<summary>ResponseParameters</summary>
 
-### Sample implementation
+```ts
+interface ResponseParameters {
+  body?: any; // response body
+  json?: boolean; // indicates if body should be JSON-stringified and content-type header set to application/json, defaults to true
+  cors?: boolean; // indicates if CORS headers should be added, defaults to true
+  statusCode?: number; // status code to return, defaults by callback (success: 200, invalid: 400, notFound: 404, notAuthorized: 401, redirect: 302, error: 500)
+  headers?: { [key: string]: any }; // custom headers to include
+}
+```
+
+</details>
+
+<details>
+<summary>RedirectParameters</summary>
+
+```ts
+interface RedirectParameters {
+  url: string; // url to redirect to
+  cors?: boolean; // indicates if CORS headers should be added, defaults to true
+  statusCode?: number; // status code to return, defaults to 302
+  headers?: { [key: string]: any }; // custom headers to include
+}
+```
+
+</details>
+
+<details>
+<summary>ErrorParameters</summary>
+
+```ts
+interface ErrorParameters {
+  body?: any; // response body
+  json?: boolean; // indicates if body should be JSON-stringified and content-type header set to application/json, defaults to true
+  cors?: boolean; // indicates if CORS headers should be added, defaults to true
+  statusCode?: number; // status code to return, defaults to 500
+  headers?: { [key: string]: any }; // custom headers to include
+  err?: Error; // optional Error object for automatic logging
+}
+```
+
+</details>
+
+<details>
+<summary>HttpApiEvent</summary>
+
+_[AWS documentation of raw event](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.proxy-format)_
+
+```ts
+export interface HttpApiEvent {
+  version: string;
+  routeKey: string;
+  rawPath: string;
+  rawQueryString: string;
+  cookies: string[];
+  headers: { [key: string]: string };
+  queryStringParameters: { [key: string]: string };
+  requestContext: {
+    accountId: string;
+    apiId: string;
+    authorizer: {
+      jwt: {
+        claims: { [key: string]: string };
+        scopes: string[];
+      };
+    };
+    domainName: string;
+    domainPrefix: string;
+    http: {
+      method: string;
+      path: string;
+      protocol: string;
+      sourceIp: string;
+      userAgent: string;
+    };
+    requestId: string;
+    routeKey: string;
+    stage: string;
+    time: string;
+    timeEpoch: number;
+  };
+  body: string;
+  pathParameters: { [key: string]: string };
+  isBase64Encoded: boolean;
+  stageVariables: { [key: string]: string };
+}
+```
+
+</details>
+
+## Response functions
+
+<details open>
+<summary>Success</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 200
+}
+```
+
+### Invocation with defaults
+
+```ts
+const response = { hello: 'world' };
+return success({ body: response });
+
+// returns
+{
+  body: "{\"hello\":\"world\"}",
+  statusCode: 200,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+    'Content-Type': 'application/json'
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const response = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+const headers = { 'Content-Type': 'image/svg+xml' };
+return success({ body: response, json: false, cors: false, headers });
+
+// returns
+{
+  body: "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>",
+  statusCode: 200,
+  headers: { 'Content-Type': 'image/svg+xml' }
+}
+```
+
+</details>
+
+<details>
+<summary>Invalid</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 400
+}
+```
+
+### Invocation with defaults
+
+```ts
+return invalid();
+
+// returns
+{
+  statusCode: 400,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const response = { invalid: 'properties' };
+return invalid({ body: response, cors: false });
+
+// returns
+{
+  body: "{\"invalid\":\"properties\"}",
+  statusCode: 400,
+  headers: { 'Content-Type': 'application/json' }
+}
+```
+
+</details>
+
+<details>
+<summary>Not found</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 404
+}
+```
+
+### Invocation with defaults
+
+```ts
+return notFound();
+
+// returns
+{
+  statusCode: 404,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const response = 'Not found';
+return notFound({ body: response, cors: false });
+
+// returns
+{
+  body: "Not found",
+  statusCode: 404,
+}
+```
+
+</details>
+
+<details>
+<summary>Not authorized</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 401
+}
+```
+
+### Invocation with defaults
+
+```ts
+return notAuthorized();
+
+// returns
+{
+  statusCode: 401,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const response = 'Not authorized';
+return notAuthorized({ body: response, cors: false });
+
+// returns
+{
+  body: "Not Authorized",
+  statusCode: 401,
+}
+```
+
+</details>
+
+<details>
+<summary>Redirect</summary>
+
+### Available parameters
+
+```ts
+{
+  url: string,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any}
+}
+```
+
+### Default parameters
+
+```ts
+{
+  cors: true,
+  statusCode: 302
+}
+```
+
+### Invocation with defaults
+
+```ts
+const url = 'https://github.com/manwaring/lambda-wrapper';
+return redirect({ url });
+
+// returns
+{
+  statusCode: 302,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+    'Location': 'https://github.com/manwaring/lambda-wrapper'
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const url = 'https://github.com/manwaring/lambda-wrapper';
+return redirect({ url, statusCode: 308, cors: false });
+
+// returns
+{
+  statusCode: 308,
+  headers: {
+    'Location': 'https://github.com/manwaring/lambda-wrapper'
+  }
+}
+```
+
+</details>
+
+<details>
+<summary>Error</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode?: number,
+  headers?: { [key: string]: any},
+  err?: Error;
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+  statusCode: 500
+}
+```
+
+### Invocation with defaults
+
+```ts
+return error();
+
+// returns
+{
+  statusCode: 500,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+catch (err) {
+  const body = { error: 'Unexpected error' };
+  return error({ body, err });
+}
+
+// logs
+console.debug(err);
+
+// returns
+{
+  body: "{\"error\": \"Unexpected error\"}",
+  statusCode: 500,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+</details>
+
+# CloudFormation Custom Resource
+
+## Sample TypeScript implementation
 
 ```ts
 import { cloudFormation } from '@manwaring/lambda-wrapper';
@@ -222,7 +1100,7 @@ export const handler = cloudFormation(({ event, success, failure }) => {
 
 \*Note that currently the method wrapped by cloudFormation cannot be async - for reasons that aren't entirely clear to me when the method is async the requests to update CloudFormation with the correct action status fail, leaving a stack in the 'pending' state
 
-### Properties and methods available on wrapper signature
+## Properties and methods available on wrapper signature
 
 ```ts
 interface CloudFormationSignature {
@@ -232,9 +1110,9 @@ interface CloudFormationSignature {
 }
 ```
 
-## DynamoDB Stream
+# DynamoDB Stream
 
-### Sample implementation
+## Sample TypeScript implementation
 
 ```ts
 import { dynamodbStream } from '@manwaring/lambda-wrapper';
@@ -256,7 +1134,7 @@ interface CustomInterface {
 }
 ```
 
-### Properties and methods available on wrapper signature
+## Properties and methods available on wrapper signature
 
 ```ts
 interface DynamoDBStreamSignature<T> {
@@ -278,9 +1156,9 @@ interface Version<T> {
 }
 ```
 
-## Lambda Authorizer
+# Lambda Authorizer
 
-### Sample implementation
+## Sample TypeScript implementation
 
 ```ts
 import { authorizer } from '@manwaring/lambda-wrapper';
@@ -299,7 +1177,7 @@ export const handler = authorizer(async ({ token, valid, invalid }) => {
 });
 ```
 
-### Properties and methods available on wrapper signature
+## Properties and methods available on wrapper signature
 
 ```ts
 interface AuthorizerSignature {
@@ -323,9 +1201,9 @@ interface Policy {
 }
 ```
 
-## SNS
+# SNS
 
-### Sample implementation
+## Sample TypeScript implementation
 
 ```ts
 import { sns } from '@manwaring/lambda-wrapper';
@@ -342,7 +1220,7 @@ export const handler = sns<CustomInterface>(async ({ message, success, error }) 
 });
 ```
 
-### Properties and methods available on wrapper signature
+## Properties and methods available on wrapper signature
 
 ```ts
 interface SnsSignature {
@@ -353,9 +1231,9 @@ interface SnsSignature {
 }
 ```
 
-## Generic event
+# Generic event
 
-### Sample implementation
+## Sample TypeScript implementation
 
 ```ts
 import { wrapper } from '@manwaring/lambda-wrapper';
@@ -373,7 +1251,7 @@ export const handler = wrapper<CustomInterface>(async ({ event, success, error }
 });
 ```
 
-### Properties and methods available on wrapper signature
+## Properties and methods available on wrapper signature
 
 ```ts
 interface WrapperSignature<T> {

@@ -1,58 +1,24 @@
-anchors:
-  container-config: &container-config
-    docker:
-      - image: circleci/node:lts
-        environment:
-          TERM: dumb
+version: 2.1
 
-  load-cache: &load-cache
-    restore_cache:
-      key: dependency-cache-{{ checksum "package-lock.json" }}
+orbs:
+  node: circleci/node@4.0.0
 
-## Circle CI configuration, see https://circleci.com/docs/2.0/configuration-reference/
-version: 2
 jobs:
-  install:
-    <<: *container-config
-    steps:
-      - checkout
-      - *load-cache
-      - run:
-          name: Install dependencies
-          command: npm ci
-      - save_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-          paths:
-            - node_modules
-
-  test:
-    <<: *container-config
-    steps:
-      - checkout
-      - *load-cache
-      - run:
-          name: Test
-          command: npm test
-      - store_artifacts:
-          path: coverage
-      - run:
-          name: Send coverage to Codecov
-          command: npm run codecov
-
   publish:
-    <<: *container-config
+    executor:
+      name: node/default
+      tag: lts
     steps:
       - checkout
-      - *load-cache
-      - run:
-          name: Set npm credentials
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_PUBLISH_TOKEN" >> ~/.npmrc
+      - node/install-packages
       - run:
           name: Publish on npm
           command: npm run publish-please
 
   deploy-example-app:
-    <<: *container-config
+    executor:
+      name: node/default
+      tag: lts
     steps:
       - checkout
       - run:
@@ -64,13 +30,8 @@ workflows:
 
   test-and-publish:
     jobs:
-      - install:
-          filters:
-            tags:
-              only: /.*/
-      - test:
-          requires:
-            - install
+      - node/test:
+          version: lts
           filters:
             tags:
               only: /.*/
@@ -83,8 +44,7 @@ workflows:
       #         only: /.*/
       - publish:
           context: manwaring-npm
-          requires:
-            - test
+          requires: [node/test]
           filters:
             branches:
               ignore: /.*/
@@ -92,8 +52,7 @@ workflows:
               only: /v.*/
       - deploy-example-app:
           context: aws-manwaring
-          requires:
-            - publish
+          requires: [publish]
           filters:
             branches:
               ignore: /.*/

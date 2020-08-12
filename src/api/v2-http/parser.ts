@@ -1,6 +1,6 @@
 import { parse } from 'querystring';
 import { HttpApiEvent } from './payload';
-import { Metrics, logger } from '../common';
+import { Metrics, logger } from '../../common';
 
 const metrics = new Metrics('API Gateway');
 

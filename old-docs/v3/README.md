@@ -5,13 +5,14 @@
 
 # AWS Lambda wrapper library
 
-### This documentation is for v2 of the library
+### This documentation is for v3 of the library
 
 1. [Overview](#overview)
 1. [Installation and setup](#installation-and-setup)
    - [Optional configuration](#optional-configuration)
 1. [Supported events](#supported-events)
    - [API Gateway](#api-gateway)
+   - [API Gateway HTTP API](#api-gateway-http-api)
    - [CloudFormation Custom Resource](#cloudformation-custom-resource)
    - [DynamoDB Stream](#dynamodb-stream)
    - [Lambda Authorizer](#lambda-authorizer)
@@ -50,6 +51,7 @@ If you want each invocation to be tagged with the AWS region, environment/, and 
 All of the events bellow have a corresponding wrapper which provides a deconstructed method signature exposing parsed/unmarshalled request parameters and helper response methods.
 
 1. [API Gateway](#api-gateway) with support for cors headers and 200, 302, 400, and 500 responses
+1. [API Gateway HTTP API](#api-gateway-http-api) with support for cors headers and 200, 302, 400, and 500 responses
 1. [CloudFormation Custom Resource](#cloudformation-custom-resource) with support for CloudFormation successes and failures
 1. [DynamoDB Stream](#dynamodb-stream) with support for success and failure responses
 1. [Lambda Authorizer](#lambda-authorizer) with support for creating access policies for successfully authorized requests
@@ -62,8 +64,10 @@ All of the events bellow have a corresponding wrapper which provides a deconstru
 
 ```ts
 import { api } from '@manwaring/lambda-wrapper';
+import { CustomInterface } from './custom-interface';
 
-export const handler = api(async ({ body, path, success, error }) => {
+// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
+export const handler = api<CustomInterface>(async ({ body, path, success, error }) => {
   try {
     const { pathParam1, pathParam2 } = path;
     const results = await doSomething(body, pathParam1, pathParam2);
@@ -77,19 +81,45 @@ export const handler = api(async ({ body, path, success, error }) => {
 ### Properties and methods available on wrapper signature
 
 ```ts
-interface ApiSignature {
+export interface ApiSignature<T = any> {
   event: APIGatewayEvent; // original event
-  body: any; // JSON or form parsed body payload if exists (based on content-type headers), otherwise the raw body object
-  path: { [name: string]: string }; // path param payload as key-value pairs
-  query: { [name: string]: string }; // query param payload as key-value pairs
-  headers: { [name: string]: string }; // headers param payload as key-value pairs
-  testRequest: boolean; // indicates if this is a test request, based on presence of headers matching 'Test-Request' or process.env.TEST_REQUEST_HEADER
-  auth: any; // auth context from custom authorizer
-  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status with payload
-  invalid(errors?: string[]): ApiResponse; // returns 400 status with errors
-  notFound(message?: string): ApiResponse; // returns 404 status with message
-  redirect(url: string): ApiResponse; // returns 302 redirect with new url
-  error(error?: any): ApiResponse; // returns 503 status with error
+  body: T; // JSON parsed body payload if exists (otherwise undefined)
+  websocket: WebsocketRequest; // websocket connection payload
+  path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise undefined)
+  query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise undefined)
+  headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise undefined)
+  testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
+  auth: any; // auth context from custom authorizer if exists (otherwise undefined)
+  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status code with optional payload as body
+  invalid(errors?: string[]): ApiResponse; // returns 400 status code with optional errors as body
+  notFound(message?: string): ApiResponse; // returns 404 status code with optional message as body
+  notAuthorized(message?: string): ApiResponse; // returns 403 status code with optional message as body
+  redirect(url: string): ApiResponse; // returns 302 status code (redirect) with new url
+  error(error?: any): ApiResponse; // returns 500 status code with optional error as body
+}
+
+export interface WebsocketRequest {
+  accountId: string;
+  apiId: string;
+  connectedAt?: number;
+  connectionId?: string;
+  domainName?: string;
+  domainPrefix?: string;
+  eventType?: string;
+  extendedRequestId?: string;
+  protocol: string;
+  httpMethod: string;
+  identity: APIGatewayEventIdentity;
+  messageDirection?: string;
+  messageId?: string | null;
+  path: string;
+  stage: string;
+  requestId: string;
+  requestTime?: string;
+  requestTimeEpoch: number;
+  resourceId: string;
+  resourcePath: string;
+  routeKey?: string;
 }
 
 interface ApiResponse {
@@ -99,7 +129,55 @@ interface ApiResponse {
 }
 ```
 
-\*Note that each callback helper functions (success, invalid, redirect, error) includes CORS-enabling header information
+\*Note that each callback helper function (success, invalid, redirect, error) includes CORS-enabling header information
+
+## API Gateway HTTP API
+
+### Sample implementation
+
+```ts
+import { httpApi } from '@manwaring/lambda-wrapper';
+import { CustomInterface } from './custom-interface';
+
+// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
+export const handler = httpApi<CustomInterface>(async ({ body, path, success, error }) => {
+  try {
+    const { pathParam1, pathParam2 } = path;
+    const results = await doSomething(body, pathParam1, pathParam2);
+    return success(results);
+  } catch (err) {
+    return error(err);
+  }
+});
+```
+
+### Properties and methods available on wrapper signature
+
+```ts
+export interface HttpApiSignature<T = any> {
+  event: HttpApiEvent; // original event from https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.proxy-format
+  body: T; // JSON parsed body payload if exists (otherwise undefined)
+  path: { [name: string]: string }; // path param payload as key-value pairs if exists (otherwise undefined)
+  query: { [name: string]: string }; // query param payload as key-value pairs if exists (otherwise undefined)
+  headers: { [name: string]: string }; // header payload as key-value pairs if exists (otherwise undefined)
+  testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
+  auth: any; // auth context from custom authorizer if exists (otherwise undefined)
+  success(payload?: any, replacer?: (this: any, key: string, value: any) => any): ApiResponse; // returns 200 status code with optional payload as body
+  invalid(errors?: string[]): ApiResponse; // returns 400 status code with optional errors as body
+  notFound(message?: string): ApiResponse; // returns 404 status code with optional message as body
+  notAuthorized(message?: string): ApiResponse; // returns 403 status code with optional message as body
+  redirect(url: string): ApiResponse; // returns 302 status code (redirect) with new url
+  error(error?: any): ApiResponse; // returns 500 status code with optional error as body
+}
+
+interface ApiResponse {
+  statusCode: number;
+  headers: { [name: string]: string | boolean };
+  body?: string;
+}
+```
+
+\*Note that each callback helper function (success, invalid, redirect, error) includes CORS-enabling header information
 
 ## CloudFormation Custom Resource
 
@@ -136,8 +214,10 @@ interface CloudFormationSignature {
 
 ```ts
 import { dynamodbStream } from '@manwaring/lambda-wrapper';
+import { CustomInterface } from './custom-interface';
 
-export const handler = dynamodbStream(async ({ newVersions, success, error }) => {
+// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
+export const handler = dynamodbStream<CustomInterface>(async ({ newVersions, success, error }) => {
   try {
     newVersions.forEach((version) => console.log(version));
     return success(newVersions);
@@ -145,27 +225,32 @@ export const handler = dynamodbStream(async ({ newVersions, success, error }) =>
     return error(err);
   }
 });
+
+interface CustomInterface {
+  id: number;
+  value: string;
+}
 ```
 
 ### Properties and methods available on wrapper signature
 
 ```ts
-interface DynamoDBStreamSignature {
+interface DynamoDBStreamSignature<T> {
   event: DynamoDBStreamEvent; // original event
-  newVersions: any[]; // array of all unmarshalled javascript objects of new images
-  oldVersions: any[]; // array of all unmarshalled javascript objects of old images
-  versions: Version[]; // array of full version object (new image, old image, etc - see Version interface)
+  newVersions: T[]; // array of all unmarshalled javascript objects of new images
+  oldVersions: T[]; // array of all unmarshalled javascript objects of old images
+  versions: Version<T>[]; // array of full version object (new image, old image, etc - see Version interface)
   success(message?: any): any; // logs and returns the message
   error(error?: any): void; // logs the error and throws it
 }
 
-interface Version {
-  newVersion: any; // unmarshalled javascript object of new image (if exists) or null
-  oldVersion: any; // unmarshalled javascript object of old image (if exists) or null
+interface Version<T> {
+  newVersion: T; // unmarshalled javascript object of new image (if exists) or null
+  oldVersion: T; // unmarshalled javascript object of old image (if exists) or null
   keys: any; // unmarshalled javascript object of keys (includes key values)
   tableName: string; // name of the table the object came from
   tableArn: string; // arn of the table the object came from
-  eventName: string; // name of the event (INSERT || MODIFY || REMOVE)
+  eventName: 'INSERT' | 'MODIFY' | 'REMOVE'; // name of the event (INSERT || MODIFY || REMOVE)
 }
 ```
 
@@ -220,8 +305,10 @@ interface Policy {
 
 ```ts
 import { sns } from '@manwaring/lambda-wrapper';
+import { CustomInterface } from './custom-interface';
 
-export const handler = sns(async ({ message, success, error }) => {
+// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
+export const handler = sns<CustomInterface>(async ({ message, success, error }) => {
   try {
     console.log(message);
     return success();
@@ -248,8 +335,10 @@ interface SnsSignature {
 
 ```ts
 import { wrapper } from '@manwaring/lambda-wrapper';
+import { CustomInterface } from './custom-interface';
 
-export const handler = wrapper(async ({ event, success, error }) => {
+// By passing in CustomInterface as a generic the async method signature will correctly identify newVersions as an array of CustomInterface, making TypeScript development easier (note that the generic is not required in JavaScript projects)
+export const handler = wrapper<CustomInterface>(async ({ event, success, error }) => {
   try {
     const { value1, value2 } = event;
     const results = await doSomething(value1, value2);
@@ -263,8 +352,8 @@ export const handler = wrapper(async ({ event, success, error }) => {
 ### Properties and methods available on wrapper signature
 
 ```ts
-interface WrapperSignature {
-  event: any; // original event
+interface WrapperSignature<T> {
+  event: T; // original event
   success(message?: any): any; // logs and returns the message
   error(error?: any): void; // logs the error and throws
 }
@@ -272,6 +361,6 @@ interface WrapperSignature {
 
 # Example projects
 
-THere is one [working example](examples) of how this package can be used in a simple 'hello world' serverless application:
+There is one [working example](examples) of how this package can be used in a simple 'hello world' serverless application:
 
 1. [Using the Serverless Framework and TypeScript](examples/ts)

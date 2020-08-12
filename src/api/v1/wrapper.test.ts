@@ -28,7 +28,6 @@ describe('API wrapper', () => {
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response functions', () => {
-    // @ts-ignore
     function custom({
       event,
       websocket,
@@ -69,7 +68,7 @@ describe('API wrapper', () => {
       Message: string;
       Id: number;
     }
-    function custom<CustomType>({
+    function custom({
       event,
       websocket,
       body,

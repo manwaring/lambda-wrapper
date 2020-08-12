@@ -25,7 +25,6 @@ describe('HTTP API wrapper', () => {
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response functions', () => {
-    // @ts-ignore
     function custom({
       event,
       body,
@@ -54,7 +53,7 @@ describe('HTTP API wrapper', () => {
       expect(invalid).toBeInstanceOf(Function);
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
-      success('success');
+      success({ body: 'success' });
     }
     httpApi(custom)(requestEvent, context, callback);
   });
@@ -92,7 +91,7 @@ describe('HTTP API wrapper', () => {
       expect(invalid).toBeInstanceOf(Function);
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
-      success('success');
+      success({ body: 'success' });
     }
     httpApi(custom)(requestEvent, context, callback);
   });
