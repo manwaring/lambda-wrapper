@@ -22,6 +22,9 @@ jobs:
     steps:
       - checkout
       - node/install-packages
+      - run: &setup-private-npm
+          name: Configure private NPM access
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_PUBLISH_TOKEN" > ~/.npmrc
       - run:
           name: Publish on npm
           command: npm run publish-please
