@@ -33,7 +33,6 @@
 
 1. [Overview](#overview)
 1. [Installation and setup](#installation-and-setup)
-   - [Optional configuration](#optional-configuration)
 1. [Supported events](#supported-events)
    - [API Gateway](#api-gateway)
    - [API Gateway HTTP API](#api-gateway-http-api)
