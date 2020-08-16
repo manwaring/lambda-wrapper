@@ -1,7 +1,7 @@
-import { api } from '@manwaring/lambda-wrapper';
+import { httpApi } from '@manwaring/lambda-wrapper';
 import 'source-map-support/register';
 
-export const handler = api(async ({ event, path, success, error }) => {
+export const handler = httpApi(async ({ event, path, success, error }) => {
   try {
     const { query } = path;    
     return success({ body: { event, query } });

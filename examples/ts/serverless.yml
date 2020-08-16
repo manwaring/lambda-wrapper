@@ -9,7 +9,8 @@ provider:
   name: aws
   stage: example
   region: us-east-1
-  runtime: nodejs10.x
+  runtime: nodejs12.x
+  logRetentionInDays: 14
   environment:
     LAMBDA_WRAPPER_LOG: true
     STAGE: ${self:provider.stage}
@@ -17,6 +18,11 @@ provider:
     REVISION: ${git:sha1}
 
 functions:
+  httpApi:
+    handler: app/httpApi.handler
+    events:
+      - httpApi: GET /http/hello
+
   api:
     handler: app/api.handler
     events:
