@@ -51,7 +51,7 @@ This library provides custom Lambda function wrappers which expose standard, abs
 
 ### Rationale and motivation
 
-AWS Lambda supports a wide variety of event triggers, each with unique payloads and expected response objects. The Lambda method signature, however, only provides a raw event object and has no included mechanisms for simplifying payload parsing or response object creation. For example, API Gateway events include only the raw request body, leaving it up to developers to implement parsing themselves. Similarly, the developer is responsible for creating a response object which includes the correct HTTP status code and headers. This library exposes helpful abstractions like parsed HTTP bodies based on content-type headers, and success functions which create response objects with the correct status codes and headers for returning to API Gateway.
+AWS Lambda supports a wide variety of event triggers, each with unique payloads and expected response objects. The Lambda method signature, however, only provides a raw event object and has no included mechanisms for simplifying payload parsing or response object creation. For example API Gateway events include only the raw request body, leaving it up to developers to implement parsing themselves. Similarly the developer is responsible for creating a response object which includes the correct HTTP status code and headers. This library exposes helpful abstractions like parsed HTTP bodies based on content-type headers, and success functions which create response objects with the correct status codes and headers for returning to API Gateway.
 
 _Feedback is much appreciated! If you have an idea for how this library can be improved (or just a complaint/criticism) then [please open an issue](https://github.com/manwaring/lambda-wrapper/issues/new)._
 
@@ -67,11 +67,11 @@ Install and save the package:
 
 If you want the wrapper to log request and response messages (helpful for debugging) set an environemnt variable for `LAMBDA_WRAPPER_LOG=true`.
 
-If you want each invocation to be tagged with the AWS region, stage/environment, and Git revision simply set environment variables for each and the library will pick them up: `REGION=us-east-1`, `STAGE=prod`, `REVISION=f4ba682`. See [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for libraries that can help you set git revision automatically.
+If you want each invocation to be tagged with the AWS region, stage/environment, and Git revision simply set environment variables for each and the library will pick them up, for example `REGION=us-east-1`, `STAGE=prod`, `REVISION=f4ba682`. See [git-rev-sync](https://www.npmjs.com/package/git-rev-sync) and [serverless-plugin-git-variables](https://www.npmjs.com/package/serverless-plugin-git-variables) for libraries that can help you set git revision automatically.
 
 # Supported events
 
-All of the events bellow have a corresponding wrapper which provides a deconstructable method signature exposing parsed/unmarshalled request parameters and helper response methods.
+Each event listed here has a wrapper which provides a deconstructable method signature exposing parsed/unmarshalled request parameters and helper response methods.
 
 1. [API Gateway](#api-gateway)
 1. [API Gateway HTTP API](#api-gateway-http-api)
@@ -88,6 +88,7 @@ All of the events bellow have a corresponding wrapper which provides a deconstru
 ```ts
 import { api } from '@manwaring/lambda-wrapper';
 import { CustomInterface } from './custom-interface';
+import { doSomething } from './you-code';
 
 export const handler = api<CustomInterface>(async ({ body, path, success, invalid, error }) => {
   try {
@@ -103,7 +104,29 @@ export const handler = api<CustomInterface>(async ({ body, path, success, invali
 });
 ```
 
-By passing in CustomInterface as a generic type the method signature will cast the `body` object as an instance of CustomInterface, making TypeScript development easier (note that the generic is not required and the body parameter defaults to type `any`)
+By passing in CustomInterface as a generic type the method signature will cast the `body` object as an instance of CustomInterface, making TypeScript development easier.  Note that the type is not required and the body property defaults to type `any`.
+
+<details>
+<summary>Sample implementation without generic</summary>
+
+```ts
+import { api } from '@manwaring/lambda-wrapper';
+import { doSomething } from './you-code';
+
+export const handler = api(async ({ body, path, success, invalid, error }) => {
+  try {
+    const { pathParam1, pathParam2 } = path;
+    if (!pathParam1) {
+      return invalid();
+    }
+    const results = await doSomething(body, pathParam1, pathParam2);
+    return success({ body: results });
+  } catch (err) {
+    return error({ err });
+  }
+});
+```
+</details>
 
 ## Properties and methods available on wrapper signature
 
@@ -581,6 +604,7 @@ Other than the raw payload from AWS the HTTP API method signature and response f
 ```ts
 import { httpApi } from '@manwaring/lambda-wrapper';
 import { CustomInterface } from './custom-interface';
+import { doSomething } from './you-code';
 
 export const handler = httpApi<CustomInterface>(async ({ body, path, success, invalid, error }) => {
   try {
@@ -596,7 +620,29 @@ export const handler = httpApi<CustomInterface>(async ({ body, path, success, in
 });
 ```
 
-By passing in CustomInterface as a generic type the method signature will cast the `body` object as an instance of CustomInterface, making TypeScript development easier (note that the generic is not required and the body parameter defaults to type `any`)
+By passing in CustomInterface as a generic type the method signature will cast the `body` object as an instance of CustomInterface, making TypeScript development easier.  Note that the type is not required and the body property defaults to type `any`.
+
+<details>
+<summary>Sample implementation without generic</summary>
+
+```ts
+import { httpApi } from '@manwaring/lambda-wrapper';
+import { doSomething } from './you-code';
+
+export const handler = httpApi(async ({ body, path, success, invalid, error }) => {
+  try {
+    const { pathParam1, pathParam2 } = path;
+    if (!pathParam1) {
+      return invalid();
+    }
+    const results = await doSomething(body, pathParam1, pathParam2);
+    return success({ body: results });
+  } catch (err) {
+    return error({ err });
+  }
+});
+```
+</details>
 
 ## Properties and methods available on wrapper signature
 
