@@ -11,6 +11,8 @@ provider:
   region: us-east-1
   runtime: nodejs12.x
   logRetentionInDays: 14
+  httpApi:
+    payload: '2.0'
   environment:
     LAMBDA_WRAPPER_LOG: true
     STAGE: ${self:provider.stage}
