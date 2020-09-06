@@ -1,7 +1,7 @@
 {
   "name": "@manwaring/lambda-wrapper",
   "description": "A lambda handler wrapper to abstract common functionality and provide useful defaults",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "scripts": {
     "publish-please-dry-run": "publish-please --dry-run",
     "publish-please": "publish-please",
@@ -16,24 +16,24 @@
     "cfn-response": "^1.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.1",
+    "@babel/core": "^7.11.6",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
-    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-env": "^7.11.5",
     "@babel/preset-typescript": "^7.10.4",
-    "@types/aws-lambda": "^8.10.61",
+    "@types/aws-lambda": "^8.10.62",
     "@types/cfn-response": "^1.0.3",
-    "@types/jest": "^26.0.10",
-    "@types/node": "^14.0.27",
+    "@types/jest": "^26.0.13",
+    "@types/node": "^14.6.4",
     "aws-lambda": "^1.0.6",
-    "aws-sdk": "^2.734.0",
+    "aws-sdk": "^2.747.0",
     "babel-jest": "^26.3.0",
     "codecov": "^3.7.2",
     "husky": "^4.2.5",
-    "jest": "^26.4.0",
+    "jest": "^26.4.2",
     "publish-please": "^5.5.1",
     "rimraf": "^3.0.2",
-    "serverless-plugin-test-helper": "^2.4.2",
-    "typescript": "^3.9.7"
+    "serverless-plugin-test-helper": "^2.4.3",
+    "typescript": "^4.0.2"
   },
   "husky": {
     "hooks": {
