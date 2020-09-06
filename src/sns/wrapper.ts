@@ -10,7 +10,7 @@ export function sns<T = any>(
 ): (event: SNSEvent, context: Context, callback: Callback) => any {
   return function handler(event: SNSEvent, context: Context, callback: Callback) {
     const message = new SnsParser<T>(event).getMessage();
-    metrics.common(message);
+    metrics.common(message, event);
     return custom({ event, message, success, error });
   };
 }

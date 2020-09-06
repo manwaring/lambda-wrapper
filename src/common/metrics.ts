@@ -3,8 +3,9 @@ import { logger } from './log';
 export class Metrics {
   constructor(private type: string) {}
 
-  common(payload): void {
+  common(parsed: any, original?: any): void {
     const { REVISION, STAGE, AWS_REGION } = process.env;
+    const payload = original ? { original, parsed } : parsed;
     logger.debug(`Received ${this.type} event payload`, payload);
     if (AWS_REGION) {
       logger.info('region', AWS_REGION);

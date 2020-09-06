@@ -25,6 +25,7 @@
     <img src="https://flat.badgen.net/david/dep/manwaring/lambda-wrapper"></a>
   <a href="https://david-dm.org/manwaring/lambda-wrapper?type=dev">
     <img src="https://flat.badgen.net/david/dev/manwaring/lambda-wrapper/?label=dev+dependencies"></a>
+    <img height="0" width="0" src="https://b7z7o7y5fi.execute-api.us-east-1.amazonaws.com/v1/readme/visits/github/manwaring/lambda-wrapper?style=flat-square">
 </p>
 
 # AWS Lambda wrapper library
@@ -1311,6 +1312,3 @@ interface WrapperSignature<T> {
 There is one [working example](examples) of how this package can be used in a simple 'hello world' serverless application:
 
 1. [Using the Serverless Framework and TypeScript](examples/ts)
-
-<img height="0" src="https://b7z7o7y5fi.execute-api.us-east-1.amazonaws.com/v1/readme/visits/github/manwaring/lambda-wrapper?style=flat-square">
-
