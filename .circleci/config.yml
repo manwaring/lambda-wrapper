@@ -71,7 +71,7 @@ workflows:
             tags:
               only: /v.*/
       - deploy-example-app:
-          context: aws-manwaring
+          context: aws-sandbox
           requires: [publish]
           filters:
             branches:
