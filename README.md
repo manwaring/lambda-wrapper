@@ -54,7 +54,7 @@ This library provides custom Lambda function wrappers which expose standard, abs
 
 AWS Lambda supports a wide variety of event triggers, each with unique payloads and expected response objects. The Lambda method signature, however, only provides a raw event object and has no included mechanisms for simplifying payload parsing or response object creation. For example API Gateway events include only the raw request body, leaving it up to developers to implement parsing themselves. Similarly the developer is responsible for creating a response object which includes the correct HTTP status code and headers. This library exposes helpful abstractions like parsed HTTP bodies based on content-type headers, and success functions which create response objects with the correct status codes and headers for returning to API Gateway.
 
-_Feedback is much appreciated! If you have an idea for how this library can be improved (or just a complaint/criticism) then [please open an issue](https://github.com/manwaring/lambda-wrapper/issues/new)._
+_Feedback is appreciated! If you have an idea for how this library can be improved (or just a complaint/criticism) then [please open an issue](https://github.com/manwaring/lambda-wrapper/issues/new)._
 
 # Installation and setup
 
