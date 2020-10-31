@@ -12,10 +12,11 @@ import {
   ResponseParameters,
   RedirectParameters,
   ErrorParameters,
+  CustomParameters,
 } from '../shared';
 
 export function api<T = any>(
-  custom: (props: ApiSignature<T>) => any
+  customHandler: (props: ApiSignature<T>) => any
 ): (event: APIGatewayEvent, context: Context, callback: Callback) => any {
   return function handler(event: APIGatewayEvent) {
     const { body, websocket, path, query, auth, headers, testRequest } = new Request(event).getProperties();
@@ -36,7 +37,7 @@ export function api<T = any>(
       redirect,
       custom,
     };
-    return custom(signature);
+    return customHandler(signature);
   };
 }
 
@@ -55,7 +56,7 @@ export interface ApiSignature<T = any> {
   notAuthorized(params?: ResponseParameters): ApiResponse;
   redirect(params: RedirectParameters): ApiResponse;
   error(params?: ErrorParameters): ApiResponse;
-  custom(params: ResponseParameters): ApiResponse;
+  custom(params: CustomParameters): ApiResponse;
 }
 
 export interface WebsocketRequest {

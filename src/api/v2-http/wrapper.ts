@@ -13,10 +13,11 @@ import {
   ResponseParameters,
   RedirectParameters,
   ErrorParameters,
+  CustomParameters,
 } from '../shared';
 
 export function httpApi<T = any>(
-  custom: (props: HttpApiSignature<T>) => any
+  customHandler: (props: HttpApiSignature<T>) => any
 ): (event: HttpApiEvent, context: Context, callback: Callback) => any {
   return function handler(event: HttpApiEvent) {
     const { body, path, query, auth, headers, testRequest } = new Request(event).getProperties();
@@ -36,7 +37,7 @@ export function httpApi<T = any>(
       redirect,
       custom,
     };
-    return custom(signature);
+    return customHandler(signature);
   };
 }
 
@@ -54,5 +55,5 @@ export interface HttpApiSignature<T = any> {
   notAuthorized(params?: ResponseParameters): ApiResponse;
   redirect(params: RedirectParameters): ApiResponse;
   error(params?: ErrorParameters): ApiResponse;
-  custom(params: ResponseParameters): ApiResponse;
+  custom(params: CustomParameters): ApiResponse;
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { HttpApiEvent } from 'serverless-plugin-test-helper';
 import { httpApi, HttpApiSignature } from './wrapper';
 
@@ -25,7 +26,7 @@ describe('HTTP API wrapper', () => {
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response functions', () => {
-    function custom({
+    function customHandler({
       event,
       body,
       path,
@@ -39,6 +40,7 @@ describe('HTTP API wrapper', () => {
       invalid,
       redirect,
       error,
+      custom,
     }: HttpApiSignature) {
       expect(event).toEqual(requestEvent);
       expect(body).toEqual({ hello: 'world' });
@@ -53,9 +55,10 @@ describe('HTTP API wrapper', () => {
       expect(invalid).toBeInstanceOf(Function);
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
+      expect(custom).toBeInstanceOf(Function);
       success({ body: 'success' });
     }
-    httpApi(custom)(requestEvent, context, callback);
+    httpApi(customHandler)(requestEvent, context, callback);
   });
 
   it('Has expected properties and response functions with optional generic type', () => {
@@ -63,7 +66,7 @@ describe('HTTP API wrapper', () => {
       Message: string;
       Id: number;
     }
-    function custom<CustomType>({
+    function customHandler<CustomType>({
       event,
       body,
       path,
@@ -77,6 +80,7 @@ describe('HTTP API wrapper', () => {
       invalid,
       redirect,
       error,
+      custom,
     }: HttpApiSignature<CustomType>) {
       expect(event).toEqual(requestEvent);
       expect(body).toEqual({ hello: 'world' });
@@ -91,8 +95,9 @@ describe('HTTP API wrapper', () => {
       expect(invalid).toBeInstanceOf(Function);
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
+      expect(custom).toBeInstanceOf(Function);
       success({ body: 'success' });
     }
-    httpApi(custom)(requestEvent, context, callback);
+    httpApi(customHandler)(requestEvent, context, callback);
   });
 });

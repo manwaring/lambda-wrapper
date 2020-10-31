@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { apiGatewayEvent } from 'serverless-plugin-test-helper';
 import { api, ApiSignature } from './wrapper';
 
@@ -28,7 +29,7 @@ describe('API wrapper', () => {
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
   it('Has expected properties and response functions', () => {
-    function custom({
+    function customHandler({
       event,
       websocket,
       body,
@@ -43,6 +44,7 @@ describe('API wrapper', () => {
       invalid,
       redirect,
       error,
+      custom,
     }: ApiSignature) {
       expect(event).toEqual(requestEvent);
       expect(websocket.connectionId).toEqual('abc-123');
@@ -58,9 +60,10 @@ describe('API wrapper', () => {
       expect(invalid).toBeInstanceOf(Function);
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
-      success('success');
+      expect(custom).toBeInstanceOf(Function);
+      success({ body: 'success' });
     }
-    api(custom)(requestEvent, context, callback);
+    api(customHandler)(requestEvent, context, callback);
   });
 
   it('Has expected properties and response functions with optional generic type', () => {
@@ -68,7 +71,7 @@ describe('API wrapper', () => {
       Message: string;
       Id: number;
     }
-    function custom({
+    function customHandler({
       event,
       websocket,
       body,
@@ -83,6 +86,7 @@ describe('API wrapper', () => {
       invalid,
       redirect,
       error,
+      custom,
     }: ApiSignature<CustomType>) {
       expect(event).toEqual(requestEvent);
       expect(websocket.connectionId).toEqual('abc-123');
@@ -98,8 +102,9 @@ describe('API wrapper', () => {
       expect(invalid).toBeInstanceOf(Function);
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
-      success('success');
+      expect(custom).toBeInstanceOf(Function);
+      success({ body: 'success' });
     }
-    api(custom)(requestEvent, context, callback);
+    api(customHandler)(requestEvent, context, callback);
   });
 });

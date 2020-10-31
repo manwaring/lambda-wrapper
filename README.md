@@ -152,6 +152,7 @@ export interface ApiSignature<T = any> {
   notAuthorized(params?: ResponseParameters): ApiResponse;
   redirect(params: RedirectParameters): ApiResponse;
   error(params?: ErrorParameters): ApiResponse;
+  custom(params: CustomParameters): ApiResponse;
 }
 ```
 
@@ -208,6 +209,22 @@ interface ErrorParameters {
   json?: boolean; // indicates if body should be JSON-stringified and content-type header set to application/json, defaults to true
   cors?: boolean; // indicates if CORS headers should be added, defaults to true
   statusCode?: number; // status code to return, defaults to 500
+  headers?: { [key: string]: any }; // custom headers to include
+  err?: Error; // optional Error object for automatic logging
+}
+```
+
+</details>
+
+<details>
+<summary>CustomParameters</summary>
+
+```ts
+interface CustomParameters {
+  body?: any; // response body
+  json?: boolean; // indicates if body should be JSON-stringified and content-type header set to application/json, defaults to true
+  cors?: boolean; // indicates if CORS headers should be added, defaults to true
+  statusCode: number; // status code to return
   headers?: { [key: string]: any }; // custom headers to include
   err?: Error; // optional Error object for automatic logging
 }
@@ -543,7 +560,7 @@ return redirect({ url, statusCode: 308, cors: false });
   cors?: boolean,
   statusCode?: number,
   headers?: { [key: string]: any},
-  err?: Error;
+  err?: Error
 }
 ```
 
@@ -587,6 +604,65 @@ console.debug(err);
 {
   body: "{\"error\": \"Unexpected error\"}",
   statusCode: 500,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+</details>
+
+<details>
+<summary>Custom</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode: number,
+  headers?: { [key: string]: any},
+  err?: Error
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+}
+```
+
+### Invocation with defaults
+
+```ts
+return custom({ statusCode: 418 });
+
+// returns
+{
+  statusCode: 418,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const body = { message: 'Custom response' };
+return custom({ body, statusCode: 418 });
+
+// returns
+{
+  body: "{\"message\": \"Custom response\"}",
+  statusCode: 418,
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Credentials': true,
@@ -667,6 +743,7 @@ export interface HttpApiSignature<T = any> {
   notAuthorized(params?: ResponseParameters): ApiResponse;
   redirect(params: RedirectParameters): ApiResponse;
   error(params?: ErrorParameters): ApiResponse;
+  custom(params: CustomParameters): ApiResponse;
 }
 ```
 
@@ -723,6 +800,22 @@ interface ErrorParameters {
   json?: boolean; // indicates if body should be JSON-stringified and content-type header set to application/json, defaults to true
   cors?: boolean; // indicates if CORS headers should be added, defaults to true
   statusCode?: number; // status code to return, defaults to 500
+  headers?: { [key: string]: any }; // custom headers to include
+  err?: Error; // optional Error object for automatic logging
+}
+```
+
+</details>
+
+<details>
+<summary>CustomParameters</summary>
+
+```ts
+interface CustomParameters {
+  body?: any; // response body
+  json?: boolean; // indicates if body should be JSON-stringified and content-type header set to application/json, defaults to true
+  cors?: boolean; // indicates if CORS headers should be added, defaults to true
+  statusCode: number; // status code to return
   headers?: { [key: string]: any }; // custom headers to include
   err?: Error; // optional Error object for automatic logging
 }
@@ -1118,6 +1211,65 @@ console.debug(err);
 {
   body: "{\"error\": \"Unexpected error\"}",
   statusCode: 500,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+</details>
+
+<details>
+<summary>Custom</summary>
+
+### Available parameters
+
+```ts
+{
+  body?: any,
+  json?: boolean,
+  cors?: boolean,
+  statusCode: number,
+  headers?: { [key: string]: any},
+  err?: Error
+}
+```
+
+### Default parameters
+
+```ts
+{
+  json: true,
+  cors: true,
+}
+```
+
+### Invocation with defaults
+
+```ts
+return custom({ statusCode: 418 });
+
+// returns
+{
+  statusCode: 418,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+  }
+}
+```
+
+### Invocation overriding defaults
+
+```ts
+const body = { message: 'Custom response' };
+return custom({ body, statusCode: 418 });
+
+// returns
+{
+  body: "{\"message\": \"Custom response\"}",
+  statusCode: 418,
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Credentials': true,
