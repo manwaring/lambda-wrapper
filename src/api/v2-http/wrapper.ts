@@ -8,6 +8,7 @@ import {
   notAuthorized,
   error,
   redirect,
+  custom,
   ApiResponse,
   ResponseParameters,
   RedirectParameters,
@@ -33,6 +34,7 @@ export function httpApi<T = any>(
       notAuthorized,
       error,
       redirect,
+      custom,
     };
     return custom(signature);
   };
@@ -52,4 +54,5 @@ export interface HttpApiSignature<T = any> {
   notAuthorized(params?: ResponseParameters): ApiResponse;
   redirect(params: RedirectParameters): ApiResponse;
   error(params?: ErrorParameters): ApiResponse;
+  custom(params: ResponseParameters): ApiResponse;
 }

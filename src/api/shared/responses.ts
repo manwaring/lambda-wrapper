@@ -41,6 +41,12 @@ export function invalid({
   return response;
 }
 
+export function custom({ body, json = true, cors = true, statusCode, headers }: CustomParameters): ApiResponse {
+  const response = getResponseFromParameters({ body, json, cors, statusCode, headers });
+  metrics.custom(response);
+  return response;
+}
+
 const defaultNotFound: ResponseParameters = {
   cors: true,
   statusCode: 404,
@@ -132,6 +138,14 @@ export interface ResponseParameters {
   json?: boolean; // indicates if body should be JSON-stringified and content-type header set to application/json, defaults to true
   cors?: boolean; // indicates if CORS headers should be added, defaults to true
   statusCode?: number; // status code to return, defaults by callback (success: 200, invalid: 400, notFound: 404, notAuthorized: 401, redirect: 302, error: 500)
+  headers?: { [key: string]: any }; // custom headers to include
+}
+
+export interface CustomParameters {
+  body?: any; // response body
+  json?: boolean; // indicates if body should be JSON-stringified and content-type header set to application/json, defaults to true
+  cors?: boolean; // indicates if CORS headers should be added, defaults to true
+  statusCode: number; // status code to return, defaults by callback (success: 200, invalid: 400, notFound: 404, notAuthorized: 401, redirect: 302, error: 500)
   headers?: { [key: string]: any }; // custom headers to include
 }
 

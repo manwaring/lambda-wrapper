@@ -45,4 +45,8 @@ export class Metrics {
   failure(response?: any): void {
     logger.debug(`Failure processing ${this.type} event, responding with`, response);
   }
+
+  custom(response?: any): void {
+    logger.debug(`Unknown processing status of ${this.type} event, responding with`, response);
+  }
 }

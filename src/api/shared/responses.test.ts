@@ -1,4 +1,4 @@
-import { success, error, invalid, notFound, notAuthorized, redirect } from './responses';
+import { success, error, invalid, notFound, notAuthorized, redirect, custom } from './responses';
 
 describe('API responses', () => {
   beforeEach(() => {
@@ -143,6 +143,17 @@ describe('API responses', () => {
         'Access-Control-Allow-Credentials': true,
       },
       statusCode: 400,
+    });
+  });
+
+  it('Handles custom response', () => {
+    const response = custom({ statusCode: 418 });
+    expect(response).toEqual({
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+      },
+      statusCode: 418,
     });
   });
 
