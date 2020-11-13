@@ -9,14 +9,15 @@ export class Request {
 
   getProperties(): any {
     const event = this.event;
-    const path = event.pathParameters ? event.pathParameters : undefined;
-    const query = event.queryStringParameters ? event.queryStringParameters : undefined;
+    const path = event.pathParameters || undefined;
+    const rawPath = event.rawPath || undefined;
+    const query = event.queryStringParameters || undefined;
     const auth = this.getAuth();
-    const headers = event.headers ? event.headers : undefined;
+    const headers = event.headers || undefined;
     const body = new Body(event.body, headers).getParsedBody();
     const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || 'Test-Request';
     const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : false;
-    const parsed = { body, path, query, auth, headers, testRequest };
+    const parsed = { body, path, rawPath, query, auth, headers, testRequest };
     metrics.common(parsed, event);
     return parsed;
   }

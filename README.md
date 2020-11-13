@@ -732,6 +732,7 @@ Note that all properties are undefined if not present on the original request.
 export interface HttpApiSignature<T = any> {
   event: HttpApiEvent; // original event provided by AWS
   body: T; // body payload parsed according to content-type headers (or raw if no content-type headers found) and cast as T if provided (defaults to `any`)
+  rawPath: string; // the endpoint path used to invoke this Lambda
   path: { [name: string]: string }; // path params as key-value pairs
   query: { [name: string]: string }; // query params as key-value pairs
   headers: { [name: string]: string }; // headers as key-value pairs

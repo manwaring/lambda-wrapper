@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [4.2.0]&nbsp;&nbsp;(2020-11-13)
+
+### Added
+
+- Added rawPath as parsed param to http api wrapper
+
+### Changed
+
+- Update dependencies
+
 ## [4.1.1]&nbsp;&nbsp;(2020-10-31)
 
 ### Changed
@@ -313,6 +323,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), 
 - Update older libraries
 - Now publish from Git tags instead of master pushes
 
+[4.2.0]: https://github.com/manwaring/lambda-wrapper/compare/v4.1.1...v4.2.0
 [4.1.1]: https://github.com/manwaring/lambda-wrapper/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/manwaring/lambda-wrapper/compare/v4.0.6...v4.1.0
 [4.0.6]: https://github.com/manwaring/lambda-wrapper/compare/v4.0.5...v4.0.6

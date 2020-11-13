@@ -57,15 +57,17 @@ describe('Http API request parsing', () => {
   it('Gets all fields with optional parameters', () => {
     const event = new HttpApiEvent({
       body: JSON.stringify({ hello: 'world' }),
+      rawPath: '/api/v1/nouns/id124',
       pathParameters: { proxy: 'not today' },
       queryStringParameters: { name: 'a test' },
       headers: { 'content-type': 'application/json', 'Test-Request': 'true' },
     });
-    const { body, path, query, auth, headers, testRequest } = new Request(event).getProperties();
+    const { body, path, rawPath, query, auth, headers, testRequest } = new Request(event).getProperties();
 
     expect(body).toEqual({ hello: 'world' });
-    expect(path['proxy']).toEqual('not today');
-    expect(query['name']).toEqual('a test');
+    expect(path['proxy']).toEqual(event.pathParameters.proxy);
+    expect(rawPath).toEqual(event.rawPath);
+    expect(query['name']).toEqual(event.queryStringParameters.name);
     expect(headers['content-type']).toEqual('application/json');
     expect(testRequest).toEqual(true);
     expect(auth).toBeTruthy();
@@ -74,13 +76,15 @@ describe('Http API request parsing', () => {
   it("Get's falsy fields when optional parameters not used", () => {
     const event = new HttpApiEvent();
     delete event.body;
+    delete event.rawPath;
     delete event.headers;
     delete event.pathParameters;
     delete event.queryStringParameters;
-    const { body, path, query, auth, headers, testRequest } = new Request(event).getProperties();
+    const { body, path, rawPath, query, auth, headers, testRequest } = new Request(event).getProperties();
 
     expect(body).toBeFalsy();
     expect(path).toBeFalsy();
+    expect(rawPath).toBeFalsy();
     expect(query).toBeFalsy();
     expect(auth).toBeTruthy();
     expect(headers).toBeFalsy();
