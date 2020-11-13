@@ -59,15 +59,19 @@ describe('Http API request parsing', () => {
       body: JSON.stringify({ hello: 'world' }),
       rawPath: '/api/v1/nouns/id124',
       pathParameters: { proxy: 'not today' },
-      queryStringParameters: { name: 'a test' },
+      rawQueryString: 'name=atest',
+      queryStringParameters: { name: 'atest' },
       headers: { 'content-type': 'application/json', 'Test-Request': 'true' },
     });
-    const { body, path, rawPath, query, auth, headers, testRequest } = new Request(event).getProperties();
+    const { body, path, rawPath, query, rawQueryString, auth, headers, testRequest } = new Request(
+      event
+    ).getProperties();
 
     expect(body).toEqual({ hello: 'world' });
     expect(path['proxy']).toEqual(event.pathParameters.proxy);
     expect(rawPath).toEqual(event.rawPath);
     expect(query['name']).toEqual(event.queryStringParameters.name);
+    expect(rawQueryString).toEqual(event.rawQueryString);
     expect(headers['content-type']).toEqual('application/json');
     expect(testRequest).toEqual(true);
     expect(auth).toBeTruthy();
@@ -79,13 +83,17 @@ describe('Http API request parsing', () => {
     delete event.rawPath;
     delete event.headers;
     delete event.pathParameters;
+    delete event.rawQueryString;
     delete event.queryStringParameters;
-    const { body, path, rawPath, query, auth, headers, testRequest } = new Request(event).getProperties();
+    const { body, path, rawPath, query, rawQueryString, auth, headers, testRequest } = new Request(
+      event
+    ).getProperties();
 
     expect(body).toBeFalsy();
     expect(path).toBeFalsy();
     expect(rawPath).toBeFalsy();
     expect(query).toBeFalsy();
+    expect(rawQueryString).toBeFalsy();
     expect(auth).toBeTruthy();
     expect(headers).toBeFalsy();
     expect(testRequest).toBeFalsy();

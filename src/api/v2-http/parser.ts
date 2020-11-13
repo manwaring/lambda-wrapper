@@ -7,17 +7,27 @@ const metrics = new Metrics('API Gateway');
 export class Request {
   constructor(private event: HttpApiEvent) {}
 
-  getProperties(): any {
+  getProperties(): {
+    body: any;
+    path: { [name: string]: string };
+    rawPath: string;
+    query: { [name: string]: string };
+    rawQueryString: string;
+    headers: { [name: string]: string };
+    testRequest: boolean;
+    auth: any;
+  } {
     const event = this.event;
     const path = event.pathParameters || undefined;
     const rawPath = event.rawPath || undefined;
     const query = event.queryStringParameters || undefined;
+    const rawQueryString = event.rawQueryString || undefined;
     const auth = this.getAuth();
     const headers = event.headers || undefined;
     const body = new Body(event.body, headers).getParsedBody();
     const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || 'Test-Request';
     const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : false;
-    const parsed = { body, path, rawPath, query, auth, headers, testRequest };
+    const parsed = { body, path, rawPath, query, rawQueryString, auth, headers, testRequest };
     metrics.common(parsed, event);
     return parsed;
   }

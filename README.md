@@ -735,6 +735,7 @@ export interface HttpApiSignature<T = any> {
   rawPath: string; // the endpoint path used to invoke this Lambda
   path: { [name: string]: string }; // path params as key-value pairs
   query: { [name: string]: string }; // query params as key-value pairs
+  rawQueryString: string // the raw query string from the request
   headers: { [name: string]: string }; // headers as key-value pairs
   testRequest: boolean; // indicates if this is a test request - looks for a header matching process.env.TEST_REQUEST_HEADER (dynamic from application) or 'Test-Request' (default)
   auth: any; // auth context from JWT authorizer
