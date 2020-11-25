@@ -12,8 +12,6 @@
     <img src="https://flat.badgen.net/codecov/c/github/manwaring/lambda-wrapper/?icon=codecov"></a>
   <a href="https://packagephobia.now.sh/result?p=@manwaring/lambda-wrapper">
     <img src="https://flat.badgen.net/packagephobia/install/@manwaring/lambda-wrapper?icon=packagephobia"></a>
-  <a href="https://www.npmjs.com/package/@manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/github/license/manwaring/lambda-wrapper"></a>
 </p>
 
 <p align="center">
@@ -21,11 +19,8 @@
     <img src="https://flat.badgen.net/circleci/github/manwaring/lambda-wrapper/master?icon=circleci"></a>
   <a href="https://flat.badgen.net/dependabot/manwaring/lambda-wrapper">
     <img src="https://flat.badgen.net/dependabot/manwaring/lambda-wrapper/?icon=dependabot&label=dependabot"></a>
-  <a href="https://david-dm.org/manwaring/lambda-wrapper">
-    <img src="https://flat.badgen.net/david/dep/manwaring/lambda-wrapper"></a>
-  <a href="https://david-dm.org/manwaring/lambda-wrapper?type=dev">
-    <img src="https://flat.badgen.net/david/dev/manwaring/lambda-wrapper/?label=dev+dependencies"></a>
-    <img height="0" width="0" src="https://b7z7o7y5fi.execute-api.us-east-1.amazonaws.com/v1/readme/visits/github/manwaring/lambda-wrapper?style=flat-square">
+  <a href="https://www.npmjs.com/package/@manwaring/lambda-wrapper">
+    <img src="https://flat.badgen.net/github/license/manwaring/lambda-wrapper"></a>
 </p>
 
 # AWS Lambda wrapper library
