@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [4.4.1]&nbsp;&nbsp;(2020-11-25)
+
+### Changed
+
+- Set `'Access-Control-Allow-Headers': 'Test-Request'` for support of the test-request header when `cors=true` is specified in API responses
+
 ## [4.4.0]&nbsp;&nbsp;(2020-11-24)
 
 ### Changed
@@ -336,6 +342,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/), 
 - Update older libraries
 - Now publish from Git tags instead of master pushes
 
+[4.4.1]: https://github.com/manwaring/lambda-wrapper/compare/v4.4.0...v4.4.1
 [4.4.0]: https://github.com/manwaring/lambda-wrapper/compare/v4.3.0...v4.4.0
 [4.3.0]: https://github.com/manwaring/lambda-wrapper/compare/v4.2.0...v4.3.0
 [4.2.0]: https://github.com/manwaring/lambda-wrapper/compare/v4.1.1...v4.2.0

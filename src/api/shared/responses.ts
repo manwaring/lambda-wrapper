@@ -3,7 +3,7 @@ import { Metrics, logger } from "../../common";
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Credentials": true,
-  "Access-Control-Allow-Headers": "*",
+  "Access-Control-Allow-Headers": "Test-Request",
 };
 
 const metrics = new Metrics("API Gateway");

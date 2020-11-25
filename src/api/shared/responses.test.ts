@@ -11,7 +11,7 @@ describe("API responses", () => {
       body: JSON.stringify("success"),
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
         "Content-Type": "application/json",
       },
@@ -24,7 +24,7 @@ describe("API responses", () => {
     expect(response).toEqual({
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
       },
       statusCode: 200,
@@ -49,7 +49,7 @@ describe("API responses", () => {
       body,
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
         "Content-Type": "image/svg+xml",
       },
@@ -80,7 +80,7 @@ describe("API responses", () => {
     expect(response).toEqual({
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
         "Content-Type": "application/json",
       },
@@ -96,7 +96,7 @@ describe("API responses", () => {
     expect(response).toEqual({
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
         "Content-Type": "application/json",
         Custom: "header",
@@ -111,7 +111,7 @@ describe("API responses", () => {
     expect(response).toEqual({
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
       },
       statusCode: 500,
@@ -123,7 +123,7 @@ describe("API responses", () => {
     expect(response).toEqual({
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
         "Content-Type": "application/json",
       },
@@ -138,7 +138,7 @@ describe("API responses", () => {
       body: JSON.stringify("invalid"),
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
         "Content-Type": "application/json",
       },
@@ -151,7 +151,7 @@ describe("API responses", () => {
     expect(response).toEqual({
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
       },
       statusCode: 400,
@@ -163,7 +163,7 @@ describe("API responses", () => {
     expect(response).toEqual({
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
       },
       statusCode: 418,
@@ -176,7 +176,7 @@ describe("API responses", () => {
       body: JSON.stringify("not found"),
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
         "Content-Type": "application/json",
       },
@@ -189,7 +189,7 @@ describe("API responses", () => {
     expect(response).toEqual({
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
       },
       statusCode: 401,
@@ -202,7 +202,7 @@ describe("API responses", () => {
       body: JSON.stringify("not found"),
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
         "Content-Type": "application/json",
       },
@@ -215,7 +215,7 @@ describe("API responses", () => {
     expect(response).toEqual({
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Headers": "Test-Request",
         "Access-Control-Allow-Credentials": true,
         Location: "url",
       },
