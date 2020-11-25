@@ -1,11 +1,12 @@
-import { Metrics, logger } from '../../common';
+import { Metrics, logger } from "../../common";
 
 const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Credentials': true,
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Credentials": true,
+  "Access-Control-Allow-Headers": "*",
 };
 
-const metrics = new Metrics('API Gateway');
+const metrics = new Metrics("API Gateway");
 
 const defaultSuccess: ResponseParameters = {
   cors: true,
@@ -95,7 +96,7 @@ export function error({
   err,
 }: ErrorParameters = defaultError): ApiResponse {
   if (err) {
-    logger.debug('Encountered error while processing request', err);
+    logger.debug("Encountered error while processing request", err);
   }
   const response = getResponseFromParameters({ body, json, cors, statusCode, headers });
   metrics.error(response);
@@ -118,10 +119,10 @@ function getResponseFromParameters({ body, json, cors, statusCode, headers }: Re
   };
   if (body) {
     if (json) {
-      response['body'] = JSON.stringify(body);
-      response.headers['Content-Type'] = 'application/json';
+      response["body"] = JSON.stringify(body);
+      response.headers["Content-Type"] = "application/json";
     } else {
-      response['body'] = body;
+      response["body"] = body;
     }
   }
   return response;
