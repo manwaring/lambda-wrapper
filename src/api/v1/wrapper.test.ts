@@ -1,26 +1,26 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { apiGatewayEvent } from 'serverless-plugin-test-helper';
-import { api, ApiSignature } from './wrapper';
+import { apiGatewayEvent } from "serverless-plugin-test-helper";
+import { api, ApiSignature } from "./wrapper";
 
-describe('API wrapper', () => {
+describe("API wrapper", () => {
   const requestEvent = apiGatewayEvent({
-    body: JSON.stringify({ hello: 'world' }),
-    pathParameters: { proxy: 'not today' },
-    queryStringParameters: { name: 'a test' },
-    headers: { 'content-type': 'application/json', 'Test-Request': 'true' },
+    body: JSON.stringify({ hello: "world" }),
+    pathParameters: { proxy: "not today" },
+    queryStringParameters: { name: "a test" },
+    headers: { "content-type": "application/json", "test-request": "true" },
     requestContext: {
-      connectionId: 'abc-123',
+      connectionId: "abc-123",
     },
   });
   const context = {
     callbackWaitsForEmptyEventLoop: false,
-    functionName: 'function-name',
-    functionVersion: '$LATEST',
-    invokedFunctionArn: 'arn:',
-    memoryLimitInMB: '128',
-    awsRequestId: 'request',
-    logGroupName: 'group',
-    logStreamName: 'stream',
+    functionName: "function-name",
+    functionVersion: "$LATEST",
+    invokedFunctionArn: "arn:",
+    memoryLimitInMB: "128",
+    awsRequestId: "request",
+    logGroupName: "group",
+    logStreamName: "stream",
     getRemainingTimeInMillis: () => 2,
     done: () => {},
     fail: () => {},
@@ -28,7 +28,7 @@ describe('API wrapper', () => {
   };
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
-  it('Has expected properties and response functions', () => {
+  it("Has expected properties and response functions", () => {
     function customHandler({
       event,
       websocket,
@@ -47,11 +47,11 @@ describe('API wrapper', () => {
       custom,
     }: ApiSignature) {
       expect(event).toEqual(requestEvent);
-      expect(websocket.connectionId).toEqual('abc-123');
-      expect(body).toEqual({ hello: 'world' });
-      expect(path).toEqual({ proxy: 'not today' });
-      expect(query).toEqual({ name: 'a test' });
-      expect(headers['content-type']).toEqual('application/json');
+      expect(websocket.connectionId).toEqual("abc-123");
+      expect(body).toEqual({ hello: "world" });
+      expect(path).toEqual({ proxy: "not today" });
+      expect(query).toEqual({ name: "a test" });
+      expect(headers["content-type"]).toEqual("application/json");
       expect(testRequest).toEqual(true);
       expect(auth).toBeTruthy();
       expect(success).toBeInstanceOf(Function);
@@ -61,12 +61,12 @@ describe('API wrapper', () => {
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
       expect(custom).toBeInstanceOf(Function);
-      success({ body: 'success' });
+      success({ body: "success" });
     }
     api(customHandler)(requestEvent, context, callback);
   });
 
-  it('Has expected properties and response functions with optional generic type', () => {
+  it("Has expected properties and response functions with optional generic type", () => {
     interface CustomType {
       Message: string;
       Id: number;
@@ -89,11 +89,11 @@ describe('API wrapper', () => {
       custom,
     }: ApiSignature<CustomType>) {
       expect(event).toEqual(requestEvent);
-      expect(websocket.connectionId).toEqual('abc-123');
-      expect(body).toEqual({ hello: 'world' });
-      expect(path).toEqual({ proxy: 'not today' });
-      expect(query).toEqual({ name: 'a test' });
-      expect(headers['content-type']).toEqual('application/json');
+      expect(websocket.connectionId).toEqual("abc-123");
+      expect(body).toEqual({ hello: "world" });
+      expect(path).toEqual({ proxy: "not today" });
+      expect(query).toEqual({ name: "a test" });
+      expect(headers["content-type"]).toEqual("application/json");
       expect(testRequest).toEqual(true);
       expect(auth).toBeTruthy();
       expect(success).toBeInstanceOf(Function);
@@ -103,7 +103,7 @@ describe('API wrapper', () => {
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
       expect(custom).toBeInstanceOf(Function);
-      success({ body: 'success' });
+      success({ body: "success" });
     }
     api(customHandler)(requestEvent, context, callback);
   });

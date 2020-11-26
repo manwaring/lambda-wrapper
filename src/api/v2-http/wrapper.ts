@@ -1,6 +1,6 @@
-import { Context, Callback } from 'aws-lambda';
-import { HttpApiEvent } from './payload';
-import { Request } from './parser';
+import { Context, Callback } from "aws-lambda";
+import { HttpApiEvent } from "./payload";
+import { Request } from "./parser";
 import {
   success,
   invalid,
@@ -14,7 +14,7 @@ import {
   RedirectParameters,
   ErrorParameters,
   CustomParameters,
-} from '../shared';
+} from "../shared";
 
 export function httpApi<T = any>(
   customHandler: (props: HttpApiSignature<T>) => any

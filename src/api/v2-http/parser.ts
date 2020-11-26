@@ -25,7 +25,7 @@ export class Request {
     const auth = this.getAuth();
     const headers = event.headers || undefined;
     const body = new Body(event.body, headers).getParsedBody();
-    const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || "Test-Request";
+    const TEST_REQUEST_HEADER = process.env.TEST_REQUEST_HEADER || "test-request";
     const testRequest = headers && headers[TEST_REQUEST_HEADER] ? JSON.parse(headers[TEST_REQUEST_HEADER]) : false;
     const parsed = { body, path, rawPath, query, rawQueryString, auth, headers, testRequest };
     metrics.common(parsed, event);

@@ -1,23 +1,23 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { HttpApiEvent } from 'serverless-plugin-test-helper';
-import { httpApi, HttpApiSignature } from './wrapper';
+import { HttpApiEvent } from "serverless-plugin-test-helper";
+import { httpApi, HttpApiSignature } from "./wrapper";
 
-describe('HTTP API wrapper', () => {
+describe("HTTP API wrapper", () => {
   const requestEvent = new HttpApiEvent({
-    body: JSON.stringify({ hello: 'world' }),
-    pathParameters: { proxy: 'not today' },
-    queryStringParameters: { name: 'a test' },
-    headers: { 'content-type': 'application/json', 'Test-Request': 'true' },
+    body: JSON.stringify({ hello: "world" }),
+    pathParameters: { proxy: "not today" },
+    queryStringParameters: { name: "a test" },
+    headers: { "content-type": "application/json", "test-request": "true" },
   });
   const context = {
     callbackWaitsForEmptyEventLoop: false,
-    functionName: 'function-name',
-    functionVersion: '$LATEST',
-    invokedFunctionArn: 'arn:',
-    memoryLimitInMB: '128',
-    awsRequestId: 'request',
-    logGroupName: 'group',
-    logStreamName: 'stream',
+    functionName: "function-name",
+    functionVersion: "$LATEST",
+    invokedFunctionArn: "arn:",
+    memoryLimitInMB: "128",
+    awsRequestId: "request",
+    logGroupName: "group",
+    logStreamName: "stream",
     getRemainingTimeInMillis: () => 2,
     done: () => {},
     fail: () => {},
@@ -25,7 +25,7 @@ describe('HTTP API wrapper', () => {
   };
   const callback = jest.fn((err, result) => (err ? new Error(err) : result));
 
-  it('Has expected properties and response functions', () => {
+  it("Has expected properties and response functions", () => {
     function customHandler({
       event,
       body,
@@ -43,10 +43,10 @@ describe('HTTP API wrapper', () => {
       custom,
     }: HttpApiSignature) {
       expect(event).toEqual(requestEvent);
-      expect(body).toEqual({ hello: 'world' });
-      expect(path['proxy']).toEqual('not today');
-      expect(query['name']).toEqual('a test');
-      expect(headers['content-type']).toEqual('application/json');
+      expect(body).toEqual({ hello: "world" });
+      expect(path["proxy"]).toEqual("not today");
+      expect(query["name"]).toEqual("a test");
+      expect(headers["content-type"]).toEqual("application/json");
       expect(testRequest).toEqual(true);
       expect(auth).toBeTruthy();
       expect(success).toBeInstanceOf(Function);
@@ -56,12 +56,12 @@ describe('HTTP API wrapper', () => {
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
       expect(custom).toBeInstanceOf(Function);
-      success({ body: 'success' });
+      success({ body: "success" });
     }
     httpApi(customHandler)(requestEvent, context, callback);
   });
 
-  it('Has expected properties and response functions with optional generic type', () => {
+  it("Has expected properties and response functions with optional generic type", () => {
     interface CustomType {
       Message: string;
       Id: number;
@@ -83,10 +83,10 @@ describe('HTTP API wrapper', () => {
       custom,
     }: HttpApiSignature<CustomType>) {
       expect(event).toEqual(requestEvent);
-      expect(body).toEqual({ hello: 'world' });
-      expect(path['proxy']).toEqual('not today');
-      expect(query['name']).toEqual('a test');
-      expect(headers['content-type']).toEqual('application/json');
+      expect(body).toEqual({ hello: "world" });
+      expect(path["proxy"]).toEqual("not today");
+      expect(query["name"]).toEqual("a test");
+      expect(headers["content-type"]).toEqual("application/json");
       expect(testRequest).toEqual(true);
       expect(auth).toBeTruthy();
       expect(success).toBeInstanceOf(Function);
@@ -96,7 +96,7 @@ describe('HTTP API wrapper', () => {
       expect(redirect).toBeInstanceOf(Function);
       expect(error).toBeInstanceOf(Function);
       expect(custom).toBeInstanceOf(Function);
-      success({ body: 'success' });
+      success({ body: "success" });
     }
     httpApi(customHandler)(requestEvent, context, callback);
   });
